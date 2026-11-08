@@ -76,8 +76,8 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
       <input type="password" id="owner-password" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500 text-center tracking-widest" placeholder="••••••••" required>
       <button type="submit" class="w-full glow-btn text-white font-bold py-3 rounded-lg">Masuk Dashboard</button>
     </form>
-    <div class="text-center mt-4"><button onclick="showPublic()" class="text-gray-500 hover:text-gray-400 text-xs">← Kembali ke halaman utama</button></div>
-    <div id="login-error" class="hidden mt-4 bg-red-900/30 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm text-center">Password salah! Akses ditolak.</div>
+    <div class="text-center mt-4"><button onclick="showPublic()" class="text-gray-500 hover:text-gray-400 text-xs">← Kembali</button></div>
+    <div id="login-error" class="hidden mt-4 bg-red-900/30 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm text-center">Password salah!</div>
   </div>
 </div>
 
@@ -103,7 +103,6 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
   </header>
 
   <main class="max-w-7xl mx-auto px-4 space-y-6">
-    <!-- Banner -->
     <section class="glass neon-border rounded-2xl p-6 relative overflow-hidden">
       <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl -z-10"></div>
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
@@ -115,7 +114,7 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
         </div>
         <div class="bg-gray-900/80 px-4 py-2 rounded-lg border border-gray-700 flex items-center gap-2">
           <span class="text-[10px] text-gray-500 uppercase">Mode Market:</span>
-          <span class="text-xs font-bold text-emerald-400">🚀 Trend Jacking</span>
+          <span id="active-market-mode" class="text-xs font-bold text-emerald-400">🚀 Trend Jacking</span>
         </div>
       </div>
       <div class="flex flex-wrap items-center justify-center gap-2 text-[10px] font-mono bg-black/30 p-3 rounded-xl border border-gray-800">
@@ -129,7 +128,6 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
       </div>
     </section>
 
-    <!-- Grid Menu -->
     <section class="glass rounded-2xl p-5 border border-gray-800">
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
         <button onclick="openModal('agency')" class="bg-gray-900/50 hover:bg-cyan-500/10 border border-gray-800 hover:border-cyan-500/40 rounded-xl p-4 text-center transition-all group"><i class="fas fa-building text-cyan-400 text-2xl mb-2 group-hover:scale-110 transition-transform"></i><p class="text-xs font-semibold text-white">agency</p></button>
@@ -145,7 +143,6 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
       </div>
     </section>
 
-    <!-- Live Feed -->
     <section class="glass rounded-2xl p-5 border border-gray-800">
       <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
         <h3 class="font-bold text-white flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span> Log Pergerakan Otomatis</h3>
@@ -154,7 +151,6 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
       <div class="space-y-2 font-mono text-xs max-h-48 overflow-y-auto custom-scroll pr-2" id="main-live-feed"></div>
     </section>
 
-    <!-- 3 BARIS KOSONG DI BAWAH DASHBOARD -->
     <div class="h-24"></div>
     <div class="h-24"></div>
     <div class="h-24"></div>
@@ -172,7 +168,7 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
   </div>
 </div>
 
-<!-- ============ CHAT MANAGER (DINAIKKAN AGAR TIDAK BENTROK NETLIFY BADGE) ============ -->
+<!-- ============ CHAT MANAGER ============ -->
 <div class="fixed bottom-24 right-6 z-40">
   <div id="chat-window" class="hidden-view glass w-80 rounded-2xl border border-gray-700 shadow-2xl mb-4 overflow-hidden flex flex-col" style="max-height:500px">
     <div class="bg-gray-900/90 p-4 border-b border-gray-800 flex justify-between items-center">
@@ -213,7 +209,11 @@ if(JOY_CORP_API.DOKU_CLIENT_ID !== "TEMPEL_CLIENT_ID_DOKU_DISINI") JOY_CORP_API.
 // ============ PASSWORD OWNER ============
 const OWNER_PASSWORD = "adekurnia";
 
-// ============ DATA DATABASE ============
+// ============ STATE ============
+let currentMarketMode = 'Trend Jacking';
+let currentTargetMode = 'Medium';
+
+// ============ DATA ============
 const db = {
   agents: [
     {name:'AI Manager', role:'Koordinator Utama', status:'green', level:10},
@@ -234,15 +234,34 @@ const db = {
     {name:'Cinematic Prince Reels', type:'Video Template', price:25, downloads:68},
     {name:'Young & Successful Blueprint', type:'E-Book', price:19, downloads:55}
   ],
+  apiKeys: [
+    {label:'Groq AI', type:'API Key', value:'gsk_xxxxx...masked', expiry:'2027-01-01'},
+    {label:'Hugging Face', type:'Token', value:'hf_xxxxx...masked', expiry:'2027-01-01'},
+    {label:'Supabase', type:'Anon Key', value:'eyJhbG...masked', expiry:'2027-01-01'},
+    {label:'Telegram Bot', type:'Token', value:'123456...masked', expiry:'Lifetime'}
+  ],
+  ideas: [
+    {title:'Automasi Trading Crypto AI', from:'Owner (Ade)', status:'approved'},
+    {title:'Jasa Automasi WhatsApp Business', from:'Della', status:'pending'},
+    {title:'Template Undangan Digital Premium', from:'Sarah', status:'pending'}
+  ],
   saldo: 12500,
+  transactions: [
+    {desc:'Penjualan AI Bestie Guide', amount:35, date:'2026-11-09'},
+    {desc:'Penjualan Cinematic Reels', amount:25, date:'2026-11-08'},
+    {desc:'Penjualan Young Blueprint', amount:19, date:'2026-11-07'},
+    {desc:'Upgrade Agent Mario', amount:-500, date:'2026-11-06'}
+  ],
   rules: [
     'Dilarang membocorkan Api Key atau data Owner.',
     'Setiap produk WAJIB memiliki watermark JOY CORP.',
-    'Sistem berjalan 100% otomatis, Owner hanya pantau & upgrade.'
+    'Sistem berjalan 100% otomatis, Owner hanya pantau & upgrade.',
+    'Dody wajib pantau keamanan 24/7 tanpa kompromi.',
+    'Michelle QC wajib approve setiap produk sebelum publish.'
   ]
 };
 
-// ============ NAVIGASI VIEW ============
+// ============ NAVIGASI ============
 function showLogin() {
   document.getElementById('public-view').classList.add('hidden-view');
   document.getElementById('login-view').classList.remove('hidden-view');
@@ -294,27 +313,79 @@ function openModal(feature) {
     db.products.forEach(p => {
       content += `<div class="bg-gray-800/50 p-4 rounded-xl border border-gray-700 flex justify-between items-center">
         <div><h4 class="font-bold text-white text-sm">${p.name}</h4><p class="text-[10px] text-gray-500">${p.type} • $${p.price} • ${p.downloads}x Sold</p></div>
-        <div class="flex gap-2">
-          <button class="bg-emerald-600/20 text-emerald-400 text-xs px-3 py-1.5 rounded-lg border border-emerald-500/30"><i class="fas fa-download"></i></button>
-        </div>
+        <button onclick="deleteProduct('${p.name}')" class="bg-red-600/20 text-red-400 text-xs px-3 py-1.5 rounded-lg border border-red-500/30"><i class="fas fa-trash"></i></button>
       </div>`;
     });
     content += '</div>';
   }
   else if(feature === 'apikey') {
-    const status = JOY_CORP_API.IS_CONNECTED ?
+    const dokuStatus = JOY_CORP_API.IS_CONNECTED ?
       `<div class="bg-emerald-900/30 border border-emerald-500/30 p-3 rounded-lg mb-4 flex items-center gap-3"><i class="fas fa-check-circle text-emerald-400 text-xl"></i><div><p class="text-emerald-400 font-bold text-sm">DOKU PAYMENT GATEWAY</p><p class="text-[10px] text-gray-400">Status: Terhubung & Siap</p></div></div>` :
-      `<div class="bg-yellow-900/30 border border-yellow-500/30 p-3 rounded-lg mb-4 flex items-center gap-3"><i class="fas fa-clock text-yellow-400 text-xl"></i><div><p class="text-yellow-400 font-bold text-sm">DOKU PAYMENT GATEWAY</p><p class="text-[10px] text-gray-400">Status: Menunggu API Key diisi di kode.</p></div></div>`;
-    content = status + '<p class="text-xs text-gray-400">Brankas Digital Aman. API Key terenkripsi.</p>';
+      `<div class="bg-yellow-900/30 border border-yellow-500/30 p-3 rounded-lg mb-4 flex items-center gap-3"><i class="fas fa-clock text-yellow-400 text-xl"></i><div><p class="text-yellow-400 font-bold text-sm">DOKU PAYMENT GATEWAY</p><p class="text-[10px] text-gray-400">Status: Menunggu API Key diisi</p></div></div>`;
+    content = dokuStatus + '<p class="text-xs text-cyan-400 font-bold mb-3">🔒 Brankas Digital Aman</p><div class="space-y-2">';
+    db.apiKeys.forEach(k => {
+      content += `<div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 flex justify-between items-center">
+        <div><p class="text-white text-sm font-semibold">${k.label}</p><p class="text-[10px] text-gray-500">${k.type} • Exp: ${k.expiry}</p></div>
+        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded">AKTIF</span>
+      </div>`;
+    });
+    content += '</div>';
+  }
+  else if(feature === 'bankide') {
+    content = '<div class="space-y-2">';
+    db.ideas.forEach(i => {
+      const badge = i.status === 'approved' ? '<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">Disetujui</span>' : '<span class="text-[10px] bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded">Pending</span>';
+      content += `<div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 flex justify-between items-center">
+        <div><p class="text-white text-sm font-semibold">${i.title}</p><p class="text-[10px] text-gray-500">Dari: ${i.from}</p></div>
+        ${badge}
+      </div>`;
+    });
+    content += '</div>';
   }
   else if(feature === 'saldo') {
     content = `<div class="bg-gradient-to-r from-cyan-900/40 to-blue-900/40 p-6 rounded-xl border border-cyan-500/30 mb-4 text-center">
       <p class="text-xs text-gray-400 mb-1">Total Pendapatan Kas JOY CORP</p>
       <h2 class="text-3xl font-extrabold text-white">$${db.saldo.toLocaleString()} <span class="text-sm text-gray-400">USD</span></h2>
+    </div><div class="space-y-2">`;
+    db.transactions.forEach(t => {
+      content += `<div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 flex justify-between text-xs">
+        <div><p class="text-white font-semibold">${t.desc}</p><p class="text-[10px] text-gray-500">${t.date}</p></div>
+        <p class="${t.amount > 0 ? 'text-emerald-400' : 'text-red-400'} font-bold">${t.amount > 0 ? '+' : ''}$${t.amount}</p>
+      </div>`;
+    });
+    content += '</div>';
+  }
+  else if(feature === 'modemarket') {
+    const modes = ['Trend Jacking','Premium','Mass Market','B2B'];
+    content = '<div class="space-y-2">';
+    modes.forEach(m => {
+      const isActive = currentMarketMode === m;
+      content += `<button onclick="setMarketMode('${m}')" class="w-full bg-gray-800/50 border ${isActive ? 'border-cyan-400' : 'border-gray-700'} p-3 rounded-xl text-left">
+        <div class="flex justify-between items-center"><span class="font-bold text-white text-sm">${m}</span>${isActive ? '<i class="fas fa-check text-cyan-400"></i>' : ''}</div>
+      </button>`;
+    });
+    content += '</div>';
+  }
+  else if(feature === 'cache') {
+    content = `<div class="text-center py-6">
+      <i class="fas fa-broom text-5xl text-cyan-400 mb-4"></i>
+      <h3 class="text-xl font-bold text-white mb-2">Pembersihan Sistem</h3>
+      <button onclick="alert('Cache dibersihkan! 45MB sampah dihapus.')" class="glow-btn text-white font-bold text-sm px-6 py-3 rounded-xl mt-4">Bersihkan Cache</button>
     </div>`;
   }
+  else if(feature === 'modetarget') {
+    const targets = ['Low','Medium','Hard'];
+    content = '<div class="space-y-2">';
+    targets.forEach(t => {
+      const isActive = currentTargetMode === t;
+      content += `<button onclick="setTarget('${t}')" class="w-full bg-gray-800/50 border ${isActive ? 'border-cyan-400' : 'border-gray-700'} p-3 rounded-xl text-left">
+        <div class="flex justify-between items-center"><span class="font-bold text-white text-sm">${t}</span>${isActive ? '<i class="fas fa-check text-cyan-400"></i>' : ''}</div>
+      </button>`;
+    });
+    content += '</div>';
+  }
   else if(feature === 'termux') {
-    content = `<div class="bg-black p-4 rounded-xl border border-gray-700 font-mono text-xs h-64 overflow-y-auto custom-scroll">
+    content = `<div class="bg-black p-4 rounded-xl border border-gray-700 font-mono text-xs h-80 overflow-y-auto custom-scroll">
       <div class="text-emerald-400 mb-2">root@joycorp:~# ./monitor.sh</div>
       <div class="text-gray-400 space-y-1">
         <p>[OK] Agency Pipeline: 100% Automated</p>
@@ -322,7 +393,9 @@ function openModal(feature) {
         <p>[OK] Groq AI: CONNECTED</p>
         <p>[OK] Supabase DB: SYNCED</p>
         <p>[OK] Telegram Bot: ONLINE</p>
-        <p>[OK] Pollinations Backup: STANDBY</p>
+        <p>[OK] Netlify Function: DEPLOYED</p>
+        <p>[OK] Mode Market: ${currentMarketMode}</p>
+        <p>[OK] Mode Target: ${currentTargetMode}</p>
         <p class="text-cyan-400">root@joycorp:~# ▋</p>
       </div>
     </div>`;
@@ -331,7 +404,7 @@ function openModal(feature) {
     content = '<div class="space-y-3">';
     db.rules.forEach((r,i) => {
       content += `<div class="bg-gray-800/50 p-4 rounded-xl border border-gray-700 flex gap-3">
-        <span class="text-cyan-400 font-bold text-sm">0${i+1}.</span>
+        <span class="text-cyan-400 font-bold text-sm flex-shrink-0">0${i+1}.</span>
         <p class="text-sm text-gray-300">${r}</p>
       </div>`;
     });
@@ -346,33 +419,51 @@ function openModal(feature) {
 }
 function closeModal() { document.getElementById('modal-overlay').classList.add('hidden-view'); }
 
-function upgradeAgent(name) {
-  if(db.saldo >= 500) {
-    if(confirm(`Gunakan $500 untuk upgrade ${name}?`)) {
-      db.saldo -= 500;
-      alert(`${name} berhasil di-upgrade!`);
-      openModal('agency');
-    }
-  } else { alert('Saldo tidak cukup!'); }
-}
+function upgradeAgent(name) { alert(`${name} di-upgrade!`); }
+function deleteProduct(name) { if(confirm(`Hapus ${name}?`)) { db.products = db.products.filter(p => p.name !== name); openModal('produk'); } }
+function setMarketMode(m) { currentMarketMode = m; document.getElementById('active-market-mode').innerText = '🚀 ' + m; openModal('modemarket'); }
+function setTarget(t) { currentTargetMode = t; alert(`Mode Target: ${t}`); openModal('modetarget'); }
 
-// ============ CHAT MANAGER ============
-function toggleChat() {
-  document.getElementById('chat-window').classList.toggle('hidden-view');
-}
-function sendMessage(e) {
+// ============ CHAT MANAGER DENGAN MESIN ASLI NETLIFY ============
+function toggleChat() { document.getElementById('chat-window').classList.toggle('hidden-view'); }
+
+async function sendMessage(e) {
   e.preventDefault();
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
   if (!text) return;
+  
   const container = document.getElementById('chat-messages');
+  
   container.insertAdjacentHTML('beforeend', `<div class="flex flex-col items-end"><div class="bg-cyan-600/20 p-3 rounded-xl rounded-tr-none border border-cyan-500/30 text-xs text-white max-w-[85%]">${text}</div></div>`);
   input.value = '';
   container.scrollTop = container.scrollHeight;
-  setTimeout(() => {
-    container.insertAdjacentHTML('beforeend', `<div class="bg-gray-800 p-3 rounded-xl rounded-tl-none border border-gray-700 text-xs text-gray-300 max-w-[85%]">Ide diterima, Ade. Saya teruskan ke divisi terkait.</div>`);
-    container.scrollTop = container.scrollHeight;
-  }, 1000);
+
+  container.insertAdjacentHTML('beforeend', `<div id="loading-msg" class="bg-gray-800 p-3 rounded-xl rounded-tl-none border border-gray-700 text-xs text-gray-400 max-w-[85%]">⏳ Mengirim ke server Netlify...</div>`);
+  container.scrollTop = container.scrollHeight;
+
+  try {
+    const response = await fetch('/.netlify/functions/send-telegram', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `Pesan dari Owner Ade:\n\n"${text}"\n\nWaktu: ${new Date().toLocaleString('id-ID')}` })
+    });
+    const data = await response.json();
+    
+    const loading = document.getElementById('loading-msg');
+    if (loading) loading.remove();
+    
+    if(data && data.success) {
+       container.insertAdjacentHTML('beforeend', `<div class="bg-emerald-900/30 p-3 rounded-xl rounded-tl-none border border-emerald-500/30 text-xs text-emerald-400 max-w-[85%]">✅ <b>Mesin Asli Berhasil!</b><br>Pesan sudah terkirim ke Telegram HP Ade.</div>`);
+    } else {
+       container.insertAdjacentHTML('beforeend', `<div class="bg-red-900/30 p-3 rounded-xl rounded-tl-none border border-red-500/30 text-xs text-red-400 max-w-[85%]">❌ Gagal: ${data ? data.error : 'Unknown error'}</div>`);
+    }
+  } catch (error) {
+    const loading = document.getElementById('loading-msg');
+    if (loading) loading.remove();
+    container.insertAdjacentHTML('beforeend', `<div class="bg-red-900/30 p-3 rounded-xl rounded-tl-none border border-red-500/30 text-xs text-red-400 max-w-[85%]">❌ Error: ${error.message}</div>`);
+  }
+  container.scrollTop = container.scrollHeight;
 }
 
 // ============ LIVE FEED ============
@@ -381,7 +472,7 @@ const feedLogs = [
   "<span class='text-purple-400 font-bold'>[Angela]</span> <span class='text-gray-300'>Menyusun strategi pemasaran...</span>",
   "<span class='text-yellow-400 font-bold'>[Mario]</span> <span class='text-gray-300'>Menulis skrip konten...</span>",
   "<span class='text-pink-400 font-bold'>[Sarah]</span> <span class='text-gray-300'>Merender konten visual...</span>",
-  "<span class='text-emerald-400 font-bold'>[Michelle]</span> <span class='text-gray-300'>QC passed. Upload ke website...</span>",
+  "<span class='text-emerald-400 font-bold'>[Michelle]</span> <span class='text-gray-300'>QC passed. Upload produk...</span>",
   "<span class='text-blue-400 font-bold'>[Grace & Elten]</span> <span class='text-gray-300'>Closing deal dengan customer...</span>",
   "<span class='text-green-400 font-bold'>[Sanny]</span> <span class='text-gray-300'>Mencatat pemasukan $35...</span>"
 ];
@@ -400,4 +491,4 @@ function startLiveFeed() {
 }
 </script>
 </body>
-</html>
+  </html>
