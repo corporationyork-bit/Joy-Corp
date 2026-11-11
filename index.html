@@ -93,7 +93,7 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
   <div class="glass neon-border rounded-2xl p-8 max-w-sm w-full text-center">
     <h2 class="text-xl font-bold text-white mb-4">Owner / Agency Login</h2>
     <form onsubmit="handleLogin(event)">
-      <input type="password" id="pass-input" placeholder="Password" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white text-center mb-4">
+      <input type="password" id="pass-input" placeholder="Password" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white text-center mb-4 focus:outline-none focus:border-cyan-500 transition">
       <button type="submit" class="w-full glow-btn text-white font-bold py-3 rounded-lg">Masuk Dashboard</button>
     </form>
     <button onclick="showPublic()" class="text-gray-500 text-xs mt-4">← Kembali</button>
@@ -107,15 +107,60 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
     <button onclick="logout()" class="bg-red-600/20 text-red-400 border border-red-500/30 text-xs px-3 py-1.5 rounded">Logout</button>
   </header>
   
-  <main class="max-w-4xl mx-auto px-4">
+  <main class="max-w-4xl mx-auto px-4 pb-10">
+    
+    <!-- WELCOME BANNER -->
+    <div class="glass neon-border rounded-xl p-6 mb-6 text-center relative overflow-hidden">
+      <div class="absolute -right-4 -top-4 text-cyan-500/10 text-8xl"><i class="fas fa-microchip"></i></div>
+      <h2 class="text-xl font-extrabold text-white mb-1 relative z-10">Command Center</h2>
+      <p class="text-[10px] text-gray-400 relative z-10">Selamat datang, <b class="text-cyan-400">ADE KURNIA SANDY</b>. Sistem Autopilot 100% Aktif.</p>
+    </div>
+
+    <!-- QUICK STATS -->
     <div class="grid grid-cols-3 gap-3 mb-6">
-      <button onclick="openModal('produk')" class="glass p-3 rounded-xl hover:bg-cyan-500/10 text-center"><i class="fas fa-box text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white">Produk</p></button>
-      <button onclick="openModal('pesanan')" class="glass p-3 rounded-xl hover:bg-cyan-500/10 text-center"><i class="fas fa-shopping-cart text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white">Pesanan</p></button>
-      <button onclick="openModal('modemarket')" class="glass p-3 rounded-xl hover:bg-cyan-500/10 text-center"><i class="fas fa-chart-line text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white">Mode Market</p></button>
+      <div class="glass p-4 rounded-xl text-center border border-gray-800">
+        <i class="fas fa-box text-cyan-400 text-2xl mb-2"></i>
+        <p class="text-xl font-bold text-white" id="stat-produk">0</p>
+        <p class="text-[9px] text-gray-500 uppercase">Produk</p>
+      </div>
+      <div class="glass p-4 rounded-xl text-center border border-gray-800">
+        <i class="fas fa-shopping-cart text-emerald-400 text-2xl mb-2"></i>
+        <p class="text-xl font-bold text-white" id="stat-pesanan">0</p>
+        <p class="text-[9px] text-gray-500 uppercase">Pesanan</p>
+      </div>
+      <div class="glass p-4 rounded-xl text-center border border-gray-800">
+        <i class="fas fa-server text-yellow-400 text-2xl mb-2"></i>
+        <p class="text-xs font-bold text-white mt-2" id="stat-server">Cek...</p>
+        <p class="text-[9px] text-gray-500 uppercase">Server</p>
+      </div>
     </div>
-    <div class="grid grid-cols-1 gap-3 mb-6">
-      <button onclick="openModal('gantipass')" class="glass p-3 rounded-xl hover:bg-red-500/10 text-center border border-gray-700 hover:border-red-500/50 transition"><i class="fas fa-key text-red-400 text-xl mb-1"></i><p class="text-xs text-white">Ganti Sandi Login & PIN</p></button>
+
+    <!-- MENU BUTTONS -->
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <button onclick="openModal('produk')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-box text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Kelola Produk</p></button>
+      <button onclick="openModal('pesanan')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-shopping-cart text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Cek Pesanan</p></button>
+      <button onclick="openModal('modemarket')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-chart-line text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Mode Market</p></button>
+      <button onclick="openModal('gantipass')" class="glass p-4 rounded-xl hover:bg-red-500/10 text-center border border-gray-800"><i class="fas fa-key text-red-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Keamanan Sandi</p></button>
+      
+      <!-- TOMBOL GANTI LINK SERVER -->
+      <button onclick="changeServerLink()" class="glass p-4 rounded-xl hover:bg-yellow-500/10 text-center border border-gray-800 col-span-2">
+        <i class="fas fa-server text-yellow-400 text-xl mb-1"></i>
+        <p class="text-xs text-white font-bold">Ganti Link Server Termux</p>
+      </button>
     </div>
+
+    <!-- LIVE FEED -->
+    <section class="glass rounded-2xl p-5 border border-gray-800">
+      <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+        <h3 class="font-bold text-white flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Log Pergerakan Otomatis</h3>
+        <span class="text-[10px] text-gray-500 font-mono bg-gray-900 px-2 py-0.5 rounded">LIVE</span>
+      </div>
+      <div class="space-y-2 font-mono text-xs max-h-48 overflow-y-auto pr-2">
+        <div class="text-emerald-400">[SYSTEM] Dashboard siap beroperasi.</div>
+        <div class="text-gray-400">[INFO] Menunggu perintah dari Manager...</div>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -152,7 +197,7 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
 
 <script>
 // ================= KONFIGURASI =================
-let BACKEND_URL = localStorage.getItem('joy_backend_url') || "https://3dd7450abee241.lhr.life";
+let BACKEND_URL = localStorage.getItem('joy_backend_url') || "https://3dd7450abee241.lhr.life"; 
 let OWNER_PIN = localStorage.getItem('joy_owner_pin') || "444033"; 
 let OWNER_PASS = localStorage.getItem('joy_owner_pass') || "Cengkareng24";
 const AGENCY_PASS = "agency123";
@@ -173,6 +218,7 @@ function handleLogin(e) {
   document.getElementById('role-display').innerText = `DASHBOARD - ${currentRole.toUpperCase()}`;
   document.getElementById('login-view').classList.add('hidden-view');
   document.getElementById('dashboard-view').classList.remove('hidden-view');
+  updateDashboardStats();
 }
 function logout() { showPublic(); }
 
@@ -199,7 +245,9 @@ async function loadPublic() {
       `;
     });
     container.innerHTML = html;
-  } catch (e) { console.log("Server offline"); }
+  } catch (e) { 
+    document.getElementById('public-products').innerHTML = '<p class="text-red-500 col-span-2 text-center">Server Offline. Owner perlu update Link Termux.</p>';
+  }
 }
 
 async function buyProduct(id, name) {
@@ -210,9 +258,44 @@ async function buyProduct(id, name) {
     const data = await res.json();
     if(data.success) {
       alert("Pembayaran Sukses! Mengarahkan ke halaman download...");
-      window.location.href = `/${data.downloadUrl}`; // Mengarah ke download.html
+      window.location.href = `/${data.downloadUrl}`; 
     } else { alert("Gagal: " + data.error); }
   } catch(e) { alert("Server Error"); }
+}
+
+// ================= STATS & LINK SERVER =================
+async function updateDashboardStats() {
+  try {
+    const res = await fetch(BACKEND_URL + '/api/products');
+    if(res.ok) {
+      document.getElementById('stat-server').innerText = "ONLINE";
+      document.getElementById('stat-server').classList.add('text-emerald-400');
+      const products = await res.json();
+      document.getElementById('stat-produk').innerText = products.length;
+    }
+    const resOrders = await fetch(BACKEND_URL + '/api/admin/orders');
+    if(resOrders.ok) {
+      const orders = await resOrders.json();
+      document.getElementById('stat-pesanan').innerText = orders.length;
+    }
+  } catch(e) {
+    document.getElementById('stat-server').innerText = "OFFLINE";
+    document.getElementById('stat-server').classList.add('text-red-500');
+  }
+}
+
+function changeServerLink() {
+  const currentUrl = localStorage.getItem('joy_backend_url') || BACKEND_URL;
+  const newUrl = prompt("Masukkan Link Termux Baru (contoh: https://xxxx.lhr.life):", currentUrl);
+  
+  if(newUrl && newUrl.startsWith('http')) {
+    localStorage.setItem('joy_backend_url', newUrl);
+    BACKEND_URL = newUrl;
+    alert("✅ Link Server berhasil diubah! Halaman akan dimuat ulang.");
+    location.reload();
+  } else if(newUrl) {
+    alert("❌ Link tidak valid. Pastikan diawali dengan http:// atau https://");
+  }
 }
 
 // ================= MODAL & FITUR =================
@@ -239,7 +322,7 @@ function openModal(feature) {
         html += `<div class="bg-gray-800 p-3 rounded mb-2"><h4 class="text-white font-bold">${p.name}</h4><p class="text-gray-400 text-[10px] mb-2">${p.category}</p>${btn}</div>`;
       });
       body.innerHTML = html;
-    });
+    }).catch(() => { body.innerHTML = '<p class="text-center text-red-500">Server Offline.</p>'; });
   }
   
   else if(feature === 'pesanan') {
@@ -254,7 +337,7 @@ function openModal(feature) {
         </div>
       `).join('');
       body.innerHTML = html || '<p class="text-center text-gray-500">Belum ada pesanan.</p>';
-    });
+    }).catch(() => { body.innerHTML = '<p class="text-center text-red-500">Server Offline.</p>'; });
   }
 
   else if(feature === 'modemarket') {
@@ -296,7 +379,7 @@ async function runFactory() {
     await fetch(BACKEND_URL + '/api/factory/run', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ marketMode: currentMarketMode }) });
     alert('Pabrik Selesai! Produk sudah masuk.');
     openModal('produk');
-  } catch(e) { alert("Pabrik Error."); }
+  } catch(e) { alert("Pabrik Error. Cek koneksi server."); }
 }
 
 async function deleteProd(id) {
@@ -362,6 +445,7 @@ async function sendMessage(e) {
     }
   } catch(e) {
     document.getElementById('loading-msg').remove();
+    container.insertAdjacentHTML('beforeend', `<div class="bg-red-900/30 p-3 rounded-xl text-xs text-red-400">Server Offline.</div>`);
   }
   container.scrollTop = container.scrollHeight;
 }
@@ -370,4 +454,4 @@ async function sendMessage(e) {
 loadPublic();
 </script>
 </body>
-</html>
+                                                                           </html>
