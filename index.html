@@ -152,7 +152,7 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
 
 <script>
 // ================= KONFIGURASI =================
-const BACKEND_URL = "https://3dd7450abee241.lhr.life";
+let BACKEND_URL = localStorage.getItem('joy_backend_url') || "https://3dd7450abee241.lhr.life";
 let OWNER_PIN = localStorage.getItem('joy_owner_pin') || "444033"; 
 let OWNER_PASS = localStorage.getItem('joy_owner_pass') || "Cengkareng24";
 const AGENCY_PASS = "agency123";
