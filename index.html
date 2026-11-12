@@ -88,9 +88,27 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
   </header>
   
   <main class="max-w-4xl mx-auto px-4 pb-10">
-    <div class="glass neon-border rounded-xl p-6 mb-6 text-center relative overflow-hidden">
+    <div class="glass neon-border rounded-xl p-6 mb-4 text-center relative overflow-hidden">
       <h2 class="text-xl font-extrabold text-white mb-1 relative z-10">Command Center</h2>
       <p class="text-[10px] text-gray-400 relative z-10">Selamat datang, <b class="text-cyan-400">ADE KURNIA SANDY</b>. Sistem Autopilot 100% Aktif.</p>
+    </div>
+
+    <!-- STATUS MODE -->
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <div class="bg-gray-800/80 border border-cyan-500/30 p-3 rounded-xl flex items-center justify-between">
+         <div>
+            <p class="text-[9px] text-gray-400 uppercase tracking-wider">Mode Market</p>
+            <p id="display-market-mode" class="text-sm font-bold text-cyan-400">Trend Jacking</p>
+         </div>
+         <i class="fas fa-chart-line text-cyan-500/50 text-xl"></i>
+      </div>
+      <div class="bg-gray-800/80 border border-yellow-500/30 p-3 rounded-xl flex items-center justify-between">
+         <div>
+            <p class="text-[9px] text-gray-400 uppercase tracking-wider">Mode Target</p>
+            <p id="display-target-mode" class="text-sm font-bold text-yellow-400">Belum Aktif</p>
+         </div>
+         <i class="fas fa-bullseye text-yellow-500/50 text-xl"></i>
+      </div>
     </div>
 
     <div class="grid grid-cols-3 gap-3 mb-6">
@@ -173,7 +191,9 @@ let OWNER_PIN = localStorage.getItem('joy_owner_pin') || "444033";
 let OWNER_PASS = localStorage.getItem('joy_owner_pass') || "Cengkareng24";
 const AGENCY_PASS = "agency123";
 let currentRole = 'guest';
-let currentMarketMode = 'Trend Jacking';
+let currentMarketMode = localStorage.getItem('joy_market_mode') || 'Trend Jacking';
+let currentTargetMode = localStorage.getItem('joy_target_mode') || 'Belum Aktif';
+let targetExpiry = localStorage.getItem('joy_target_expiry') || 0;
 let chatHistory = [];
 
 if(!localStorage.getItem('joy_rules')) {
@@ -200,12 +220,17 @@ function handleLogin(e) {
   else if(p === AGENCY_PASS) currentRole = 'agency';
   else return alert('Password Salah!');
   
+  localStorage.setItem('joy_logged_in', currentRole);
   document.getElementById('role-display').innerText = `DASHBOARD - ${currentRole.toUpperCase()}`;
   document.getElementById('login-view').classList.add('hidden-view');
   document.getElementById('dashboard-view').classList.remove('hidden-view');
   updateDashboardStats();
+  updateModeDisplay();
 }
-function logout() { showPublic(); }
+function logout() { 
+  localStorage.removeItem('joy_logged_in');
+  showPublic(); 
+}
 
 async function loadPublic() {
   try {
@@ -261,6 +286,19 @@ async function updateDashboardStats() {
   } catch(e) {
     document.getElementById('stat-server').innerText = "OFFLINE";
     document.getElementById('stat-server').classList.add('text-red-500');
+  }
+}
+
+function updateModeDisplay() {
+  document.getElementById('display-market-mode').innerText = currentMarketMode;
+  const now = Date.now();
+  const targetEl = document.getElementById('display-target-mode');
+  if(now < targetExpiry) {
+     targetEl.innerText = currentTargetMode + " (Aktif)";
+  } else {
+     targetEl.innerText = "Belum Aktif";
+     localStorage.removeItem('joy_target_mode');
+     localStorage.removeItem('joy_target_expiry');
   }
 }
 
@@ -351,23 +389,63 @@ function openModal(feature) {
       { id: 'Mass Market', desc: 'Untuk pemula. Harga murah, banyak pembeli.' },
       { id: 'B2B', desc: 'Dijual ke perusahaan. Solusi bisnis, harga tinggi.' }
     ];
-    body.innerHTML = modes.map(m => `
-      <button onclick="currentMarketMode='${m.id}'; alert('Mode: ${m.id}')" class="w-full text-left p-3 bg-gray-800 rounded mb-2 border border-gray-700">
-        <b class="text-cyan-400">${m.id}</b><br><span class="text-[10px] text-gray-400">${m.desc}</span>
-      </button>
-    `).join('');
+    
+    body.innerHTML = modes.map(m => {
+      const isActive = (currentMarketMode === m.id);
+      return `
+        <button onclick="setMarketMode('${m.id}')" class="w-full text-left p-3 rounded-xl mb-2 border transition-all ${isActive ? 'bg-cyan-500/20 border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.3)]' : 'bg-gray-800 border-gray-700 hover:border-gray-500'}">
+          <div class="flex justify-between items-center">
+            <b class="${isActive ? 'text-cyan-400' : 'text-white'}">${m.id}</b>
+            ${isActive ? '<i class="fas fa-check-circle text-cyan-400"></i>' : ''}
+          </div>
+          <span class="text-[10px] text-gray-400 mt-1 block">${m.desc}</span>
+        </button>
+      `;
+    }).join('');
   }
   else if(feature === 'modetarget') {
+    const now = Date.now();
+    const isLocked = (now < targetExpiry);
+    
+    if (isLocked) {
+      body.innerHTML = `
+        <div class="bg-yellow-900/20 border border-yellow-500/50 p-4 rounded-xl text-center mb-4">
+          <i class="fas fa-lock text-yellow-400 text-3xl mb-2"></i>
+          <p class="font-bold text-white text-sm mb-1">Target ${currentTargetMode} Sedang Aktif</p>
+          <p class="text-[10px] text-yellow-200">Terkunci selama 24 jam. Tidak bisa diubah sampai waktu habis.</p>
+        </div>
+        <div class="space-y-2 opacity-40 pointer-events-none">
+          <button class="w-full bg-gray-800 p-3 rounded border border-gray-700 text-left"><b class="text-white">Low Target</b></button>
+          <button class="w-full bg-gray-800 p-3 rounded border border-gray-700 text-left"><b class="text-white">Medium Target</b></button>
+          <button class="w-full bg-gray-800 p-3 rounded border border-gray-700 text-left"><b class="text-white">Hard Target</b></button>
+        </div>
+      `;
+      return;
+    }
+    
+    const targets = [
+      { id: 'Low', desc: 'Pelan tapi pasti, aman untuk agen.' },
+      { id: 'Medium', desc: 'Standar keseharian, balance produksi.' },
+      { id: 'Hard', desc: 'Kerja lembur, agen dikejar target tinggi.' }
+    ];
+    
     body.innerHTML = `
-      <div class="bg-yellow-900/20 border border-yellow-500/30 p-3 rounded mb-3 text-[10px] text-yellow-200">
+      <div class="bg-blue-900/20 border border-blue-500/30 p-3 rounded mb-3 text-[10px] text-blue-200">
         Mode Target: Sekali klik, akan aktif otomatis selama 24 jam. Hanya Owner yang bisa menghentikan.
       </div>
       <div class="space-y-2">
-        <button onclick="alert('Target Low diaktifkan 24 Jam!')" class="w-full bg-gray-800 p-3 rounded border border-gray-700">Low Target</button>
-        <button onclick="alert('Target Medium diaktifkan 24 Jam!')" class="w-full bg-gray-800 p-3 rounded border border-gray-700">Medium Target</button>
-        <button onclick="alert('Target Hard diaktifkan 24 Jam!')" class="w-full bg-gray-800 p-3 rounded border border-gray-700">Hard Target</button>
-      </div>
-    `;
+    ` + targets.map(t => {
+      const isActive = (currentTargetMode === t.id);
+      return `
+        <button onclick="setTargetMode('${t.id}')" class="w-full text-left p-3 rounded-xl mb-2 border transition-all ${isActive ? 'bg-yellow-500/20 border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.3)]' : 'bg-gray-800 border-gray-700 hover:border-gray-500'}">
+          <div class="flex justify-between items-center">
+            <b class="${isActive ? 'text-yellow-400' : 'text-white'}">${t.id} Target</b>
+            ${isActive ? '<i class="fas fa-check-circle text-yellow-400"></i>' : ''}
+          </div>
+          <span class="text-[10px] text-gray-400 mt-1 block">${t.desc}</span>
+        </button>
+      `;
+    }).join('') + `</div>`;
   }
   else if(feature === 'cache') {
     body.innerHTML = `
@@ -443,6 +521,25 @@ async function resetDownload(id) {
   alert("Akses direset!"); openModal('pesanan');
 }
 
+function setTargetMode(mode) {
+  const expiry = Date.now() + (24 * 60 * 60 * 1000);
+  localStorage.setItem('joy_target_mode', mode);
+  localStorage.setItem('joy_target_expiry', expiry);
+  currentTargetMode = mode;
+  targetExpiry = expiry;
+  updateModeDisplay();
+  closeModal();
+  alert(`Mode Target ${mode} diaktifkan selama 24 Jam!`);
+}
+
+function setMarketMode(mode) {
+  currentMarketMode = mode;
+  localStorage.setItem('joy_market_mode', mode);
+  updateModeDisplay();
+  closeModal();
+  alert(`Mode Market diubah ke: ${mode}`);
+}
+
 function saveApiKey() {
   const name = document.getElementById('new-api-name').value;
   const key = document.getElementById('new-api-key').value;
@@ -467,7 +564,8 @@ function clearCacheSafely() {
     joy_owner_pin: localStorage.getItem('joy_owner_pin'),
     joy_owner_pass: localStorage.getItem('joy_owner_pass'),
     joy_apikeys: localStorage.getItem('joy_apikeys'),
-    joy_rules: localStorage.getItem('joy_rules')
+    joy_rules: localStorage.getItem('joy_rules'),
+    joy_logged_in: localStorage.getItem('joy_logged_in')
   };
   localStorage.clear();
   for(let k in preserved) { if(preserved[k]) localStorage.setItem(k, preserved[k]); }
@@ -535,7 +633,18 @@ async function sendMessage(e) {
   container.scrollTop = container.scrollHeight;
 }
 
-loadPublic();
+// CEK APAKAH SUDAH LOGIN SEBELUMNYA
+const savedRole = localStorage.getItem('joy_logged_in');
+if (savedRole) {
+    currentRole = savedRole;
+    document.getElementById('public-view').classList.add('hidden-view');
+    document.getElementById('dashboard-view').classList.remove('hidden-view');
+    document.getElementById('role-display').innerText = `DASHBOARD - ${currentRole.toUpperCase()}`;
+    updateDashboardStats();
+    updateModeDisplay();
+} else {
+    loadPublic();
+}
 </script>
 </body>
-      </html>
+  </html>
