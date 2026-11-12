@@ -155,18 +155,15 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
 </div>
 
 <!-- MODAL -->
-else if(feature === 'termux') {
-  body.innerHTML = `
-    <div class="bg-black p-4 rounded-xl border border-gray-700 font-mono text-xs h-60 overflow-y-auto mb-2" id="termux-output">
-      <div class="text-emerald-400">root@joycorp:~# Selamat datang di Terminal JOY CORP</div>
-      <div class="text-gray-400">Ketik 'help' untuk melihat perintah yang diizinkan.</div>
+<div id="modal-overlay" class="hidden-view fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+  <div class="glass w-full max-w-md rounded-xl flex flex-col max-h-[85vh]">
+    <div class="p-3 border-b border-gray-800 flex justify-between font-bold text-white text-sm">
+      <span id="modal-title">Menu</span>
+      <button onclick="closeModal()">&times;</button>
     </div>
-    <div class="flex gap-2 bg-black p-2 rounded border border-gray-700">
-      <span class="text-cyan-400 font-mono text-xs pt-1">#</span>
-      <input type="text" id="termux-input" class="flex-1 bg-transparent text-white outline-none font-mono text-xs" onkeypress="if(event.key==='Enter') runRealTermux(this.value)">
-    </div>
-  `;
-}
+    <div id="modal-body" class="p-4 overflow-y-auto text-xs"></div>
+  </div>
+</div>
 
 <!-- CHAT WIDGET -->
 <div class="fixed bottom-6 right-6 z-40">
@@ -463,12 +460,12 @@ function openModal(feature) {
   else if(feature === 'termux') {
     body.innerHTML = `
       <div class="bg-black p-4 rounded-xl border border-gray-700 font-mono text-xs h-60 overflow-y-auto mb-2" id="termux-output">
-        <div class="text-emerald-400">root@joycorp:~# ./monitor.sh</div>
-        <div class="text-gray-400">[OK] System active. Type 'help' for commands.</div>
+        <div class="text-emerald-400">root@joycorp:~# Selamat datang di Terminal JOY CORP</div>
+        <div class="text-gray-400">Ketik 'help' untuk melihat perintah yang diizinkan.</div>
       </div>
       <div class="flex gap-2 bg-black p-2 rounded border border-gray-700">
         <span class="text-cyan-400 font-mono text-xs pt-1">#</span>
-        <input type="text" id="termux-input" class="flex-1 bg-transparent text-white outline-none font-mono text-xs" onkeypress="if(event.key==='Enter') runTermuxCommand(this.value)">
+        <input type="text" id="termux-input" class="flex-1 bg-transparent text-white outline-none font-mono text-xs" onkeypress="if(event.key==='Enter') runRealTermux(this.value)">
       </div>
     `;
   }
@@ -575,16 +572,25 @@ function clearCacheSafely() {
   alert('Cache berhasil dibersihkan! Data produk dan API aman.');
 }
 
-function runTermuxCommand(cmd) {
+async function runRealTermux(cmd) {
   const out = document.getElementById('termux-output');
   const input = document.getElementById('termux-input');
   if(!cmd.trim()) return;
+  
   out.innerHTML += `<div class="text-cyan-400"># ${cmd}</div>`;
-  if(cmd === 'help') out.innerHTML += `<div class="text-gray-400">Commands: help, status, clear</div>`;
-  else if(cmd === 'status') out.innerHTML += `<div class="text-emerald-400">System OK. Server Running.</div>`;
-  else if(cmd === 'clear') out.innerHTML = `<div class="text-emerald-400">root@joycorp:~# ./monitor.sh</div>`;
-  else out.innerHTML += `<div class="text-red-400">Command not found.</div>`;
   input.value = '';
+  out.scrollTop = out.scrollHeight;
+
+  try {
+    const res = await fetch(BACKEND_URL + '/api/termux/run', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ command: cmd })
+    });
+    const data = await res.json();
+    out.innerHTML += `<div class="text-gray-300 whitespace-pre-wrap">${data.output}</div>`;
+  } catch(e) {
+    out.innerHTML += `<div class="text-red-400">Server Offline.</div>`;
+  }
   out.scrollTop = out.scrollHeight;
 }
 
@@ -650,25 +656,4 @@ if (savedRole) {
 }
 </script>
 </body>
-  </html>
-async function runRealTermux(cmd) {
-  const out = document.getElementById('termux-output');
-  const input = document.getElementById('termux-input');
-  if(!cmd.trim()) return;
-  
-  out.innerHTML += `<div class="text-cyan-400"># ${cmd}</div>`;
-  input.value = '';
-  out.scrollTop = out.scrollHeight;
-
-  try {
-    const res = await fetch(BACKEND_URL + '/api/termux/run', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ command: cmd })
-    });
-    const data = await res.json();
-    out.innerHTML += `<div class="text-gray-300 whitespace-pre-wrap">${data.output}</div>`;
-  } catch(e) {
-    out.innerHTML += `<div class="text-red-400">Server Offline.</div>`;
-  }
-  out.scrollTop = out.scrollHeight;
-}
+</html>
