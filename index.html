@@ -651,3 +651,24 @@ if (savedRole) {
 </script>
 </body>
   </html>
+async function runRealTermux(cmd) {
+  const out = document.getElementById('termux-output');
+  const input = document.getElementById('termux-input');
+  if(!cmd.trim()) return;
+  
+  out.innerHTML += `<div class="text-cyan-400"># ${cmd}</div>`;
+  input.value = '';
+  out.scrollTop = out.scrollHeight;
+
+  try {
+    const res = await fetch(BACKEND_URL + '/api/termux/run', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ command: cmd })
+    });
+    const data = await res.json();
+    out.innerHTML += `<div class="text-gray-300 whitespace-pre-wrap">${data.output}</div>`;
+  } catch(e) {
+    out.innerHTML += `<div class="text-red-400">Server Offline.</div>`;
+  }
+  out.scrollTop = out.scrollHeight;
+}
