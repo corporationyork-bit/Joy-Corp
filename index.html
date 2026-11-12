@@ -155,15 +155,18 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
 </div>
 
 <!-- MODAL -->
-<div id="modal-overlay" class="hidden-view fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-  <div class="glass w-full max-w-md rounded-xl flex flex-col max-h-[85vh]">
-    <div class="p-3 border-b border-gray-800 flex justify-between font-bold text-white text-sm">
-      <span id="modal-title">Menu</span>
-      <button onclick="closeModal()">&times;</button>
+else if(feature === 'termux') {
+  body.innerHTML = `
+    <div class="bg-black p-4 rounded-xl border border-gray-700 font-mono text-xs h-60 overflow-y-auto mb-2" id="termux-output">
+      <div class="text-emerald-400">root@joycorp:~# Selamat datang di Terminal JOY CORP</div>
+      <div class="text-gray-400">Ketik 'help' untuk melihat perintah yang diizinkan.</div>
     </div>
-    <div id="modal-body" class="p-4 overflow-y-auto text-xs"></div>
-  </div>
-</div>
+    <div class="flex gap-2 bg-black p-2 rounded border border-gray-700">
+      <span class="text-cyan-400 font-mono text-xs pt-1">#</span>
+      <input type="text" id="termux-input" class="flex-1 bg-transparent text-white outline-none font-mono text-xs" onkeypress="if(event.key==='Enter') runRealTermux(this.value)">
+    </div>
+  `;
+}
 
 <!-- CHAT WIDGET -->
 <div class="fixed bottom-6 right-6 z-40">
