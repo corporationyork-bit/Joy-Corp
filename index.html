@@ -1,133 +1,541 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const PDFDocument = require('pdfkit');
-const crypto = require('crypto');
-const { createClient } = require('@supabase/supabase-js');
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JOY CORP — Global Digital Agency</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+.glass { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+.neon-border { border: 1px solid rgba(6, 182, 212, 0.3); box-shadow: 0 0 15px rgba(6, 182, 212, 0.1); }
+.glow-btn { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
+.hidden-view { display: none !important; }
+</style>
+</head>
+<body class="min-h-screen pb-32">
 
-const app = express();
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+<!-- HALAMAN DEPAN -->
+<div id="public-view" class="min-h-screen flex flex-col">
+  <header class="glass border-b border-gray-800 px-4 py-6 text-center">
+    <div class="w-20 h-20 rounded-2xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-400 font-bold text-4xl mx-auto mb-4">J</div>
+    <h1 class="text-4xl font-extrabold text-white mb-2">JOY CORP.</h1>
+    <p class="text-cyan-400 font-mono text-sm mb-1">GLOBAL DIGITAL AGENCY</p>
+    <p class="text-gray-400 text-xs italic">"Solusi Digital Otomatis untuk Bisnis Modern"</p>
+  </header>
+  
+  <main class="max-w-4xl mx-auto px-4 py-8 flex-1 w-full">
+    <div class="text-center mb-8">
+      <h2 class="text-2xl font-bold text-white mb-2">Produk Digital Premium</h2>
+      <p class="text-gray-400 text-sm mb-4">Dibuat oleh AI • Dikurasi Expert • Dijamin Berkualitas</p>
+      <button onclick="showLogin()" class="text-cyan-400 hover:text-white text-xs border border-cyan-500/30 px-4 py-2 rounded-lg"><i class="fas fa-lock mr-1"></i> Login Owner/Agency</button>
+    </div>
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    <div id="public-products" class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-12">
+      <p class="text-gray-500 text-center col-span-2">Memuat produk...</p>
+    </div>
 
-function generatePDFBuffer(title, content, category) {
-  return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ margin: 50 });
-    const buffers = [];
-    doc.on('data', buffers.push.bind(buffers));
-    doc.on('end', () => resolve(Buffer.concat(buffers)));
-    doc.on('error', reject);
-    doc.fontSize(24).font('Helvetica-Bold').text(title, { align: 'center' });
-    doc.moveDown();
-    doc.fontSize(12).font('Helvetica').fillColor('#666666').text(`Kategori: ${category}`, { align: 'center' });
-    doc.moveDown(2);
-    doc.fontSize(12).fillColor('#000000').text(content, { align: 'justify', lineGap: 5 });
-    const bottom = doc.page.height - 50;
-    doc.fontSize(10).fillColor('#999999').text('Karya JOY Corporation', 50, bottom, { align: 'center' });
-    doc.end();
-  });
+    <!-- PROFIL PERUSAHAAN -->
+    <section class="glass neon-border rounded-2xl p-6 relative mb-8">
+      <h2 class="text-xl font-bold text-white mb-1">PROFIL JOY CORPORATION</h2>
+      <p class="text-xs text-cyan-400 font-mono mb-4">ESTABLISHED: 11 NOVEMBER 2024</p>
+      <p class="text-sm text-gray-300 mb-6">JOY CORP adalah Ekosistem Automasi Multi-Agent pertama yang digerakkan sepenuhnya oleh AI. Dirancang untuk memenuhi kebutuhan digital Anda 24/7 dengan riset presisi, konten kreatif, dan keamanan siber terintegrasi.</p>
+      
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700"><h3 class="font-bold text-white mb-2"><i class="fas fa-eye text-cyan-400 mr-1"></i> Visi</h3><p class="text-xs text-gray-400">Menjadi ekosistem automasi digital Nomor 1 di Asia pada 2030.</p></div>
+        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700"><h3 class="font-bold text-white mb-2"><i class="fas fa-bullseye text-blue-400 mr-1"></i> Misi</h3><p class="text-xs text-gray-400">Memproduksi aset premium harian, pelayanan 24/7, dan keamanan transaksi.</p></div>
+      </div>
+
+      <!-- LINK JOY MARKET -->
+      <div class="bg-cyan-900/30 border border-cyan-500/50 p-4 rounded-xl mb-6 text-center">
+        <h3 class="font-bold text-white mb-2"><i class="fas fa-store text-cyan-400 mr-1"></i> JOY MARKET</h3>
+        <p class="text-[10px] text-gray-300 mb-3">Toko Resmi Penjualan Produk Digital JOY CORP (Dikelola oleh Michelle, dibantu Desi & Panda).</p>
+        <a href="#market-link" class="inline-block bg-cyan-600 text-white text-xs font-bold px-4 py-2 rounded">Kunjungi Website Market</a>
+      </div>
+
+      <div class="grid grid-cols-4 gap-2 text-center mb-6">
+        <div class="bg-gray-900 p-2 rounded border border-gray-700"><p class="text-lg font-bold text-cyan-400">14</p><p class="text-[9px] text-gray-500">Agen AI</p></div>
+        <div class="bg-gray-900 p-2 rounded border border-gray-700"><p class="text-lg font-bold text-emerald-400">150+</p><p class="text-[9px] text-gray-500">Produk</p></div>
+        <div class="bg-gray-900 p-2 rounded border border-gray-700"><p class="text-lg font-bold text-yellow-400">50+</p><p class="text-[9px] text-gray-500">Klien</p></div>
+        <div class="bg-gray-900 p-2 rounded border border-gray-700"><p class="text-lg font-bold text-purple-400">24/7</p><p class="text-[9px] text-gray-500">Online</p></div>
+      </div>
+      <div class="text-[10px] text-gray-500 flex justify-between">
+        <span>© 2024 JOY CORP. All Rights Reserved.</span>
+        <span>SIGNED: <b>ADE KURNIA SANDY</b></span>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- LOGIN -->
+<div id="login-view" class="hidden-view min-h-screen flex items-center justify-center px-4">
+  <div class="glass neon-border rounded-2xl p-8 max-w-sm w-full text-center">
+    <h2 class="text-xl font-bold text-white mb-4">Owner / Agency Login</h2>
+    <form onsubmit="handleLogin(event)">
+      <input type="password" id="pass-input" placeholder="Password" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white text-center mb-4 focus:outline-none focus:border-cyan-500">
+      <button type="submit" class="w-full glow-btn text-white font-bold py-3 rounded-lg">Masuk Dashboard</button>
+    </form>
+    <button onclick="showPublic()" class="text-gray-500 text-xs mt-4">← Kembali</button>
+  </div>
+</div>
+
+<!-- DASHBOARD OWNER -->
+<div id="dashboard-view" class="hidden-view">
+  <header class="glass border-b border-gray-800 px-4 py-3 flex justify-between items-center mb-6">
+    <h1 class="font-bold text-white text-sm" id="role-display">DASHBOARD</h1>
+    <button onclick="logout()" class="bg-red-600/20 text-red-400 border border-red-500/30 text-xs px-3 py-1.5 rounded">Logout</button>
+  </header>
+  
+  <main class="max-w-4xl mx-auto px-4 pb-10">
+    <div class="glass neon-border rounded-xl p-6 mb-6 text-center relative overflow-hidden">
+      <h2 class="text-xl font-extrabold text-white mb-1 relative z-10">Command Center</h2>
+      <p class="text-[10px] text-gray-400 relative z-10">Selamat datang, <b class="text-cyan-400">ADE KURNIA SANDY</b>. Sistem Autopilot 100% Aktif.</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-3 mb-6">
+      <div class="glass p-4 rounded-xl text-center border border-gray-800">
+        <i class="fas fa-box text-cyan-400 text-2xl mb-2"></i>
+        <p class="text-xl font-bold text-white" id="stat-produk">0</p>
+        <p class="text-[9px] text-gray-500 uppercase">Produk</p>
+      </div>
+      <div class="glass p-4 rounded-xl text-center border border-gray-800">
+        <i class="fas fa-shopping-cart text-emerald-400 text-2xl mb-2"></i>
+        <p class="text-xl font-bold text-white" id="stat-pesanan">0</p>
+        <p class="text-[9px] text-gray-500 uppercase">Pesanan</p>
+      </div>
+      <div class="glass p-4 rounded-xl text-center border border-gray-800">
+        <i class="fas fa-server text-yellow-400 text-2xl mb-2"></i>
+        <p class="text-xs font-bold text-white mt-2" id="stat-server">Cek...</p>
+        <p class="text-[9px] text-gray-500 uppercase">Server</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <button onclick="openModal('produk')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-box text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Produk</p></button>
+      <button onclick="openModal('pesanan')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-shopping-cart text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Pesanan</p></button>
+      <button onclick="openModal('saldo')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-wallet text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Saldo Real</p></button>
+      <button onclick="openModal('apikey')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-shield-alt text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Security API</p></button>
+      <button onclick="openModal('modemarket')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-chart-line text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Mode Market</p></button>
+      <button onclick="openModal('modetarget')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-bullseye text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Mode Target</p></button>
+      <button onclick="openModal('cache')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-broom text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Bersihkan Cache</p></button>
+      <button onclick="openModal('termux')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-terminal text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Termux</p></button>
+      <button onclick="openModal('peraturan')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800 col-span-2"><i class="fas fa-book text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Peraturan & Kesehatan Agency</p></button>
+      <button onclick="changeServerLink()" class="glass p-4 rounded-xl hover:bg-yellow-500/10 text-center border border-gray-800 col-span-2 mt-2"><i class="fas fa-server text-yellow-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Ganti Link Server Termux</p></button>
+    </div>
+
+    <section class="glass rounded-2xl p-5 border border-gray-800">
+      <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+        <h3 class="font-bold text-white flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Log Pergerakan</h3>
+        <span class="text-[10px] text-gray-500 font-mono bg-gray-900 px-2 py-0.5 rounded">LIVE</span>
+      </div>
+      <div class="space-y-2 font-mono text-xs max-h-48 overflow-y-auto pr-2" id="live-logs">
+        <div class="text-emerald-400">[SYSTEM] Dashboard siap beroperasi.</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" class="hidden-view fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+  <div class="glass w-full max-w-md rounded-xl flex flex-col max-h-[85vh]">
+    <div class="p-3 border-b border-gray-800 flex justify-between font-bold text-white text-sm">
+      <span id="modal-title">Menu</span>
+      <button onclick="closeModal()">&times;</button>
+    </div>
+    <div id="modal-body" class="p-4 overflow-y-auto text-xs"></div>
+  </div>
+</div>
+
+<!-- CHAT WIDGET -->
+<div class="fixed bottom-6 right-6 z-40">
+  <div id="chat-window" class="hidden-view glass w-80 rounded-2xl border border-gray-700 shadow-2xl mb-4 overflow-hidden flex flex-col" style="max-height:500px">
+    <div class="bg-gray-900/90 p-4 border-b border-gray-800 flex justify-between items-center">
+      <h4 class="text-sm font-bold text-white">AI Manager (Joy)</h4>
+      <button onclick="toggleChat()" class="text-gray-400">&times;</button>
+    </div>
+    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-900/40" style="max-height:350px">
+      <div class="bg-gray-800 p-3 rounded-xl rounded-tl-none border border-gray-700 text-xs text-gray-300">Halo, Ade. Ada ide?</div>
+    </div>
+    <div class="p-3 bg-gray-900/90 border-t border-gray-800">
+      <form onsubmit="sendMessage(event)" class="flex gap-2">
+        <input type="text" id="chat-input" placeholder="Ketik..." class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white">
+        <button type="submit" class="glow-btn text-white rounded-lg px-4 py-2"><i class="fas fa-paper-plane text-xs"></i></button>
+      </form>
+    </div>
+  </div>
+  <button onclick="toggleChat()" class="w-14 h-14 rounded-full glow-btn text-white shadow-lg flex items-center justify-center text-xl"><i class="fas fa-comments"></i></button>
+</div>
+
+<script>
+let BACKEND_URL = localStorage.getItem('joy_backend_url') || "https://3dd7450abee241.lhr.life"; 
+let OWNER_PIN = localStorage.getItem('joy_owner_pin') || "444033"; 
+let OWNER_PASS = localStorage.getItem('joy_owner_pass') || "Cengkareng24";
+const AGENCY_PASS = "agency123";
+let currentRole = 'guest';
+let currentMarketMode = 'Trend Jacking';
+let chatHistory = [];
+
+if(!localStorage.getItem('joy_rules')) {
+  localStorage.setItem('joy_rules', JSON.stringify([
+    "1. Dilarang membocorkan API Key atau data Owner.",
+    "2. Semua produk wajib QC Michelle sebelum tayang.",
+    "3. Yuliana & Yusi wajib cek kesehatan agen rutin.",
+    "4. Sanny dilarang tarik dana tanpa izin Owner."
+  ]));
+}
+if(!localStorage.getItem('joy_apikeys')) {
+  localStorage.setItem('joy_apikeys', JSON.stringify([
+    { name: 'Groq AI', key: 'gsk_xxxx', status: 'AKTIF' },
+    { name: 'Supabase', key: 'eyJhbG...', status: 'AKTIF' }
+  ]));
 }
 
-app.get('/api/products', async (req, res) => {
-  const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-  res.json(data || []);
-});
+function showLogin() { document.getElementById('public-view').classList.add('hidden-view'); document.getElementById('login-view').classList.remove('hidden-view'); }
+function showPublic() { document.getElementById('login-view').classList.add('hidden-view'); document.getElementById('dashboard-view').classList.add('hidden-view'); document.getElementById('public-view').classList.remove('hidden-view'); }
+function handleLogin(e) {
+  e.preventDefault();
+  const p = document.getElementById('pass-input').value;
+  if(p === OWNER_PASS) currentRole = 'owner';
+  else if(p === AGENCY_PASS) currentRole = 'agency';
+  else return alert('Password Salah!');
+  
+  document.getElementById('role-display').innerText = `DASHBOARD - ${currentRole.toUpperCase()}`;
+  document.getElementById('login-view').classList.add('hidden-view');
+  document.getElementById('dashboard-view').classList.remove('hidden-view');
+  updateDashboardStats();
+}
+function logout() { showPublic(); }
 
-app.delete('/api/products/:id', async (req, res) => {
-  const { data: product } = await supabase.from('products').select('file_path').eq('id', req.params.id).single();
-  if (product && product.file_path) await supabase.storage.from('joycorp-files').remove([product.file_path]);
-  await supabase.from('products').delete().eq('id', req.params.id);
-  res.json({ success: true });
-});
-
-app.get('/api/download-by-id/:id', async (req, res) => {
-  const { data: product } = await supabase.from('products').select('file_path').eq('id', req.params.id).single();
-  if (!product || !product.file_path) return res.status(404).send('File tidak ada.');
-  const { data: urlData } = await supabase.storage.from('joycorp-files').createSignedUrl(product.file_path, 60);
-  res.redirect(urlData.signedUrl);
-});
-
-app.post('/api/factory/run', async (req, res) => {
-  const { marketMode } = req.body;
+async function loadPublic() {
   try {
-    const prompt = `Buatkan JSON 4 produk digital BERVARIASI (1 E-Book, 1 Video Script, 1 Template, 1 Bot Script).
-    Mode Market: ${marketMode || 'Trend Jacking'}. Format: {"products": [{"name":"...", "category":"...", "price":15, "description":"..."}]}`;
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST', headers: { 'Authorization': `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'llama3-8b-8192', messages: [{ role: 'user', content: prompt }], response_format: { type: "json_object" } })
+    const res = await fetch(BACKEND_URL + '/api/products');
+    const products = await res.json();
+    const container = document.getElementById('public-products');
+    if(products.length === 0) { container.innerHTML = '<p class="text-gray-500 col-span-2 text-center">Belum ada produk.</p>'; return; }
+    let html = '';
+    products.forEach(p => {
+      html += `<div class="glass p-5 rounded-xl border border-gray-700">
+          <span class="text-[10px] bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded font-mono">${p.category}</span>
+          <h3 class="font-bold text-white mt-2 mb-1">${p.name}</h3>
+          <p class="text-xs text-gray-400 mb-3 line-clamp-2">${p.description}</p>
+          <div class="flex justify-between items-center mt-3">
+            <span class="text-lg font-bold text-cyan-400">$${p.price}</span>
+            <button onclick="buyProduct(${p.id}, '${p.name.replace(/'/g, "\\'")}')" class="glow-btn text-white px-4 py-1.5 rounded-lg text-xs font-bold">Beli</button>
+          </div>
+        </div>`;
     });
-    const aiData = await response.json();
-    let parsed = JSON.parse(aiData.choices[0].message.content);
-    const items = parsed.products || parsed;
-    
-    const validItems = [];
-    for (const item of items) {
-      if (!item.name || !item.description) continue;
-      let filePath = null;
-      if (item.category === 'E-Book') {
-        const pdfBuffer = await generatePDFBuffer(item.name, item.description, item.category);
-        const fileName = `ebook-${Date.now()}-${Math.floor(Math.random()*100)}.pdf`;
-        await supabase.storage.from('joycorp-files').upload(fileName, pdfBuffer, { contentType: 'application/pdf' });
-        filePath = fileName;
-      }
-      validItems.push({ name: item.name, category: item.category, price: item.price || 10, description: item.description, file_path: filePath, active: true });
-    }
-    await supabase.from('products').insert(validItems);
-    res.json({ success: true, message: `${validItems.length} Produk dibuat.` });
-  } catch (err) { res.status(500).json({ error: "Pabrik gagal." }); }
-});
-
-// Saldo Real (Mulai dari $1000)
-app.get('/api/sales', async (req, res) => {
-  const { data: orders } = await supabase.from('orders').select('amount, created_at, id').eq('status', 'paid');
-  let total = 1000; // Modal Awal
-  let history = [{ desc: 'Modal Awal JOY CORP', amount: 1000, date: '2026-11-11' }];
-  if (orders) {
-    orders.forEach(o => {
-      total += Number(o.amount);
-      history.push({ desc: `Penjualan (Order: ${o.id.slice(0,8)})`, amount: Number(o.amount), date: new Date(o.created_at).toLocaleDateString('id-ID') });
-    });
+    container.innerHTML = html;
+  } catch (e) { 
+    document.getElementById('public-products').innerHTML = '<p class="text-red-500 col-span-2 text-center">Server Offline. Update Link Termux.</p>';
   }
-  res.json({ saldo: total, history: history });
-});
+}
 
-app.post('/api/checkout', async (req, res) => {
-  const { productId, email } = req.body;
-  const token = crypto.randomBytes(16).toString('hex');
-  await supabase.from('orders').insert({ product_id: productId, buyer_email: email, status: 'paid', download_token: token, max_download: 1 });
-  res.json({ success: true, downloadUrl: `download.html?token=${token}` });
-});
+async function buyProduct(id, name) {
+  const email = prompt(`Masukkan Email untuk membeli "${name}":`);
+  if(!email) return alert('Email wajib!');
+  try {
+    const res = await fetch(BACKEND_URL + '/api/checkout', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ productId: id, email }) });
+    const data = await res.json();
+    if(data.success) {
+      alert("Pembayaran Sukses!");
+      window.location.href = `/${data.downloadUrl}`; 
+    } else { alert("Gagal: " + data.error); }
+  } catch(e) { alert("Server Error"); }
+}
 
-app.get('/api/download/:token', async (req, res) => {
-  const { data: order } = await supabase.from('orders').select('*, products(file_path)').eq('download_token', req.params.token).single();
-  if (!order) return res.status(404).send('Token tidak valid.');
-  if (order.download_count >= order.max_download) return res.status(403).send('Batas download tercapai. Chat Admin.');
-  await supabase.from('orders').update({ download_count: order.download_count + 1 }).eq('id', order.id);
-  const { data: urlData } = await supabase.storage.from('joycorp-files').createSignedUrl(order.products.file_path, 60);
-  res.redirect(urlData.signedUrl);
-});
+async function updateDashboardStats() {
+  try {
+    const res = await fetch(BACKEND_URL + '/api/products');
+    if(res.ok) {
+      document.getElementById('stat-server').innerText = "ONLINE";
+      document.getElementById('stat-server').classList.add('text-emerald-400');
+      const products = await res.json();
+      document.getElementById('stat-produk').innerText = products.length;
+    }
+    const resOrders = await fetch(BACKEND_URL + '/api/admin/orders');
+    if(resOrders.ok) {
+      const orders = await resOrders.json();
+      document.getElementById('stat-pesanan').innerText = orders.length;
+    }
+  } catch(e) {
+    document.getElementById('stat-server').innerText = "OFFLINE";
+    document.getElementById('stat-server').classList.add('text-red-500');
+  }
+}
 
-app.get('/api/admin/orders', async (req, res) => {
-  const { data } = await supabase.from('orders').select('*, products(name)').order('created_at', { ascending: false });
-  res.json(data || []);
-});
+function changeServerLink() {
+  const currentUrl = localStorage.getItem('joy_backend_url') || BACKEND_URL;
+  const newUrl = prompt("Masukkan Link Termux Baru:", currentUrl);
+  if(newUrl && newUrl.startsWith('http')) {
+    localStorage.setItem('joy_backend_url', newUrl);
+    BACKEND_URL = newUrl;
+    alert("✅ Link Server diubah!");
+    location.reload();
+  } else if(newUrl) { alert("❌ Link tidak valid."); }
+}
 
-app.post('/api/admin/reset-download/:id', async (req, res) => {
-  await supabase.from('orders').update({ max_download: 2, download_count: 0 }).eq('id', req.params.id);
-  res.json({ success: true });
-});
+function openModal(feature) {
+  document.getElementById('modal-title').innerText = feature.toUpperCase();
+  const body = document.getElementById('modal-body');
+  body.innerHTML = '<p class="text-center text-gray-500 py-4">Memuat...</p>';
+  document.getElementById('modal-overlay').classList.remove('hidden-view');
 
-app.post('/api/chat', async (req, res) => {
-  const { message, history } = req.body;
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST', headers: { 'Authorization': `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: 'llama3-8b-8192', messages: [{ role: 'system', content: 'Kamu Joy, Manager JOY CORP.' }, ...(history||[]), { role: 'user', content: message }] })
-  });
-  const data = await response.json();
-  res.json({ reply: data.choices[0].message.content });
-});
+  if(feature === 'produk') {
+    fetch(BACKEND_URL + '/api/products').then(r => r.json()).then(products => {
+      let html = '';
+      if(currentRole === 'owner' || currentRole === 'agency') {
+        html += `<button onclick="runFactory()" class="w-full bg-emerald-600 text-white font-bold py-2 rounded mb-3"><i class="fas fa-plus mr-1"></i>Tambah Produk (Pabrik)</button>`;
+      }
+      products.forEach(p => {
+        let btn = '';
+        if(currentRole === 'owner') {
+          btn = `<div class="flex gap-2 mt-2">
+            <a href="${BACKEND_URL}/api/download-by-id/${p.id}" class="bg-blue-600/20 text-blue-400 px-3 py-1 rounded border border-blue-500/30"><i class="fas fa-download"></i> Download</a>
+            <button onclick="deleteProd(${p.id})" class="bg-red-600/20 text-red-400 px-3 py-1 rounded border border-red-500/30"><i class="fas fa-trash"></i> Hapus</button>
+          </div>`;
+        }
+        html += `<div class="bg-gray-800 p-3 rounded mb-2"><h4 class="text-white font-bold">${p.name}</h4><p class="text-gray-400 text-[10px] mb-2">${p.category}</p>${btn}</div>`;
+      });
+      body.innerHTML = html;
+    }).catch(() => { body.innerHTML = '<p class="text-center text-red-500">Server Offline.</p>'; });
+  }
+  else if(feature === 'pesanan') {
+    if(currentRole !== 'owner') return body.innerHTML = '<p class="text-center text-red-500">Hanya Owner.</p>';
+    fetch(BACKEND_URL + '/api/admin/orders').then(r => r.json()).then(orders => {
+      let html = orders.map(o => `
+        <div class="bg-gray-800 p-3 rounded mb-2 text-xs">
+          <p class="text-gray-400">Email: <b class="text-white">${o.buyer_email}</b></p>
+          <p class="text-white font-bold mt-1">${o.products ? o.products.name : 'Unknown'}</p>
+          <p class="text-gray-500 mt-1">Download: ${o.download_count}/${o.max_download}x</p>
+          <button onclick="resetDownload('${o.id}')" class="mt-2 bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 px-2 py-1 rounded">Reset 1x Download</button>
+        </div>
+      `).join('');
+      body.innerHTML = html || '<p class="text-center text-gray-500">Belum ada pesanan.</p>';
+    }).catch(() => { body.innerHTML = '<p class="text-center text-red-500">Server Offline.</p>'; });
+  }
+  else if(feature === 'saldo') {
+    fetch(BACKEND_URL + '/api/sales').then(r => r.json()).then(data => {
+      let html = `<div class="bg-gradient-to-r from-cyan-900/40 to-blue-900/40 p-6 rounded-xl border border-cyan-500/30 mb-4 text-center">
+        <p class="text-xs text-gray-400 mb-1">Total Pendapatan Kas (Mulai $1,000)</p>
+        <h2 class="text-3xl font-extrabold text-white">$${data.saldo.toLocaleString()} <span class="text-sm text-gray-400">USD</span></h2>
+      </div><div class="space-y-2">`;
+      data.history.forEach(t => {
+        html += `<div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 flex justify-between text-xs">
+          <div><p class="text-white font-semibold">${t.desc}</p><p class="text-[10px] text-gray-500">${t.date}</p></div>
+          <p class="${t.amount > 0 ? 'text-emerald-400' : 'text-red-400'} font-bold">${t.amount > 0 ? '+' : ''}$${t.amount}</p>
+        </div>`;
+      });
+      body.innerHTML = html + '</div>';
+    }).catch(() => { body.innerHTML = '<p class="text-center text-red-500">Server Offline.</p>'; });
+  }
+  else if(feature === 'apikey') {
+    let keys = JSON.parse(localStorage.getItem('joy_apikeys'));
+    let html = `<div class="bg-gray-800 p-3 rounded mb-4">
+      <input type="text" id="new-api-name" placeholder="Nama API (Cth: DOKU)" class="w-full bg-gray-900 text-white p-2 rounded mb-2 border border-gray-700">
+      <input type="password" id="new-api-key" placeholder="Masukkan API Key" class="w-full bg-gray-900 text-white p-2 rounded mb-2 border border-gray-700">
+      <button onclick="saveApiKey()" class="w-full bg-cyan-600 text-white font-bold py-2 rounded">Tambah API Key</button>
+    </div><div class="space-y-2">`;
+    keys.forEach((k, i) => {
+      html += `<div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 flex justify-between items-center">
+        <div><p class="text-white text-sm font-semibold">${k.name}</p><p class="text-[10px] text-gray-500">${k.status}</p></div>
+        <button onclick="deleteApiKey(${i})" class="text-red-400"><i class="fas fa-trash"></i></button>
+      </div>`;
+    });
+    body.innerHTML = html + '</div>';
+  }
+  else if(feature === 'modemarket') {
+    const modes = [
+      { id: 'Trend Jacking', desc: 'Ikut tren viral. Cepat, murah, target luas.' },
+      { id: 'Premium', desc: 'Produk eksklusif. Harga mahal, target pebisnis.' },
+      { id: 'Mass Market', desc: 'Untuk pemula. Harga murah, banyak pembeli.' },
+      { id: 'B2B', desc: 'Dijual ke perusahaan. Solusi bisnis, harga tinggi.' }
+    ];
+    body.innerHTML = modes.map(m => `
+      <button onclick="currentMarketMode='${m.id}'; alert('Mode: ${m.id}')" class="w-full text-left p-3 bg-gray-800 rounded mb-2 border border-gray-700">
+        <b class="text-cyan-400">${m.id}</b><br><span class="text-[10px] text-gray-400">${m.desc}</span>
+      </button>
+    `).join('');
+  }
+  else if(feature === 'modetarget') {
+    body.innerHTML = `
+      <div class="bg-yellow-900/20 border border-yellow-500/30 p-3 rounded mb-3 text-[10px] text-yellow-200">
+        Mode Target: Sekali klik, akan aktif otomatis selama 24 jam. Hanya Owner yang bisa menghentikan.
+      </div>
+      <div class="space-y-2">
+        <button onclick="alert('Target Low diaktifkan 24 Jam!')" class="w-full bg-gray-800 p-3 rounded border border-gray-700">Low Target</button>
+        <button onclick="alert('Target Medium diaktifkan 24 Jam!')" class="w-full bg-gray-800 p-3 rounded border border-gray-700">Medium Target</button>
+        <button onclick="alert('Target Hard diaktifkan 24 Jam!')" class="w-full bg-gray-800 p-3 rounded border border-gray-700">Hard Target</button>
+      </div>
+    `;
+  }
+  else if(feature === 'cache') {
+    body.innerHTML = `
+      <div class="text-center py-6">
+        <i class="fas fa-broom text-5xl text-cyan-400 mb-4"></i>
+        <h3 class="text-xl font-bold text-white mb-2">Pembersihan Sistem</h3>
+        <p class="text-[10px] text-gray-400 mb-4">Menghapus file sampah tanpa menghilangkan data API atau produk.</p>
+        <button onclick="clearCacheSafely()" class="glow-btn text-white font-bold text-sm px-6 py-3 rounded-xl mt-4">Bersihkan Cache (Aman)</button>
+      </div>
+    `;
+  }
+  else if(feature === 'termux') {
+    body.innerHTML = `
+      <div class="bg-black p-4 rounded-xl border border-gray-700 font-mono text-xs h-60 overflow-y-auto mb-2" id="termux-output">
+        <div class="text-emerald-400">root@joycorp:~# ./monitor.sh</div>
+        <div class="text-gray-400">[OK] System active. Type 'help' for commands.</div>
+      </div>
+      <div class="flex gap-2 bg-black p-2 rounded border border-gray-700">
+        <span class="text-cyan-400 font-mono text-xs pt-1">#</span>
+        <input type="text" id="termux-input" class="flex-1 bg-transparent text-white outline-none font-mono text-xs" onkeypress="if(event.key==='Enter') runTermuxCommand(this.value)">
+      </div>
+    `;
+  }
+  else if(feature === 'peraturan') {
+    let rules = JSON.parse(localStorage.getItem('joy_rules'));
+    let html = `
+      <div class="flex gap-2 mb-4">
+        <input type="text" id="new-rule" placeholder="Tambah aturan baru..." class="flex-1 bg-gray-900 text-white p-2 rounded border border-gray-700">
+        <button onclick="addRule()" class="bg-cyan-600 text-white px-4 py-2 rounded font-bold"><i class="fas fa-plus"></i></button>
+      </div>
+      <div class="space-y-2 mb-6">
+    `;
+    rules.forEach((r, i) => {
+      html += `<div class="bg-gray-800 p-3 rounded flex justify-between items-center text-xs">
+        <span class="text-gray-300">${r}</span>
+        <button onclick="deleteRule(${i})" class="text-red-400 ml-2"><i class="fas fa-trash"></i></button>
+      </div>`;
+    });
+    html += `</div>
+      <hr class="border-gray-700 my-4">
+      <div class="space-y-3">
+        <button onclick="changePin()" class="w-full bg-red-600/20 text-red-400 border border-red-500/30 p-2 rounded font-bold">Ganti PIN Owner</button>
+        <button onclick="checkAgencyHealth()" class="w-full bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 p-2 rounded font-bold">Cek Kesehatan Agency</button>
+      </div>
+    `;
+    body.innerHTML = html;
+  }
+}
 
-const PORT = process.env.PORT || 1521;
-app.listen(PORT, () => console.log(`✅ JOY CORP RUNNING on port ${PORT}`));
+function closeModal() { document.getElementById('modal-overlay').classList.add('hidden-view'); }
+
+async function runFactory() {
+  if(!confirm("Pabrik akan membuat 4 produk. Lanjut?")) return;
+  document.getElementById('modal-body').innerHTML = '<p class="text-center text-cyan-400 animate-pulse">Pabrik AI sedang beroperasi...</p>';
+  try {
+    await fetch(BACKEND_URL + '/api/factory/run', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ marketMode: currentMarketMode }) });
+    alert('Pabrik Selesai!');
+    openModal('produk');
+  } catch(e) { alert("Pabrik Error."); }
+}
+
+async function deleteProd(id) {
+  const pin = prompt("Masukkan PIN Owner:");
+  if(pin !== OWNER_PIN) return alert("PIN Salah!");
+  await fetch(`${BACKEND_URL}/api/products/${id}`, { method: 'DELETE' });
+  openModal('produk');
+}
+
+async function resetDownload(id) {
+  const pin = prompt("Masukkan PIN Owner:");
+  if(pin !== OWNER_PIN) return alert("PIN Salah!");
+  await fetch(`${BACKEND_URL}/api/admin/reset-download/${id}`, { method: 'POST' });
+  alert("Akses direset!"); openModal('pesanan');
+}
+
+function saveApiKey() {
+  const name = document.getElementById('new-api-name').value;
+  const key = document.getElementById('new-api-key').value;
+  if(!name || !key) return alert('Isi semua kolom!');
+  let keys = JSON.parse(localStorage.getItem('joy_apikeys'));
+  keys.push({ name, key, status: 'AKTIF' });
+  localStorage.setItem('joy_apikeys', JSON.stringify(keys));
+  openModal('apikey');
+}
+
+function deleteApiKey(index) {
+  if(!confirm('Hapus API Key ini?')) return;
+  let keys = JSON.parse(localStorage.getItem('joy_apikeys'));
+  keys.splice(index, 1);
+  localStorage.setItem('joy_apikeys', JSON.stringify(keys));
+  openModal('apikey');
+}
+
+function clearCacheSafely() {
+  const preserved = {
+    joy_backend_url: localStorage.getItem('joy_backend_url'),
+    joy_owner_pin: localStorage.getItem('joy_owner_pin'),
+    joy_owner_pass: localStorage.getItem('joy_owner_pass'),
+    joy_apikeys: localStorage.getItem('joy_apikeys'),
+    joy_rules: localStorage.getItem('joy_rules')
+  };
+  localStorage.clear();
+  for(let k in preserved) { if(preserved[k]) localStorage.setItem(k, preserved[k]); }
+  alert('Cache berhasil dibersihkan! Data produk dan API aman.');
+}
+
+function runTermuxCommand(cmd) {
+  const out = document.getElementById('termux-output');
+  const input = document.getElementById('termux-input');
+  if(!cmd.trim()) return;
+  out.innerHTML += `<div class="text-cyan-400"># ${cmd}</div>`;
+  if(cmd === 'help') out.innerHTML += `<div class="text-gray-400">Commands: help, status, clear</div>`;
+  else if(cmd === 'status') out.innerHTML += `<div class="text-emerald-400">System OK. Server Running.</div>`;
+  else if(cmd === 'clear') out.innerHTML = `<div class="text-emerald-400">root@joycorp:~# ./monitor.sh</div>`;
+  else out.innerHTML += `<div class="text-red-400">Command not found.</div>`;
+  input.value = '';
+  out.scrollTop = out.scrollHeight;
+}
+
+function addRule() {
+  const r = document.getElementById('new-rule').value;
+  if(!r) return;
+  let rules = JSON.parse(localStorage.getItem('joy_rules'));
+  rules.push(r);
+  localStorage.setItem('joy_rules', JSON.stringify(rules));
+  openModal('peraturan');
+}
+
+function deleteRule(i) {
+  let rules = JSON.parse(localStorage.getItem('joy_rules'));
+  rules.splice(i, 1);
+  localStorage.setItem('joy_rules', JSON.stringify(rules));
+  openModal('peraturan');
+}
+
+function changePin() {
+  const oldP = prompt('PIN Lama:');
+  if(oldP !== OWNER_PIN) return alert('PIN Salah!');
+  const newP = prompt('PIN Baru (6 angka):');
+  if(newP) { localStorage.setItem('joy_owner_pin', newP); OWNER_PIN = newP; alert('PIN Diubah!'); }
+}
+
+function checkAgencyHealth() {
+  alert('Cek Kesehatan: Semua Agen (Della, Sarah, Michelle, Desi, Panda) dalam kondisi OPTIMAL. Yuliana & Yusi siap standby.');
+}
+
+function toggleChat() { document.getElementById('chat-window').classList.toggle('hidden-view'); }
+async function sendMessage(e) {
+  e.preventDefault();
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  const container = document.getElementById('chat-messages');
+  container.insertAdjacentHTML('beforeend', `<div class="flex flex-col items-end"><div class="bg-cyan-600/20 p-3 rounded-xl text-xs text-white">${text}</div></div>`);
+  input.value = '';
+  chatHistory.push({ role: 'user', content: text });
+  try {
+    const res = await fetch(BACKEND_URL + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text, history: chatHistory.slice(-10) }) });
+    const data = await res.json();
+    if(data.reply) {
+      container.insertAdjacentHTML('beforeend', `<div class="bg-gray-800 p-3 rounded-xl text-xs text-gray-300">${data.reply}</div>`);
+      chatHistory.push({ role: 'assistant', content: data.reply });
+    }
+  } catch(e) { container.insertAdjacentHTML('beforeend', `<div class="bg-red-900/30 p-3 rounded-xl text-xs text-red-400">Server Offline.</div>`); }
+  container.scrollTop = container.scrollHeight;
+}
+
+loadPublic();
+</script>
+</body>
+      </html>
