@@ -41,21 +41,6 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
         <div class="bg-gray-800 p-4 rounded-xl border border-gray-700"><h3 class="font-bold text-white mb-2"><i class="fas fa-eye text-cyan-400 mr-1"></i> Visi</h3><p class="text-xs text-gray-400">Menjadi ekosistem automasi digital Nomor 1 di Asia pada 2030.</p></div>
         <div class="bg-gray-800 p-4 rounded-xl border border-gray-700"><h3 class="font-bold text-white mb-2"><i class="fas fa-bullseye text-blue-400 mr-1"></i> Misi</h3><p class="text-xs text-gray-400">Memproduksi aset premium harian, pelayanan 24/7, dan keamanan transaksi.</p></div>
       </div>
-      <div class="bg-cyan-900/30 border border-cyan-500/50 p-4 rounded-xl mb-6 text-center">
-        <h3 class="font-bold text-white mb-2"><i class="fas fa-store text-cyan-400 mr-1"></i> JOY MARKET</h3>
-        <p class="text-[10px] text-gray-300 mb-3">Toko Resmi Penjualan Produk Digital JOY CORP (Dikelola oleh Michelle, dibantu Desi & Panda).</p>
-        <a href="#market-link" class="inline-block bg-cyan-600 text-white text-xs font-bold px-4 py-2 rounded">Kunjungi Website Market</a>
-      </div>
-      <div class="grid grid-cols-4 gap-2 text-center mb-6">
-        <div class="bg-gray-900 p-2 rounded border border-gray-700"><p class="text-lg font-bold text-cyan-400">14</p><p class="text-[9px] text-gray-500">Agen AI</p></div>
-        <div class="bg-gray-900 p-2 rounded border border-gray-700"><p class="text-lg font-bold text-emerald-400">150+</p><p class="text-[9px] text-gray-500">Produk</p></div>
-        <div class="bg-gray-900 p-2 rounded border border-gray-700"><p class="text-lg font-bold text-yellow-400">50+</p><p class="text-[9px] text-gray-500">Klien</p></div>
-        <div class="bg-gray-900 p-2 rounded border border-gray-700"><p class="text-lg font-bold text-purple-400">24/7</p><p class="text-[9px] text-gray-500">Online</p></div>
-      </div>
-      <div class="text-[10px] text-gray-500 flex justify-between">
-        <span>© 2024 JOY CORP. All Rights Reserved.</span>
-        <span>SIGNED: <b>ADE KURNIA SANDY</b></span>
-      </div>
     </section>
   </main>
 </div>
@@ -81,49 +66,21 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
   <main class="max-w-4xl mx-auto px-4 pb-10">
     <div class="glass neon-border rounded-xl p-6 mb-4 text-center relative overflow-hidden">
       <h2 class="text-xl font-extrabold text-white mb-1 relative z-10">Command Center</h2>
-      <p class="text-[10px] text-gray-400 relative z-10">Selamat datang, <b class="text-cyan-400">ADE KURNIA SANDY</b>. Sistem Autopilot 100% Aktif.</p>
-    </div>
-    <div class="grid grid-cols-2 gap-3 mb-6">
-      <div class="bg-gray-800/80 border border-cyan-500/30 p-3 rounded-xl flex items-center justify-between">
-         <div><p class="text-[9px] text-gray-400 uppercase tracking-wider">Mode Market</p><p id="display-market-mode" class="text-sm font-bold text-cyan-400">Trend Jacking</p></div>
-         <i class="fas fa-chart-line text-cyan-500/50 text-xl"></i>
-      </div>
-      <div class="bg-gray-800/80 border border-yellow-500/30 p-3 rounded-xl flex items-center justify-between">
-         <div><p class="text-[9px] text-gray-400 uppercase tracking-wider">Mode Target</p><p id="display-target-mode" class="text-sm font-bold text-yellow-400">Belum Aktif</p></div>
-         <i class="fas fa-bullseye text-yellow-500/50 text-xl"></i>
-      </div>
+      <p class="text-[10px] text-gray-400 relative z-10">Selamat datang, <b class="text-cyan-400">ADE KURNIA SANDY</b>.</p>
     </div>
     <div class="grid grid-cols-3 gap-3 mb-6">
       <div class="glass p-4 rounded-xl text-center border border-gray-800"><i class="fas fa-box text-cyan-400 text-2xl mb-2"></i><p class="text-xl font-bold text-white" id="stat-produk">0</p><p class="text-[9px] text-gray-500 uppercase">Produk</p></div>
       <div class="glass p-4 rounded-xl text-center border border-gray-800"><i class="fas fa-shopping-cart text-emerald-400 text-2xl mb-2"></i><p class="text-xl font-bold text-white" id="stat-pesanan">0</p><p class="text-[9px] text-gray-500 uppercase">Pesanan</p></div>
-      <div class="glass p-4 rounded-xl text-center border border-gray-800"><i class="fas fa-server text-yellow-400 text-2xl mb-2"></i><p class="text-xs font-bold text-white mt-2" id="stat-server">Cek...</p><p class="text-[9px] text-gray-500 uppercase">Server</p></div>
+      <div class="glass p-4 rounded-xl text-center border border-gray-800"><i class="fas fa-database text-yellow-400 text-2xl mb-2"></i><p class="text-xs font-bold text-white mt-2" id="stat-server">DB</p><p class="text-[9px] text-gray-500 uppercase">Data</p></div>
     </div>
     <div class="grid grid-cols-2 gap-3 mb-6">
       <button onclick="openModal('produk')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-box text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Produk</p></button>
-      <button onclick="openModal('pesanan')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-shopping-cart text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Pesanan</p></button>
-      <button onclick="openModal('saldo')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-wallet text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Saldo Real</p></button>
-      <button onclick="openModal('apikey')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-shield-alt text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Security API</p></button>
-      <button onclick="openModal('modemarket')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-chart-line text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Mode Market</p></button>
-      <button onclick="openModal('modetarget')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-bullseye text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Mode Target</p></button>
-      <button onclick="openModal('health')" class="glass p-4 rounded-xl hover:bg-red-500/10 text-center border border-gray-800 col-span-2"><i class="fas fa-heartbeat text-red-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Cek Kesehatan Sistem</p></button>
-      <button onclick="openModal('termux')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-terminal text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Termux</p></button>
-      <button onclick="openModal('cache')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-broom text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Bersihkan Cache</p></button>
-      <button onclick="openModal('peraturan')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800 col-span-2"><i class="fas fa-book text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Peraturan & Kesehatan Agency</p></button>
-      <button onclick="changeServerLink()" class="glass p-4 rounded-xl hover:bg-yellow-500/10 text-center border border-gray-800 col-span-2 mt-2"><i class="fas fa-server text-yellow-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Ganti Link Server Termux</p></button>
+      <button onclick="changeServerLink()" class="glass p-4 rounded-xl hover:bg-yellow-500/10 text-center border border-gray-800"><i class="fas fa-server text-yellow-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Link Pabrik</p></button>
     </div>
-    <section class="glass rounded-2xl p-5 border border-gray-800">
-      <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
-        <h3 class="font-bold text-white flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Log Pergerakan</h3>
-        <span class="text-[10px] text-gray-500 font-mono bg-gray-900 px-2 py-0.5 rounded">LIVE</span>
-      </div>
-      <div class="space-y-2 font-mono text-xs max-h-48 overflow-y-auto pr-2" id="live-logs">
-        <div class="text-emerald-400">[SYSTEM] Dashboard siap beroperasi.</div>
-      </div>
-    </section>
   </main>
 </div>
 
-<!-- MODAL OVERLAY -->
+<!-- MODAL -->
 <div id="modal-overlay" class="hidden-view fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
   <div class="glass w-full max-w-md rounded-xl flex flex-col max-h-[85vh]">
     <div class="p-3 border-b border-gray-800 flex justify-between font-bold text-white text-sm">
@@ -134,79 +91,59 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
   </div>
 </div>
 
-<!-- CHAT WIDGET -->
-<div class="fixed bottom-6 right-6 z-40">
-  <div id="chat-window" class="hidden-view glass w-80 rounded-2xl border border-gray-700 shadow-2xl mb-4 overflow-hidden flex flex-col" style="max-height:500px">
-    <div class="bg-gray-900/90 p-4 border-b border-gray-800 flex justify-between items-center">
-      <h4 class="text-sm font-bold text-white">AI Manager (Joy)</h4>
-      <button onclick="toggleChat()" class="text-gray-400">&times;</button>
-    </div>
-    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-900/40" style="max-height:350px">
-      <div class="bg-gray-800 p-3 rounded-xl rounded-tl-none border border-gray-700 text-xs text-gray-300">Halo, Ade. Ada ide?</div>
-    </div>
-    <div class="p-3 bg-gray-900/90 border-t border-gray-800">
-      <form onsubmit="sendMessage(event)" class="flex gap-2">
-        <input type="text" id="chat-input" placeholder="Ketik..." class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white">
-        <button type="submit" class="glow-btn text-white rounded-lg px-4 py-2"><i class="fas fa-paper-plane text-xs"></i></button>
-      </form>
-    </div>
-  </div>
-  <button onclick="toggleChat()" class="w-14 h-14 rounded-full glow-btn text-white shadow-lg flex items-center justify-center text-xl"><i class="fas fa-comments"></i></button>
-</div>
-
 <script>
 // ================= KONFIGURASI =================
+// URL Supabase Mas Ade
+const SUPABASE_URL = "https://nszdjbnoikdvqquhxrhe.supabase.co";
+// ⚠️ MAS ADE WAJIB PASTE KUNCI ANON SUPABASE DI SINI (YANG DIAWALI eyJhbG...)
+let SUPABASE_ANON_KEY = localStorage.getItem('joy_supabase_anon') || "PASTE_ANON_KEY_DISINI";
+
 let BACKEND_URL = localStorage.getItem('joy_backend_url') || "https://3dd7450abee241.lhr.life"; 
 let OWNER_PIN = localStorage.getItem('joy_owner_pin') || "444033"; 
 let OWNER_PASS = localStorage.getItem('joy_owner_pass') || "Cengkareng24";
-const AGENCY_PASS = "agency123";
 let currentRole = 'guest';
-let currentMarketMode = localStorage.getItem('joy_market_mode') || 'Trend Jacking';
-let currentTargetMode = localStorage.getItem('joy_target_mode') || 'Belum Aktif';
-let targetExpiry = localStorage.getItem('joy_target_expiry') || 0;
-let chatHistory = [];
 
-if(!localStorage.getItem('joy_rules')) {
-  localStorage.setItem('joy_rules', JSON.stringify([
-    "1. Dilarang membocorkan API Key atau data Owner.",
-    "2. Semua produk wajib QC Michelle sebelum tayang.",
-    "3. Yuliana & Yusi wajib cek kesehatan agen rutin.",
-    "4. Sanny dilarang tarik dana tanpa izin Owner."
-  ]));
-}
-if(!localStorage.getItem('joy_apikeys')) {
-  localStorage.setItem('joy_apikeys', JSON.stringify([
-    { name: 'Groq AI', key: 'gsk_xxxx', status: 'AKTIF' },
-    { name: 'Supabase', key: 'eyJhbG...', status: 'AKTIF' }
-  ]));
-}
-
-// ================= NAVIGASI & AUTH =================
 function showLogin() { document.getElementById('public-view').classList.add('hidden-view'); document.getElementById('login-view').classList.remove('hidden-view'); }
 function showPublic() { document.getElementById('login-view').classList.add('hidden-view'); document.getElementById('dashboard-view').classList.add('hidden-view'); document.getElementById('public-view').classList.remove('hidden-view'); }
 function handleLogin(e) {
   e.preventDefault();
   const p = document.getElementById('pass-input').value;
   if(p === OWNER_PASS) currentRole = 'owner';
-  else if(p === AGENCY_PASS) currentRole = 'agency';
   else return alert('Password Salah!');
   
   localStorage.setItem('joy_logged_in', currentRole);
   document.getElementById('role-display').innerText = `DASHBOARD - ${currentRole.toUpperCase()}`;
   document.getElementById('login-view').classList.add('hidden-view');
   document.getElementById('dashboard-view').classList.remove('hidden-view');
-  updateDashboardStats();
-  updateModeDisplay();
+  loadProductsFromDB();
 }
 function logout() { localStorage.removeItem('joy_logged_in'); showPublic(); }
 
-// ================= TOKO PUBLIK =================
-async function loadPublic() {
+// ==========================================
+// FUNGSI BACA DATABASE LANGSUNG (TANPA TERMUX)
+// ==========================================
+async function fetchDirectDB() {
+    if(SUPABASE_ANON_KEY === "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU") {
+        alert("⚠️ Mas Ade belum memasukkan Anon Key Supabase di kode index.html!");
+        return [];
+    }
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
+        headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        }
+    });
+    if(!res.ok) throw new Error("Gagal konek ke Supabase");
+    return await res.json();
+}
+
+async function loadProductsFromDB() {
   try {
-    const res = await fetch(BACKEND_URL + '/api/products');
-    const products = await res.json();
+    const products = await fetchDirectDB();
+    document.getElementById('stat-produk').innerText = products.length;
     const container = document.getElementById('public-products');
     if(products.length === 0) { container.innerHTML = '<p class="text-gray-500 col-span-2 text-center">Belum ada produk.</p>'; return; }
+    
     let html = '';
     products.forEach(p => {
       html += `<div class="glass p-5 rounded-xl border border-gray-700">
@@ -221,357 +158,59 @@ async function loadPublic() {
     });
     container.innerHTML = html;
   } catch (e) { 
-    document.getElementById('public-products').innerHTML = '<p class="text-red-500 col-span-2 text-center">Server Offline. Update Link Termux.</p>';
+    document.getElementById('public-products').innerHTML = '<p class="text-red-500 col-span-2 text-center">Gagal memuat data. Cek Anon Key.</p>';
   }
 }
 
-async function buyProduct(id, name) {
-  const email = prompt(`Masukkan Email untuk membeli "${name}":`);
-  if(!email) return alert('Email wajib!');
-  try {
-    const res = await fetch(BACKEND_URL + '/api/checkout', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ productId: id, email }) });
-    const data = await res.json();
-    if(data.success) { alert("Pembayaran Sukses!"); window.location.href = `/${data.downloadUrl}`; } 
-    else { alert("Gagal: " + data.error); }
-  } catch(e) { alert("Server Error"); }
-}
-
-// ================= STATS & DISPLAY =================
-async function updateDashboardStats() {
-  try {
-    const res = await fetch(BACKEND_URL + '/api/products');
-    if(res.ok) {
-      document.getElementById('stat-server').innerText = "ONLINE";
-      document.getElementById('stat-server').classList.add('text-emerald-400');
-      const products = await res.json();
-      document.getElementById('stat-produk').innerText = products.length;
-    }
-    const resOrders = await fetch(BACKEND_URL + '/api/admin/orders');
-    if(resOrders.ok) {
-      const orders = await resOrders.json();
-      document.getElementById('stat-pesanan').innerText = orders.length;
-    }
-  } catch(e) {
-    document.getElementById('stat-server').innerText = "OFFLINE";
-    document.getElementById('stat-server').classList.add('text-red-500');
-  }
-}
-
-function updateModeDisplay() {
-  document.getElementById('display-market-mode').innerText = currentMarketMode;
-  const now = Date.now();
-  const targetEl = document.getElementById('display-target-mode');
-  if(now < targetExpiry) {
-     targetEl.innerText = currentTargetMode + " (Aktif)";
-  } else {
-     targetEl.innerText = "Belum Aktif";
-     localStorage.removeItem('joy_target_mode');
-     localStorage.removeItem('joy_target_expiry');
-  }
-}
-
-function changeServerLink() {
-  const currentUrl = localStorage.getItem('joy_backend_url') || BACKEND_URL;
-  const newUrl = prompt("Masukkan Link Termux Baru:", currentUrl);
-  if(newUrl && newUrl.startsWith('http')) {
-    localStorage.setItem('joy_backend_url', newUrl);
-    BACKEND_URL = newUrl;
-    alert("✅ Link Server diubah!");
-    location.reload();
-  } else if(newUrl) { alert("❌ Link tidak valid."); }
-}
-
-// ================= MODAL =================
-function openModal(feature) {
-  document.getElementById('modal-title').innerText = feature.toUpperCase();
-  const body = document.getElementById('modal-body');
-  body.innerHTML = '<p class="text-center text-gray-500 py-4">Memuat...</p>';
-  document.getElementById('modal-overlay').classList.remove('hidden-view');
-
-  if(feature === 'produk') {
-    fetch(BACKEND_URL + '/api/products').then(r => r.json()).then(products => {
-      let html = '';
-      if(currentRole === 'owner' || currentRole === 'agency') {
-        html += `<button onclick="runFactory()" class="w-full bg-emerald-600 text-white font-bold py-2 rounded mb-3"><i class="fas fa-plus mr-1"></i>Tambah Produk (Pabrik)</button>`;
-      }
-      products.forEach(p => {
-        let btn = '';
-        if(currentRole === 'owner') {
-          btn = `<div class="flex gap-2 mt-2">
-            <a href="${BACKEND_URL}/api/download-by-id/${p.id}" class="bg-blue-600/20 text-blue-400 px-3 py-1 rounded border border-blue-500/30"><i class="fas fa-download"></i> Download</a>
-            <button onclick="deleteProd(${p.id})" class="bg-red-600/20 text-red-400 px-3 py-1 rounded border border-red-500/30"><i class="fas fa-trash"></i> Hapus</button>
-          </div>`;
-        }
-        html += `<div class="bg-gray-800 p-3 rounded mb-2"><h4 class="text-white font-bold">${p.name}</h4><p class="text-gray-400 text-[10px] mb-2">${p.category}</p>${btn}</div>`;
-      });
-      body.innerHTML = html;
-    }).catch(() => { body.innerHTML = '<p class="text-center text-red-500">Server Offline.</p>'; });
-  }
-  else if(feature === 'health') {
-    body.innerHTML = '<div class="text-center py-6"><i class="fas fa-spinner fa-spin text-cyan-400 text-3xl mb-3"></i><p class="text-xs text-gray-400">Memeriksa sistem...</p></div>';
-    fetch(BACKEND_URL + '/api/health').then(r => r.json()).then(data => {
-      let html = '<div class="space-y-3">';
-      const createCard = (name, status, icon) => {
-        const isOk = status === 'OK';
-        return `<div class="flex justify-between items-center bg-gray-800 p-3 rounded-lg border ${isOk ? 'border-emerald-500/30' : 'border-red-500/30'}">
-          <div class="flex items-center gap-2"><i class="fas ${icon} ${isOk ? 'text-emerald-400' : 'text-red-400'}"></i><span class="text-white font-bold text-sm">${name}</span></div>
-          <span class="text-[10px] font-bold px-2 py-1 rounded ${isOk ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}">${status}</span>
-        </div>`;
-      };
-      html += createCard('Database (Supabase)', data.supabase, 'fa-database');
-      html += createCard('Penyimpanan File', data.storage, 'fa-folder-open');
-      html += createCard('AI Utama (Groq)', data.groq, 'fa-bolt');
-      html += createCard('AI Cadangan', data.pollinations, 'fa-cloud');
-
-      if(data.errors && data.errors.length > 0) {
-        html += '<div class="mt-4 bg-red-900/20 p-3 rounded border border-red-500/30"><p class="text-xs text-red-400 font-bold mb-1">Detail Masalah:</p><ul class="text-[10px] text-gray-300 list-disc pl-4 space-y-1">';
-        data.errors.forEach(err => { html += `<li>${err}</li>`; });
-        html += '</ul></div>';
-      } else {
-        html += '<div class="mt-4 text-center text-emerald-400 text-xs font-bold"><i class="fas fa-check-circle"></i> Semua Sistem Normal!</div>';
-      }
-      html += '</div>';
-      body.innerHTML = html;
-    }).catch(e => { body.innerHTML = '<p class="text-center text-red-500">Gagal cek kesehatan. Server Termux Offline.</p>'; });
-  }
-  else if(feature === 'pesanan') {
-    if(currentRole !== 'owner') return body.innerHTML = '<p class="text-center text-red-500">Hanya Owner.</p>';
-    fetch(BACKEND_URL + '/api/admin/orders').then(r => r.json()).then(orders => {
-      let html = orders.map(o => `
-        <div class="bg-gray-800 p-3 rounded mb-2 text-xs">
-          <p class="text-gray-400">Email: <b class="text-white">${o.buyer_email}</b></p>
-          <p class="text-white font-bold mt-1">${o.products ? o.products.name : 'Unknown'}</p>
-          <p class="text-gray-500 mt-1">Download: ${o.download_count}/${o.max_download}x</p>
-          <button onclick="resetDownload('${o.id}')" class="mt-2 bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 px-2 py-1 rounded">Reset 1x Download</button>
-        </div>
-      `).join('');
-      body.innerHTML = html || '<p class="text-center text-gray-500">Belum ada pesanan.</p>';
-    }).catch(() => { body.innerHTML = '<p class="text-center text-red-500">Server Offline.</p>'; });
-  }
-  else if(feature === 'saldo') {
-    fetch(BACKEND_URL + '/api/sales').then(r => r.json()).then(data => {
-      let html = `<div class="bg-gradient-to-r from-cyan-900/40 to-blue-900/40 p-6 rounded-xl border border-cyan-500/30 mb-4 text-center">
-        <p class="text-xs text-gray-400 mb-1">Total Pendapatan Kas (Mulai $1,000)</p>
-        <h2 class="text-3xl font-extrabold text-white">$${data.saldo.toLocaleString()} <span class="text-sm text-gray-400">USD</span></h2>
-      </div><div class="space-y-2">`;
-      data.history.forEach(t => {
-        html += `<div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 flex justify-between text-xs">
-          <div><p class="text-white font-semibold">${t.desc}</p><p class="text-[10px] text-gray-500">${t.date}</p></div>
-          <p class="${t.amount > 0 ? 'text-emerald-400' : 'text-red-400'} font-bold">${t.amount > 0 ? '+' : ''}$${t.amount}</p>
-        </div>`;
-      });
-      body.innerHTML = html + '</div>';
-    }).catch(() => { body.innerHTML = '<p class="text-center text-red-500">Server Offline.</p>'; });
-  }
-  else if(feature === 'apikey') {
-    let keys = JSON.parse(localStorage.getItem('joy_apikeys'));
-    let html = `<div class="bg-gray-800 p-3 rounded mb-4">
-      <input type="text" id="new-api-name" placeholder="Nama API (Cth: DOKU)" class="w-full bg-gray-900 text-white p-2 rounded mb-2 border border-gray-700">
-      <input type="password" id="new-api-key" placeholder="Masukkan API Key" class="w-full bg-gray-900 text-white p-2 rounded mb-2 border border-gray-700">
-      <button onclick="saveApiKey()" class="w-full bg-cyan-600 text-white font-bold py-2 rounded">Tambah API Key</button>
-    </div><div class="space-y-2">`;
-    keys.forEach((k, i) => {
-      html += `<div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 flex justify-between items-center">
-        <div><p class="text-white text-sm font-semibold">${k.name}</p><p class="text-[10px] text-gray-500">${k.status}</p></div>
-        <button onclick="deleteApiKey(${i})" class="text-red-400"><i class="fas fa-trash"></i></button>
-      </div>`;
-    });
-    body.innerHTML = html + '</div>';
-  }
-  else if(feature === 'modemarket') {
-    const modes = [
-      { id: 'Trend Jacking', desc: 'Ikut tren viral. Cepat, murah, target luas.' },
-      { id: 'Premium', desc: 'Produk eksklusif. Harga mahal, target pebisnis.' },
-      { id: 'Mass Market', desc: 'Untuk pemula. Harga murah, banyak pembeli.' },
-      { id: 'B2B', desc: 'Dijual ke perusahaan. Solusi bisnis, harga tinggi.' }
-    ];
-    body.innerHTML = modes.map(m => {
-      const isActive = (currentMarketMode === m.id);
-      return `
-        <button onclick="setMarketMode('${m.id}')" class="w-full text-left p-3 rounded-xl mb-2 border transition-all ${isActive ? 'bg-cyan-500/20 border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.3)]' : 'bg-gray-800 border-gray-700 hover:border-gray-500'}">
-          <div class="flex justify-between items-center"><b class="${isActive ? 'text-cyan-400' : 'text-white'}">${m.id}</b>${isActive ? '<i class="fas fa-check-circle text-cyan-400"></i>' : ''}</div>
-          <span class="text-[10px] text-gray-400 mt-1 block">${m.desc}</span>
-        </button>`;
-    }).join('');
-  }
-  else if(feature === 'modetarget') {
-    const now = Date.now(); const isLocked = (now < targetExpiry);
-    if (isLocked) {
-      body.innerHTML = `
-        <div class="bg-yellow-900/20 border border-yellow-500/50 p-4 rounded-xl text-center mb-4">
-          <i class="fas fa-lock text-yellow-400 text-3xl mb-2"></i>
-          <p class="font-bold text-white text-sm mb-1">Target ${currentTargetMode} Sedang Aktif</p>
-          <p class="text-[10px] text-yellow-200">Terkunci selama 24 jam. Tidak bisa diubah sampai waktu habis.</p>
-        </div>
-        <div class="space-y-2 opacity-40 pointer-events-none">
-          <button class="w-full bg-gray-800 p-3 rounded border border-gray-700 text-left"><b class="text-white">Low Target</b></button>
-          <button class="w-full bg-gray-800 p-3 rounded border border-gray-700 text-left"><b class="text-white">Medium Target</b></button>
-          <button class="w-full bg-gray-800 p-3 rounded border border-gray-700 text-left"><b class="text-white">Hard Target</b></button>
-        </div>`;
-      return;
-    }
-    const targets = [
-      { id: 'Low', desc: 'Pelan tapi pasti, aman untuk agen.' },
-      { id: 'Medium', desc: 'Standar keseharian, balance produksi.' },
-      { id: 'Hard', desc: 'Kerja lembur, agen dikejar target tinggi.' }
-    ];
-    body.innerHTML = `<div class="bg-blue-900/20 border border-blue-500/30 p-3 rounded mb-3 text-[10px] text-blue-200">Mode Target: Sekali klik, akan aktif otomatis selama 24 jam.</div><div class="space-y-2">` + 
-    targets.map(t => {
-      const isActive = (currentTargetMode === t.id);
-      return `<button onclick="setTargetMode('${t.id}')" class="w-full text-left p-3 rounded-xl mb-2 border transition-all ${isActive ? 'bg-yellow-500/20 border-yellow-500' : 'bg-gray-800 border-gray-700'}">
-          <div class="flex justify-between items-center"><b class="${isActive ? 'text-yellow-400' : 'text-white'}">${t.id} Target</b>${isActive ? '<i class="fas fa-check-circle text-yellow-400"></i>' : ''}</div>
-          <span class="text-[10px] text-gray-400 mt-1 block">${t.desc}</span>
-        </button>`;
-    }).join('') + `</div>`;
-  }
-  else if(feature === 'cache') {
-    body.innerHTML = `<div class="text-center py-6"><i class="fas fa-broom text-5xl text-cyan-400 mb-4"></i><h3 class="text-xl font-bold text-white mb-2">Pembersihan Sistem</h3><p class="text-[10px] text-gray-400 mb-4">Menghapus file sampah tanpa menghilangkan data API atau produk.</p><button onclick="clearCacheSafely()" class="glow-btn text-white font-bold text-sm px-6 py-3 rounded-xl mt-4">Bersihkan Cache (Aman)</button></div>`;
-  }
-  else if(feature === 'termux') {
-    body.innerHTML = `
-      <div class="bg-black p-4 rounded-xl border border-gray-700 font-mono text-xs h-60 overflow-y-auto mb-2" id="termux-output">
-        <div class="text-emerald-400">root@joycorp:~# Selamat datang di Terminal JOY CORP</div>
-        <div class="text-gray-400">Ketik 'ls' untuk melihat file.</div>
-      </div>
-      <div class="flex gap-2 bg-black p-2 rounded border border-gray-700">
-        <span class="text-cyan-400 font-mono text-xs pt-1">#</span>
-        <input type="text" id="termux-input" class="flex-1 bg-transparent text-white outline-none font-mono text-xs" onkeypress="if(event.key==='Enter') runRealTermux(this.value)">
-      </div>`;
-  }
-  else if(feature === 'peraturan') {
-    let rules = JSON.parse(localStorage.getItem('joy_rules'));
-    let html = `<div class="flex gap-2 mb-4"><input type="text" id="new-rule" placeholder="Tambah aturan baru..." class="flex-1 bg-gray-900 text-white p-2 rounded border border-gray-700"><button onclick="addRule()" class="bg-cyan-600 text-white px-4 py-2 rounded font-bold"><i class="fas fa-plus"></i></button></div><div class="space-y-2 mb-6">`;
-    rules.forEach((r, i) => {
-      html += `<div class="bg-gray-800 p-3 rounded flex justify-between items-center text-xs"><span class="text-gray-300">${r}</span><button onclick="deleteRule(${i})" class="text-red-400 ml-2"><i class="fas fa-trash"></i></button></div>`;
-    });
-    html += `</div><hr class="border-gray-700 my-4"><div class="space-y-3"><button onclick="changePin()" class="w-full bg-red-600/20 text-red-400 border border-red-500/30 p-2 rounded font-bold">Ganti PIN Owner</button><button onclick="checkAgencyHealth()" class="w-full bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 p-2 rounded font-bold">Cek Kesehatan Agency</button></div>`;
-    body.innerHTML = html;
-  }
-}
-
-function closeModal() { document.getElementById('modal-overlay').classList.add('hidden-view'); }
-
-// ================= FUNGSI PENDUKUNG =================
+// ==========================================
+// FUNGSI PABRIK (TETAP PAKAI TERMUX)
+// ==========================================
 async function runFactory() {
   if(!confirm("Pabrik akan membuat 4 produk. Lanjut?")) return;
-  document.getElementById('modal-body').innerHTML = '<p class="text-center text-cyan-400 animate-pulse">Pabrik AI sedang beroperasi... (Tunggu 15-20 detik)</p>';
+  document.getElementById('modal-body').innerHTML = '<p class="text-center text-cyan-400 animate-pulse">Pabrik AI beroperasi... (Tunggu 15 detik)</p>';
   try {
-    const res = await fetch(BACKEND_URL + '/api/factory/run', { 
-        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ marketMode: currentMarketMode }) 
-    });
+    const res = await fetch(BACKEND_URL + '/api/factory/run', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ marketMode: 'Premium' }) });
     const data = await res.json();
     if (res.ok && data.success) {
         alert('✅ ' + data.message);
-        updateDashboardStats(); // Refresh otomatis
+        loadProductsFromDB(); // Refresh data dari database langsung
         openModal('produk');
-    } else {
-        alert('❌ Gagal dari Server: ' + (data.error || 'Unknown Error'));
-        openModal('produk');
-    }
-  } catch(e) { 
-    alert("❌ Koneksi Terputus ke Termux: " + e.message); 
-    openModal('produk');
+    } else { alert('❌ Gagal: ' + (data.error || 'Unknown')); openModal('produk'); }
+  } catch(e) { alert("❌ Koneksi Terputus ke Termux: " + e.message); openModal('produk'); }
+}
+
+function openModal(feature) {
+  document.getElementById('modal-title').innerText = feature.toUpperCase();
+  const body = document.getElementById('modal-body');
+  document.getElementById('modal-overlay').classList.remove('hidden-view');
+  
+  if(feature === 'produk') {
+    body.innerHTML = `<button onclick="runFactory()" class="w-full bg-emerald-600 text-white font-bold py-2 rounded mb-3"><i class="fas fa-plus mr-1"></i>Buat Produk Baru</button><p class="text-center text-gray-500 text-[10px]">Data di bawah ini diambil langsung dari database (tanpa Termux).</p><div id="list-produk" class="space-y-2 mt-2">Memuat...</div>`;
+    fetchDirectDB().then(products => {
+        let html = '';
+        products.forEach(p => { html += `<div class="bg-gray-800 p-3 rounded mb-2"><h4 class="text-white font-bold">${p.name}</h4><p class="text-gray-400 text-[10px]">${p.category}</p></div>`; });
+        document.getElementById('list-produk').innerHTML = html || '<p class="text-center text-gray-500">Belum ada produk.</p>';
+    });
   }
 }
-
-async function deleteProd(id) {
-  const pin = prompt("Masukkan PIN Owner:"); if(pin !== OWNER_PIN) return alert("PIN Salah!");
-  await fetch(`${BACKEND_URL}/api/products/${id}`, { method: 'DELETE' }); updateDashboardStats(); openModal('produk');
+function closeModal() { document.getElementById('modal-overlay').classList.add('hidden-view'); }
+function changeServerLink() {
+  const newUrl = prompt("Masukkan Link Termux Baru (Untuk Pabrik):", BACKEND_URL);
+  if(newUrl && newUrl.startsWith('http')) { localStorage.setItem('joy_backend_url', newUrl); BACKEND_URL = newUrl; alert("✅ Link Pabrik diubah!"); }
 }
+function buyProduct(id, name) { alert(`Fitur pembayaran untuk "${name}" akan segera hadir!`); }
 
-async function resetDownload(id) {
-  const pin = prompt("Masukkan PIN Owner:"); if(pin !== OWNER_PIN) return alert("PIN Salah!");
-  await fetch(`${BACKEND_URL}/api/admin/reset-download/${id}`, { method: 'POST' }); alert("Akses direset!"); openModal('pesanan');
-}
-
-function setTargetMode(mode) {
-  const expiry = Date.now() + (24 * 60 * 60 * 1000); localStorage.setItem('joy_target_mode', mode); localStorage.setItem('joy_target_expiry', expiry);
-  currentTargetMode = mode; targetExpiry = expiry; updateModeDisplay(); closeModal(); alert(`Mode Target ${mode} diaktifkan 24 Jam!`);
-}
-
-function setMarketMode(mode) {
-  currentMarketMode = mode; localStorage.setItem('joy_market_mode', mode); updateModeDisplay(); closeModal(); alert(`Mode Market diubah ke: ${mode}`);
-}
-
-function saveApiKey() {
-  const name = document.getElementById('new-api-name').value; const key = document.getElementById('new-api-key').value;
-  if(!name || !key) return alert('Isi semua kolom!');
-  let keys = JSON.parse(localStorage.getItem('joy_apikeys')); keys.push({ name, key, status: 'AKTIF' });
-  localStorage.setItem('joy_apikeys', JSON.stringify(keys)); openModal('apikey');
-}
-
-function deleteApiKey(index) {
-  if(!confirm('Hapus API Key ini?')) return;
-  let keys = JSON.parse(localStorage.getItem('joy_apikeys')); keys.splice(index, 1);
-  localStorage.setItem('joy_apikeys', JSON.stringify(keys)); openModal('apikey');
-}
-
-function clearCacheSafely() {
-  const preserved = { joy_backend_url: localStorage.getItem('joy_backend_url'), joy_owner_pin: localStorage.getItem('joy_owner_pin'), joy_owner_pass: localStorage.getItem('joy_owner_pass'), joy_apikeys: localStorage.getItem('joy_apikeys'), joy_rules: localStorage.getItem('joy_rules'), joy_logged_in: localStorage.getItem('joy_logged_in') };
-  localStorage.clear(); for(let k in preserved) { if(preserved[k]) localStorage.setItem(k, preserved[k]); }
-  alert('Cache berhasil dibersihkan! Data produk dan API aman.');
-}
-
-async function runRealTermux(cmd) {
-  const out = document.getElementById('termux-output'); const input = document.getElementById('termux-input');
-  if(!cmd.trim()) return;
-  out.innerHTML += `<div class="text-cyan-400"># ${cmd}</div>`; input.value = ''; out.scrollTop = out.scrollHeight;
-  try {
-    const res = await fetch(BACKEND_URL + '/api/termux/run', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ command: cmd }) });
-    const data = await res.json(); out.innerHTML += `<div class="text-gray-300 whitespace-pre-wrap">${data.output}</div>`;
-  } catch(e) { out.innerHTML += `<div class="text-red-400">Server Offline.</div>`; }
-  out.scrollTop = out.scrollHeight;
-}
-
-function addRule() {
-  const r = document.getElementById('new-rule').value; if(!r) return;
-  let rules = JSON.parse(localStorage.getItem('joy_rules')); rules.push(r);
-  localStorage.setItem('joy_rules', JSON.stringify(rules)); openModal('peraturan');
-}
-
-function deleteRule(i) {
-  let rules = JSON.parse(localStorage.getItem('joy_rules')); rules.splice(i, 1);
-  localStorage.setItem('joy_rules', JSON.stringify(rules)); openModal('peraturan');
-}
-
-function changePin() {
-  const oldP = prompt('PIN Lama:'); if(oldP !== OWNER_PIN) return alert('PIN Salah!');
-  const newP = prompt('PIN Baru (6 angka):'); if(newP) { localStorage.setItem('joy_owner_pin', newP); OWNER_PIN = newP; alert('PIN Diubah!'); }
-}
-
-function checkAgencyHealth() {
-  alert('Cek Kesehatan: Semua Agen (Della, Sarah, Michelle, Desi, Panda) dalam kondisi OPTIMAL. Yuliana & Yusi siap standby.');
-}
-
-function toggleChat() { document.getElementById('chat-window').classList.toggle('hidden-view'); }
-async function sendMessage(e) {
-  e.preventDefault();
-  const input = document.getElementById('chat-input'); const text = input.value.trim(); if(!text) return;
-  const container = document.getElementById('chat-messages');
-  container.insertAdjacentHTML('beforeend', `<div class="flex flex-col items-end"><div class="bg-cyan-600/20 p-3 rounded-xl text-xs text-white">${text}</div></div>`);
-  input.value = ''; chatHistory.push({ role: 'user', content: text });
-  try {
-    const res = await fetch(BACKEND_URL + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text, history: chatHistory.slice(-10) }) });
-    const data = await res.json();
-    if(data.reply) {
-      container.insertAdjacentHTML('beforeend', `<div class="bg-gray-800 p-3 rounded-xl text-xs text-gray-300">${data.reply}</div>`);
-      chatHistory.push({ role: 'assistant', content: data.reply });
-    }
-  } catch(e) { container.insertAdjacentHTML('beforeend', `<div class="bg-red-900/30 p-3 rounded-xl text-xs text-red-400">Server Offline.</div>`); }
-  container.scrollTop = container.scrollHeight;
-}
-
+// INIT
 const savedRole = localStorage.getItem('joy_logged_in');
 if (savedRole) {
     currentRole = savedRole;
     document.getElementById('public-view').classList.add('hidden-view');
     document.getElementById('dashboard-view').classList.remove('hidden-view');
     document.getElementById('role-display').innerText = `DASHBOARD - ${currentRole.toUpperCase()}`;
-    updateDashboardStats();
-    updateModeDisplay();
+    loadProductsFromDB();
 } else {
-    loadPublic();
+    loadProductsFromDB();
 }
 </script>
 </body>
-  </html>
+</html>
