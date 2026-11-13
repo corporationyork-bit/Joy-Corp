@@ -93,13 +93,12 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
 
 <script>
 // ================= KONFIGURASI =================
-// URL Supabase Mas Ade
 const SUPABASE_URL = "https://nszdjbnoikdvqquhxrhe.supabase.co";
-// ⚠️ MAS ADE WAJIB PASTE KUNCI ANON SUPABASE DI SINI (YANG DIAWALI eyJhbG...)
-let SUPABASE_ANON_KEY = localStorage.getItem('joy_supabase_anon') || "PASTE_ANON_KEY_DISINI";
 
-let BACKEND_URL = localStorage.getItem('joy_backend_url') || "https://3dd7450abee241.lhr.life"; 
-let OWNER_PIN = localStorage.getItem('joy_owner_pin') || "444033"; 
+// ⚠️⚠️⚠️ MAS ADE: PASTE KUNCI SERVICE_ROLE SUPABASE DI BAWAH INI (YANG DIAWALI eyJhbG...) ⚠️⚠️⚠️
+let SUPABASE_KEY = "PASTE_SERVICE_ROLE_KEY_DISINI"; 
+
+let BACKEND_URL = localStorage.getItem('joy_backend_url') || "https://435e9565a2f1b0.app.lhr.life"; 
 let OWNER_PASS = localStorage.getItem('joy_owner_pass') || "Cengkareng24";
 let currentRole = 'guest';
 
@@ -123,17 +122,19 @@ function logout() { localStorage.removeItem('joy_logged_in'); showPublic(); }
 // FUNGSI BACA DATABASE LANGSUNG (TANPA TERMUX)
 // ==========================================
 async function fetchDirectDB() {
-    if(SUPABASE_ANON_KEY === "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU") {
-        alert("⚠️ Mas Ade belum memasukkan Anon Key Supabase di kode index.html!");
-        return [];
+    if(SUPABASE_KEY === "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5NDAyOTQzNywiZXhwIjoyMTA5NjA1NDM3fQ.STXzkWODEoqbJFoNzHyE2AJk6kwMGhsQppOVPfSsXaM" || SUPABASE_KEY.length < 50) {
+        throw new Error("Kunci Service Role belum diisi atau salah copy!");
     }
     const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
         headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
         }
     });
-    if(!res.ok) throw new Error("Gagal konek ke Supabase");
+    if(!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Gagal konek ke Supabase");
+    }
     return await res.json();
 }
 
@@ -152,13 +153,13 @@ async function loadProductsFromDB() {
           <p class="text-xs text-gray-400 mb-3 line-clamp-2">${p.description}</p>
           <div class="flex justify-between items-center mt-3">
             <span class="text-lg font-bold text-cyan-400">$${p.price}</span>
-            <button onclick="buyProduct(${p.id}, '${p.name.replace(/'/g, "\\'")}')" class="glow-btn text-white px-4 py-1.5 rounded-lg text-xs font-bold">Beli</button>
+            <button class="glow-btn text-white px-4 py-1.5 rounded-lg text-xs font-bold">Beli</button>
           </div>
         </div>`;
     });
     container.innerHTML = html;
   } catch (e) { 
-    document.getElementById('public-products').innerHTML = '<p class="text-red-500 col-span-2 text-center">Gagal memuat data. Cek Anon Key.</p>';
+    document.getElementById('public-products').innerHTML = `<p class="text-red-500 col-span-2 text-center">Error: ${e.message}</p>`;
   }
 }
 
@@ -173,10 +174,10 @@ async function runFactory() {
     const data = await res.json();
     if (res.ok && data.success) {
         alert('✅ ' + data.message);
-        loadProductsFromDB(); // Refresh data dari database langsung
+        loadProductsFromDB(); 
         openModal('produk');
     } else { alert('❌ Gagal: ' + (data.error || 'Unknown')); openModal('produk'); }
-  } catch(e) { alert("❌ Koneksi Terputus ke Termux: " + e.message); openModal('produk'); }
+  } catch(e) { alert("❌ Koneksi ke Termux Terputus. Pastikan Termux nyala."); openModal('produk'); }
 }
 
 function openModal(feature) {
@@ -185,11 +186,14 @@ function openModal(feature) {
   document.getElementById('modal-overlay').classList.remove('hidden-view');
   
   if(feature === 'produk') {
-    body.innerHTML = `<button onclick="runFactory()" class="w-full bg-emerald-600 text-white font-bold py-2 rounded mb-3"><i class="fas fa-plus mr-1"></i>Buat Produk Baru</button><p class="text-center text-gray-500 text-[10px]">Data di bawah ini diambil langsung dari database (tanpa Termux).</p><div id="list-produk" class="space-y-2 mt-2">Memuat...</div>`;
+    body.innerHTML = `<button onclick="runFactory()" class="w-full bg-emerald-600 text-white font-bold py-2 rounded mb-3"><i class="fas fa-plus mr-1"></i>Buat Produk Baru</button><p class="text-center text-gray-500 text-[10px]">Data langsung dari database.</p><div id="list-produk" class="space-y-2 mt-2">Memuat...</div>`;
+    
     fetchDirectDB().then(products => {
         let html = '';
         products.forEach(p => { html += `<div class="bg-gray-800 p-3 rounded mb-2"><h4 class="text-white font-bold">${p.name}</h4><p class="text-gray-400 text-[10px]">${p.category}</p></div>`; });
         document.getElementById('list-produk').innerHTML = html || '<p class="text-center text-gray-500">Belum ada produk.</p>';
+    }).catch(err => {
+        document.getElementById('list-produk').innerHTML = `<p class="text-center text-red-500 font-bold">Error: ${err.message}</p>`;
     });
   }
 }
@@ -198,7 +202,6 @@ function changeServerLink() {
   const newUrl = prompt("Masukkan Link Termux Baru (Untuk Pabrik):", BACKEND_URL);
   if(newUrl && newUrl.startsWith('http')) { localStorage.setItem('joy_backend_url', newUrl); BACKEND_URL = newUrl; alert("✅ Link Pabrik diubah!"); }
 }
-function buyProduct(id, name) { alert(`Fitur pembayaran untuk "${name}" akan segera hadir!`); }
 
 // INIT
 const savedRole = localStorage.getItem('joy_logged_in');
