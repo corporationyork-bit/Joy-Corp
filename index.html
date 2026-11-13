@@ -16,6 +16,7 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
 </head>
 <body class="min-h-screen pb-32">
 
+<!-- HALAMAN DEPAN -->
 <div id="public-view" class="min-h-screen flex flex-col">
   <header class="glass border-b border-gray-800 px-4 py-6 text-center">
     <div class="w-20 h-20 rounded-2xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-400 font-bold text-4xl mx-auto mb-4">J</div>
@@ -59,6 +60,7 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
   </main>
 </div>
 
+<!-- LOGIN -->
 <div id="login-view" class="hidden-view min-h-screen flex items-center justify-center px-4">
   <div class="glass neon-border rounded-2xl p-8 max-w-sm w-full text-center">
     <h2 class="text-xl font-bold text-white mb-4">Owner / Agency Login</h2>
@@ -70,6 +72,7 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
   </div>
 </div>
 
+<!-- DASHBOARD -->
 <div id="dashboard-view" class="hidden-view">
   <header class="glass border-b border-gray-800 px-4 py-3 flex justify-between items-center mb-6">
     <h1 class="font-bold text-white text-sm" id="role-display">DASHBOARD</h1>
@@ -102,8 +105,9 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
       <button onclick="openModal('apikey')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-shield-alt text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Security API</p></button>
       <button onclick="openModal('modemarket')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-chart-line text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Mode Market</p></button>
       <button onclick="openModal('modetarget')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-bullseye text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Mode Target</p></button>
-      <button onclick="openModal('cache')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-broom text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Bersihkan Cache</p></button>
+      <button onclick="openModal('health')" class="glass p-4 rounded-xl hover:bg-red-500/10 text-center border border-gray-800 col-span-2"><i class="fas fa-heartbeat text-red-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Cek Kesehatan Sistem</p></button>
       <button onclick="openModal('termux')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-terminal text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Termux</p></button>
+      <button onclick="openModal('cache')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800"><i class="fas fa-broom text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Bersihkan Cache</p></button>
       <button onclick="openModal('peraturan')" class="glass p-4 rounded-xl hover:bg-cyan-500/10 text-center border border-gray-800 col-span-2"><i class="fas fa-book text-cyan-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Peraturan & Kesehatan Agency</p></button>
       <button onclick="changeServerLink()" class="glass p-4 rounded-xl hover:bg-yellow-500/10 text-center border border-gray-800 col-span-2 mt-2"><i class="fas fa-server text-yellow-400 text-xl mb-1"></i><p class="text-xs text-white font-bold">Ganti Link Server Termux</p></button>
     </div>
@@ -119,6 +123,7 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
   </main>
 </div>
 
+<!-- MODAL OVERLAY -->
 <div id="modal-overlay" class="hidden-view fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
   <div class="glass w-full max-w-md rounded-xl flex flex-col max-h-[85vh]">
     <div class="p-3 border-b border-gray-800 flex justify-between font-bold text-white text-sm">
@@ -129,6 +134,7 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
   </div>
 </div>
 
+<!-- CHAT WIDGET -->
 <div class="fixed bottom-6 right-6 z-40">
   <div id="chat-window" class="hidden-view glass w-80 rounded-2xl border border-gray-700 shadow-2xl mb-4 overflow-hidden flex flex-col" style="max-height:500px">
     <div class="bg-gray-900/90 p-4 border-b border-gray-800 flex justify-between items-center">
@@ -149,6 +155,7 @@ body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
 </div>
 
 <script>
+// ================= KONFIGURASI =================
 let BACKEND_URL = localStorage.getItem('joy_backend_url') || "https://3dd7450abee241.lhr.life"; 
 let OWNER_PIN = localStorage.getItem('joy_owner_pin') || "444033"; 
 let OWNER_PASS = localStorage.getItem('joy_owner_pass') || "Cengkareng24";
@@ -174,6 +181,7 @@ if(!localStorage.getItem('joy_apikeys')) {
   ]));
 }
 
+// ================= NAVIGASI & AUTH =================
 function showLogin() { document.getElementById('public-view').classList.add('hidden-view'); document.getElementById('login-view').classList.remove('hidden-view'); }
 function showPublic() { document.getElementById('login-view').classList.add('hidden-view'); document.getElementById('dashboard-view').classList.add('hidden-view'); document.getElementById('public-view').classList.remove('hidden-view'); }
 function handleLogin(e) {
@@ -192,6 +200,7 @@ function handleLogin(e) {
 }
 function logout() { localStorage.removeItem('joy_logged_in'); showPublic(); }
 
+// ================= TOKO PUBLIK =================
 async function loadPublic() {
   try {
     const res = await fetch(BACKEND_URL + '/api/products');
@@ -227,6 +236,7 @@ async function buyProduct(id, name) {
   } catch(e) { alert("Server Error"); }
 }
 
+// ================= STATS & DISPLAY =================
 async function updateDashboardStats() {
   try {
     const res = await fetch(BACKEND_URL + '/api/products');
@@ -271,6 +281,7 @@ function changeServerLink() {
   } else if(newUrl) { alert("❌ Link tidak valid."); }
 }
 
+// ================= MODAL =================
 function openModal(feature) {
   document.getElementById('modal-title').innerText = feature.toUpperCase();
   const body = document.getElementById('modal-body');
@@ -295,6 +306,33 @@ function openModal(feature) {
       });
       body.innerHTML = html;
     }).catch(() => { body.innerHTML = '<p class="text-center text-red-500">Server Offline.</p>'; });
+  }
+  else if(feature === 'health') {
+    body.innerHTML = '<div class="text-center py-6"><i class="fas fa-spinner fa-spin text-cyan-400 text-3xl mb-3"></i><p class="text-xs text-gray-400">Memeriksa sistem...</p></div>';
+    fetch(BACKEND_URL + '/api/health').then(r => r.json()).then(data => {
+      let html = '<div class="space-y-3">';
+      const createCard = (name, status, icon) => {
+        const isOk = status === 'OK';
+        return `<div class="flex justify-between items-center bg-gray-800 p-3 rounded-lg border ${isOk ? 'border-emerald-500/30' : 'border-red-500/30'}">
+          <div class="flex items-center gap-2"><i class="fas ${icon} ${isOk ? 'text-emerald-400' : 'text-red-400'}"></i><span class="text-white font-bold text-sm">${name}</span></div>
+          <span class="text-[10px] font-bold px-2 py-1 rounded ${isOk ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}">${status}</span>
+        </div>`;
+      };
+      html += createCard('Database (Supabase)', data.supabase, 'fa-database');
+      html += createCard('Penyimpanan File', data.storage, 'fa-folder-open');
+      html += createCard('AI Utama (Groq)', data.groq, 'fa-bolt');
+      html += createCard('AI Cadangan', data.pollinations, 'fa-cloud');
+
+      if(data.errors && data.errors.length > 0) {
+        html += '<div class="mt-4 bg-red-900/20 p-3 rounded border border-red-500/30"><p class="text-xs text-red-400 font-bold mb-1">Detail Masalah:</p><ul class="text-[10px] text-gray-300 list-disc pl-4 space-y-1">';
+        data.errors.forEach(err => { html += `<li>${err}</li>`; });
+        html += '</ul></div>';
+      } else {
+        html += '<div class="mt-4 text-center text-emerald-400 text-xs font-bold"><i class="fas fa-check-circle"></i> Semua Sistem Normal!</div>';
+      }
+      html += '</div>';
+      body.innerHTML = html;
+    }).catch(e => { body.innerHTML = '<p class="text-center text-red-500">Gagal cek kesehatan. Server Termux Offline.</p>'; });
   }
   else if(feature === 'pesanan') {
     if(currentRole !== 'owner') return body.innerHTML = '<p class="text-center text-red-500">Hanya Owner.</p>';
@@ -413,18 +451,18 @@ function openModal(feature) {
 
 function closeModal() { document.getElementById('modal-overlay').classList.add('hidden-view'); }
 
+// ================= FUNGSI PENDUKUNG =================
 async function runFactory() {
   if(!confirm("Pabrik akan membuat 4 produk. Lanjut?")) return;
   document.getElementById('modal-body').innerHTML = '<p class="text-center text-cyan-400 animate-pulse">Pabrik AI sedang beroperasi... (Tunggu 15-20 detik)</p>';
   try {
     const res = await fetch(BACKEND_URL + '/api/factory/run', { 
-        method: 'POST', 
-        headers: {'Content-Type':'application/json'}, 
-        body: JSON.stringify({ marketMode: currentMarketMode }) 
+        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ marketMode: currentMarketMode }) 
     });
     const data = await res.json();
     if (res.ok && data.success) {
         alert('✅ ' + data.message);
+        updateDashboardStats(); // Refresh otomatis
         openModal('produk');
     } else {
         alert('❌ Gagal dari Server: ' + (data.error || 'Unknown Error'));
@@ -438,7 +476,7 @@ async function runFactory() {
 
 async function deleteProd(id) {
   const pin = prompt("Masukkan PIN Owner:"); if(pin !== OWNER_PIN) return alert("PIN Salah!");
-  await fetch(`${BACKEND_URL}/api/products/${id}`, { method: 'DELETE' }); openModal('produk');
+  await fetch(`${BACKEND_URL}/api/products/${id}`, { method: 'DELETE' }); updateDashboardStats(); openModal('produk');
 }
 
 async function resetDownload(id) {
@@ -447,8 +485,7 @@ async function resetDownload(id) {
 }
 
 function setTargetMode(mode) {
-  const expiry = Date.now() + (24 * 60 * 60 * 1000);
-  localStorage.setItem('joy_target_mode', mode); localStorage.setItem('joy_target_expiry', expiry);
+  const expiry = Date.now() + (24 * 60 * 60 * 1000); localStorage.setItem('joy_target_mode', mode); localStorage.setItem('joy_target_expiry', expiry);
   currentTargetMode = mode; targetExpiry = expiry; updateModeDisplay(); closeModal(); alert(`Mode Target ${mode} diaktifkan 24 Jam!`);
 }
 
