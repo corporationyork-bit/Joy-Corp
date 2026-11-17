@@ -1,1 +1,42 @@
-
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JOY CORPORATION</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif}
+body{background:#121212;color:#e4e4e7;display:flex;min-height:100vh}
+.sidebar{width:260px;background:#18181b;padding:20px;position:fixed;height:100vh}
+.sidebar h2{font-size:1.2rem;margin-bottom:20px}
+.sidebar a{display:block;padding:12px;color:#a1a1aa;text-decoration:none;border-radius:6px;margin-bottom:4px}
+.sidebar a.active{background:#3f3f46;color:#e4e4e7}
+.main{margin-left:260px;padding:24px;flex-grow:1}
+.card{background:#1e1e24;padding:20px;border-radius:8px;margin-bottom:20px}
+.btn{background:#52525b;color:#e4e4e7;padding:10px 16px;border:none;border-radius:6px;cursor:pointer}
+.inp{background:#1a1a1f;border:1px solid #2a2a30;padding:10px;color:#e4e4e7;border-radius:6px;width:100%;margin-bottom:10px}
+.msg{padding:12px;background:#1e1e24;border-radius:8px;margin-bottom:10px}
+.msg.teq{border-left:2px solid #f59e0b}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+<h2>JOY CORP</h2>
+<a class="active" onclick="show('cmd')">Command Center</a>
+<a onclick="show('chat')">Chat Tequila</a>
+<a onclick="show('vault')">API Vault</a>
+<a onclick="show('meet')">Meeting Room</a>
+</aside>
+<div class="main">
+<div id="cmd"><h1>Command Center</h1><div class="card"><h3>Revenue</h3><p id="rev">Rp 0</p></div></div>
+<div id="chat" style="display:none"><h1>Chat Tequila</h1><div id="msgs"></div><input class="inp" id="ci" placeholder="Ketik pesan..."><button class="btn" onclick="send()">Kirim</button></div>
+<div id="vault" style="display:none"><h1>API Vault</h1><input class="inp" id="vp" type="password" placeholder="PIN"><button class="btn" onclick="loadKeys()">Load Keys</button><div id="vlist"></div></div>
+<div id="meet" style="display:none"><h1>Meeting Room</h1><div id="mlist"></div></div>
+</div>
+<script>
+function show(v){document.querySelectorAll('.main>div').forEach(d=>d.style.display='none');document.getElementById(v).style.display='block'}
+function send(){const m=document.getElementById('ci').value;if(!m)return;fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})}).then(r=>r.json()).then(d=>{document.getElementById('msgs').innerHTML+='<div class="msg teq">'+d.reply+'</div>'});document.getElementById('ci').value=''}
+function loadKeys(){const p=document.getElementById('vp').value;fetch('/api/keys',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:p})}).then(r=>r.json()).then(d=>{document.getElementById('vlist').innerHTML=JSON.stringify(d)})}
+</script>
+</body>
+</html>
