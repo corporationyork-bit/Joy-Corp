@@ -329,6 +329,7 @@ pin:'1234',
 unlocked:false,
 voiceOn:false,
 recognition:null,
+chatHistory:[], // <-- MEMORI CHAT TEQUILA DITAMBAHKAN DISINI
 products:[
 {id:'YT-01',name:'Drama "Janji Senja" Ep.1',type:'Video',stage:'Bedah & Skrip',progress:30},
 {id:'YT-02',name:'Drama "Janji Senja" Ep.2',type:'Video',stage:'Kreasi',progress:70},
@@ -626,7 +627,7 @@ toggleMic(){
  }
 },
 
-// === INI ADALAH MESIN ASLI (REAL API INTEGRATION) ===
+// === MESIN ASLI (REAL API INTEGRATION) ===
 async send(){
  const inp=document.getElementById('ci');
  const m=inp.value.trim();
@@ -637,44 +638,50 @@ async send(){
  
  const ty=document.createElement('div');
  ty.className='typing';
- ty.textContent='Tequila sedang berpikir...';
+ ty.textContent='Tequila sedang berkoordinasi dengan tim...';
  document.getElementById('msgs').appendChild(ty);
  ty.scrollIntoView();
 
  try {
-  // Mengirim request ke backend API Mas Ade yang ada di GitHub (/api/chat)
+  // Tembak ke API Vercel (/api/chat)
   const response = await fetch('/api/chat', {
    method: 'POST',
    headers: { 'Content-Type': 'application/json' },
    body: JSON.stringify({ 
     message: m,
-    history: this.logs.sys.slice(-3) 
+    history: this.chatHistory.slice(-6) // <-- KIRIM MEMORI KE AI
    })
   });
 
+  if (!response.ok) {
+      throw new Error(`Server Error: ${response.status}`);
+  }
+
   const data = await response.json();
   ty.remove();
-
-  // Menangani berbagai format response dari backend
-  const reply = data.reply || data.response || data.message || data.choices?.[0]?.message?.content || "Maaf Mas Ade, sistem tidak merespon dengan format yang benar.";
   
-  this.addMsg('teq', reply);
-  if(this.voiceOn) this.speak(reply);
+  this.addMsg('teq', data.reply);
+  if(this.voiceOn) this.speak(data.reply);
   
   this.log('sys', `Tequila memproses: "${m.substring(0, 30)}..."`, 'info');
 
  } catch (error) {
   ty.remove();
-  this.addMsg('teq', 'Maaf Mas Ade, gagal terhubung ke server API. Pastikan file api/chat.js sudah terdeploy dengan benar di Vercel dan Groq API Key sudah aktif.');
+  this.addMsg('teq', `[SYSTEM ERROR] Maaf Mas Ade, gagal terhubung ke server AI. Pastikan API Key Groq di Vercel sudah benar. (${error.message})`);
   console.error('Chat API Error:', error);
  }
 },
-// =================================================
 
 addMsg(w,t){
  const d=document.createElement('div');d.className='msg '+w;
  d.innerHTML=`<div class="mtag ${w==='me'?'me':''}">${w==='me'?'MAS ADE':'TEQUILA'}</div>${t}`;
  document.getElementById('msgs').appendChild(d);d.scrollIntoView();
+ 
+ // Simpan pesan ke memori chat agar Tequila ingat konteks
+ this.chatHistory.push({
+     role: w === 'me' ? 'user' : 'assistant',
+     content: t
+ });
 },
 
 speak(t){const u=new SpeechSynthesisUtterance(t);u.lang='id-ID';speechSynthesis.speak(u)},
@@ -712,4 +719,4 @@ loadState(){
 document.addEventListener('DOMContentLoaded',()=>JOY.init());
 </script>
 </body>
-                                                                      </html>
+ </html>
