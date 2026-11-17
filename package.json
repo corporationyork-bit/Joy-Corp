@@ -1,8 +1,9 @@
 {
-  "name": "joycorp-api",
-  "version": "1.0.0",
-  "main": "server.js",
+  "name": "joy-corp",
+  "version": "1.5.0",
+  "description": "JOY CORPORATION - Command Center with AI Manager Tequila",
+  "private": true,
   "dependencies": {
-    "express": "^4.19.2"
+    "@supabase/supabase-js": "^2.39.0"
   }
 }
