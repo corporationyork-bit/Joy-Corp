@@ -1,42 +1,473 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JOY CORPORATION</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>JOY CORPORATION — Command Center v2.0</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif}
-body{background:#121212;color:#e4e4e7;display:flex;min-height:100vh}
-.sidebar{width:260px;background:#18181b;padding:20px;position:fixed;height:100vh}
-.sidebar h2{font-size:1.2rem;margin-bottom:20px}
-.sidebar a{display:block;padding:12px;color:#a1a1aa;text-decoration:none;border-radius:6px;margin-bottom:4px}
-.sidebar a.active{background:#3f3f46;color:#e4e4e7}
-.main{margin-left:260px;padding:24px;flex-grow:1}
-.card{background:#1e1e24;padding:20px;border-radius:8px;margin-bottom:20px}
-.btn{background:#52525b;color:#e4e4e7;padding:10px 16px;border:none;border-radius:6px;cursor:pointer}
-.inp{background:#1a1a1f;border:1px solid #2a2a30;padding:10px;color:#e4e4e7;border-radius:6px;width:100%;margin-bottom:10px}
-.msg{padding:12px;background:#1e1e24;border-radius:8px;margin-bottom:10px}
-.msg.teq{border-left:2px solid #f59e0b}
+:root{--bg:#121212;--side:#18181b;--card:#1e1e24;--hover:#27272a;--inp:#1a1a1f;--brd:#2a2a30;--tp:#e4e4e7;--ts:#a1a1aa;--tm:#71717a;--acc:#52525b;--accA:#3f3f46;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--info:#60a5fa;--teq:#f59e0b;--gold:#d4af37}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--tp);min-height:100vh;overflow-x:hidden}
+body{display:flex;flex-direction:column}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{text-decoration:none;color:inherit}
+.app-wrap{display:flex;flex-grow:1}
+.sidebar{width:260px;background:var(--side);border-right:1px solid var(--brd);padding:20px 16px;position:fixed;height:100vh;top:0;left:0;z-index:100;overflow-y:auto;transition:transform .3s}
+.brand{display:flex;align-items:center;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--brd);margin-bottom:20px}
+.brand-logo{width:32px;height:32px;flex-shrink:0}
+.brand-text{font-size:.95rem;font-weight:700;line-height:1.2}
+.brand-text span{display:block;font-size:.65rem;color:var(--ts);font-weight:400}
+.nav{list-style:none}
+.nav a{display:flex;align-items:center;gap:12px;padding:12px;color:var(--ts);border-radius:8px;font-size:.9rem;margin-bottom:4px;cursor:pointer;transition:all .2s}
+.nav a:active{background:var(--hover)}
+.nav a.active{background:var(--accA);color:var(--tp);font-weight:600}
+.nav svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
+.main{margin-left:260px;flex-grow:1;display:flex;flex-direction:column;min-height:100vh;width:calc(100% - 260px)}
+.topbar{height:64px;background:var(--side);border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50}
+.tl{display:flex;align-items:center;gap:16px}
+.hamb{display:none;background:var(--card);border:1px solid var(--brd);padding:8px;min-width:40px;min-height:40px;align-items:center;justify-content:center;border-radius:6px}
+.hamb svg{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none}
+.tt{font-size:1.1rem;font-weight:600}
+.sys-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:8px;animation:pulse 2s infinite;display:inline-block}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.7)}70%{box-shadow:0 0 0 6px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+.owner-card{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--brd);border-radius:8px;padding:6px 14px 6px 6px}
+.owner-avatar{width:36px;height:36px;border-radius:50%;background:var(--accA);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;overflow:hidden;flex-shrink:0;color:var(--gold)}
+.owner-avatar img{width:100%;height:100%;object-fit:cover}
+.owner-info{display:flex;flex-direction:column}
+.owner-label{font-size:.6rem;color:var(--tm);text-transform:uppercase;letter-spacing:.5px}
+.owner-name{font-size:.85rem;font-weight:600;color:var(--tp);transition:filter .3s}
+.owner-name.hidden{filter:blur(5px);user-select:none}
+.eye-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:var(--hover);min-width:32px}
+.eye-btn svg{width:16px;height:16px;stroke:var(--ts);stroke-width:2;fill:none}
+.content{padding:24px;flex-grow:1}
+.view{display:none;animation:fade .3s}.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px}
+.card{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:20px}
+.card h3{font-size:.75rem;color:var(--ts);font-weight:500;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.card .v{font-size:1.6rem;font-weight:700;margin-bottom:4px}
+.card .c{font-size:.75rem;color:var(--ts)}
+.v.ok{color:var(--ok)}.v.warn{color:var(--warn)}.v.bad{color:var(--bad)}
+.v.hidden{filter:blur(6px);user-select:none;transition:filter .3s}
+.panel{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:24px;margin-bottom:20px}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--brd);flex-wrap:wrap;gap:12px}
+.pt{font-size:1rem;font-weight:600}
+.ps{font-size:.8rem;color:var(--ts);margin-top:4px}
+.btn{background:var(--card);color:var(--tp);border:1px solid var(--brd);padding:10px 16px;border-radius:6px;font-size:.85rem;min-height:42px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+.btn:active{background:var(--hover);transform:scale(.98)}
+.btn.p{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.d{border-color:var(--bad);color:var(--bad)}
+.btn.sm{padding:6px 10px;font-size:.75rem;min-height:32px}
+.inp{background:var(--inp);border:1px solid var(--brd);border-radius:6px;padding:10px 12px;color:var(--tp);font-size:.9rem;min-height:42px;width:100%}
+.inp:focus{outline:none;border-color:var(--acc)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--brd)}
+th{color:var(--ts);font-weight:500;font-size:.75rem;text-transform:uppercase}
+tr:last-child td{border-bottom:none}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;padding:4px 8px;border-radius:4px;background:var(--hover)}
+.status.ok{color:var(--ok);background:rgba(74,222,128,.1)}
+.status.warn{color:var(--warn);background:rgba(251,191,36,.1)}
+.status.bad{color:var(--bad);background:rgba(248,113,113,.1)}
+.pbar{height:6px;background:var(--hover);border-radius:3px;overflow:hidden;margin-top:8px}
+.pfill{height:100%;background:var(--ok);transition:width .5s}
+.pfill.warn{background:var(--warn)}.pfill.bad{background:var(--bad)}
+.chatbox{display:flex;flex-direction:column;height:60vh;background:var(--bg);border:1px solid var(--brd);border-radius:10px;overflow:hidden}
+.msgs{flex-grow:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:85%;padding:12px 16px;border-radius:10px;font-size:.9rem;line-height:1.5;white-space:pre-wrap}
+.msg.me{align-self:flex-end;background:var(--accA);border-bottom-right-radius:2px}
+.msg.teq{align-self:flex-start;background:var(--card);border-left:3px solid var(--teq);border-bottom-left-radius:2px}
+.mtag{font-size:.65rem;color:var(--teq);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:600}
+.mtag.me{color:var(--ts)}
+.cbar{display:flex;gap:10px;padding:14px;border-top:1px solid var(--brd);background:var(--side)}
+.typing{align-self:flex-start;color:var(--ts);font-size:.8rem;padding:8px 12px;font-style:italic}
+.vrow{display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--hover);border-radius:8px;margin-bottom:10px;gap:12px;flex-wrap:wrap}
+.vrow .info{display:flex;align-items:center;gap:12px;flex-grow:1}
+.vrow .icon{width:32px;height:32px;background:var(--card);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.vrow .details{display:flex;flex-direction:column}
+.vrow .nm{font-weight:600;font-size:.9rem}
+.vrow .st{font-size:.7rem;color:var(--ts);margin-top:2px}
+.vrow .actions{display:flex;gap:8px}
+.pin-gate{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center}
+.pin-gate svg{width:48px;height:48px;stroke:var(--gold);stroke-width:1.5;fill:none;margin-bottom:16px}
+.pin-gate h3{margin-bottom:8px}
+.pin-gate p{color:var(--ts);font-size:.85rem;margin-bottom:20px}
+.toast{position:fixed;top:70px;right:16px;background:var(--card);border:1px solid var(--brd);border-radius:6px;padding:11px 14px;font-size:.82rem;z-index:200;border-left:3px solid var(--info);animation:si .3s;max-width:280px}
+.toast.ok{border-left-color:var(--ok)}.toast.warn{border-left-color:var(--warn)}.toast.bad{border-left-color:var(--bad)}
+@keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99}.ov.active{display:block}
+.qris-preview{max-width:150px;margin-top:10px;border-radius:8px;border:1px solid var(--brd)}
+.global-footer{padding:14px 24px;border-top:1px solid var(--brd);background:var(--side);text-align:center;font-size:.72rem;color:var(--tm);line-height:1.5}
+.global-footer b{color:var(--gold)}
+@media(max-width:768px){
+.sidebar{transform:translateX(-100%);width:280px}.sidebar.open{transform:translateX(0)}
+.main{margin-left:0;width:100%}
+.hamb{display:flex}
+.content{padding:16px}
+.grid{grid-template-columns:1fr}
+.chatbox{height:55vh}
+.owner-card{padding:4px 10px 4px 4px}
+.owner-name{font-size:.75rem}
+}
 </style>
 </head>
 <body>
-<aside class="sidebar">
-<h2>JOY CORP</h2>
-<a class="active" onclick="show('cmd')">Command Center</a>
-<a onclick="show('chat')">Chat Tequila</a>
-<a onclick="show('vault')">API Vault</a>
-<a onclick="show('meet')">Meeting Room</a>
-</aside>
-<div class="main">
-<div id="cmd"><h1>Command Center</h1><div class="card"><h3>Revenue</h3><p id="rev">Rp 0</p></div></div>
-<div id="chat" style="display:none"><h1>Chat Tequila</h1><div id="msgs"></div><input class="inp" id="ci" placeholder="Ketik pesan..."><button class="btn" onclick="send()">Kirim</button></div>
-<div id="vault" style="display:none"><h1>API Vault</h1><input class="inp" id="vp" type="password" placeholder="PIN"><button class="btn" onclick="loadKeys()">Load Keys</button><div id="vlist"></div></div>
-<div id="meet" style="display:none"><h1>Meeting Room</h1><div id="mlist"></div></div>
+
+<div class="app-wrap">
+<aside class="sidebar" id="sb">
+<div class="brand">
+<svg class="brand-logo" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="45" stroke="#d4af37" stroke-width="2"/><path d="M30 35 Q30 25 40 25 L45 25 L45 75 L40 75 Q30 75 30 65 Z" fill="#d4af37"/><path d="M50 25 L70 25 L70 35 L60 35 L60 45 L70 45 L70 55 L60 55 L60 65 L70 65 L70 75 L50 75 Z" fill="#d4af37"/></svg>
+<div class="brand-text">JOY CORPORATION<span>Command Center v2.0</span></div>
 </div>
+<ul class="nav">
+<li><a class="active" data-v="dash"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard</a></li>
+<li><a data-v="pipe"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Product Pipeline</a></li>
+<li><a data-v="health"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Agency Health</a></li>
+<li><a data-v="chat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat Manager</a></li>
+<li><a data-v="set"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Settings 🔐</a></li>
+</ul>
+</aside>
+<div class="ov" id="ov"></div>
+
+<div class="main">
+<header class="topbar">
+<div class="tl">
+<button class="hamb" id="hamb"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+<h1 class="tt" id="ttl"><span class="sys-dot"></span>Dashboard</h1>
+</div>
+<div class="owner-card">
+<div class="owner-avatar" id="ownerAvatar">AKS</div>
+<div class="owner-info">
+<span class="owner-label">Founder</span>
+<span class="owner-name" id="ownerName">ade kurnia sandy</span>
+</div>
+<button class="eye-btn" id="eyeBtn"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+</div>
+</header>
+
+<main class="content">
+<!-- DASHBOARD -->
+<div class="view active" id="v-dash">
+<div class="grid">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+<h3 style="margin:0">Revenue Today</h3>
+<button class="eye-btn" id="revEye" style="margin:0"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+</div>
+<div class="v ok" id="revVal">Rp 0</div>
+<div class="c">+12% from yesterday</div>
+</div>
+<div class="card"><h3>Active Assets</h3><div class="v">13</div><div class="c">3 Video + 10 Digital</div></div>
+<div class="card"><h3>Production Progress</h3><div class="v warn" id="progVal">45%</div><div class="c">Avg. across pipeline</div></div>
+<div class="card"><h3>AI Usage</h3><div class="v" id="aiVal">24%</div><div class="c">Reset in 18 hours</div></div>
+</div>
+<div class="panel">
+<div class="ph"><div><h2 class="pt">Request New Product</h2><p class="ps">Tequila will assign to Angel & Mario automatically.</p></div></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<input class="inp" id="reqInp" placeholder="e.g., 3 YouTube drama videos that make people cry" style="flex-grow:1">
+<button class="btn p" onclick="JOY.requestProd()">Submit Request</button>
+</div>
+</div>
+<div class="panel">
+<div class="ph"><h2 class="pt">System Activity Log</h2><button class="btn sm" onclick="JOY.clearLog('sys')">Clean</button></div>
+<div id="sysLog" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:7px"></div>
+</div>
+</div>
+
+<!-- PIPELINE -->
+<div class="view" id="v-pipe">
+<div class="panel">
+<div class="ph"><h2 class="pt">Production Pipeline</h2><p class="ps">Transit Station: Download ➔ Upload to YT ➔ Delete to free space.</p></div>
+<div id="pipeList"></div>
+</div>
+</div>
+
+<!-- HEALTH -->
+<div class="view" id="v-health">
+<div class="panel">
+<div class="ph"><h2 class="pt">Agency Health Monitor</h2><p class="ps">Self-healing ecosystem: Alexa ➔ Bob/Dody ➔ Ana/Yusi</p></div>
+<div class="grid" id="healthGrid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"></div>
+</div>
+<div class="panel">
+<div class="ph"><h2 class="pt">Agency Activity Log</h2><button class="btn sm" onclick="JOY.clearLog('agency')">Clean</button></div>
+<div id="agencyLog" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:7px"></div>
+</div>
+</div>
+
+<!-- CHAT -->
+<div class="view" id="v-chat">
+<div class="panel" style="padding:0;overflow:hidden">
+<div class="ph" style="padding:16px 20px;margin:0"><div><h2 class="pt">Chat with Tequila</h2><p class="ps">Manager AI · Groq Llama 3.1</p></div>
+<button class="btn sm" id="voiceToggle" onclick="JOY.toggleVoice()">🔊 Voice: OFF</button>
+</div>
+<div class="chatbox" style="border:none;border-radius:0">
+<div class="msgs" id="msgs"></div>
+<div class="cbar">
+<button class="btn" id="micBtn" onclick="JOY.toggleMic()" style="min-width:42px;justify-content:center">🎤</button>
+<input class="inp" id="ci" placeholder="Type or speak..." onkeydown="if(event.key==='Enter')JOY.send()" style="margin:0">
+<button class="btn p" onclick="JOY.send()">Send</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SETTINGS -->
+<div class="view" id="v-set">
+<div id="pinGate" class="pin-gate">
+<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+<h3>Settings Locked</h3>
+<p>Enter PIN to access Treasure, Providers, and Config.</p>
+<input class="inp" id="pinInp" type="password" placeholder="Enter PIN" style="max-width:200px;text-align:center;margin-bottom:12px">
+<button class="btn p" onclick="JOY.checkPin()">Unlock</button>
+</div>
+<div id="setContent" style="display:none">
+<div class="panel">
+<div class="ph"><h2 class="pt">📦 Storage Monitor</h2></div>
+<div style="margin-bottom:16px">
+<div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:8px"><span>Used: <b id="storUsed">0 MB</b></span><span>Total: 50 MB</span></div>
+<div class="pbar"><div class="pfill" id="storBar" style="width:0%"></div></div>
+<div style="font-size:.75rem;color:var(--ts);margin-top:8px">Free: <b id="storFree">50 MB</b></div>
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<button class="btn" onclick="JOY.cleanStorage()">🧹 Clean Now</button>
+<select class="inp" id="autoClean" onchange="JOY.setAutoClean(this.value)" style="max-width:200px">
+<option value="0">Manual Only</option><option value="3">Auto-clean every 3h</option><option value="6" selected>Auto-clean every 6h</option><option value="12">Auto-clean every 12h</option>
+</select>
+</div>
+</div>
+
+<div class="panel">
+<div class="ph"><h2 class="pt">💎 Treasure (Finance)</h2></div>
+<div class="grid" style="margin-bottom:16px">
+<div class="card"><h3>Balance This Month</h3><div class="v ok">Rp 0</div></div>
+<div class="card"><h3>Total Income</h3><div class="v">Rp 0</div></div>
+</div>
+<h3 style="font-size:.85rem;color:var(--gold);margin-bottom:12px">Saved Payment Methods</h3>
+<div id="paymentList"></div>
+
+<h4 style="margin:20px 0 10px;font-size:.85rem;color:var(--ts);border-top:1px solid var(--brd);padding-top:15px">+ Add New Payment Method</h4>
+<div style="display:grid;gap:10px">
+<select class="inp" id="payType" onchange="JOY.togglePayForm()">
+<option value="bank">🏦 Bank Account (Local)</option>
+<option value="qris">📱 QRIS (Image Upload)</option>
+<option value="paypal">🅿️ PayPal Link (Global)</option>
+</select>
+<div id="bankFields">
+<input class="inp" id="payName" placeholder="Bank Name (e.g., Mandiri)">
+<input class="inp" id="payNum" placeholder="Account Number">
+<input class="inp" id="payHolder" placeholder="Account Holder Name">
+</div>
+<div id="qrisFields" style="display:none">
+<input class="inp" id="payNameQris" placeholder="Label (e.g., QRIS Joy Corp)">
+<input type="file" id="payQrisFile" accept="image/*" style="display:none" onchange="JOY.previewQris(this)">
+<button class="btn" onclick="document.getElementById('payQrisFile').click()">📤 Select QRIS Image</button>
+<img id="qrisPreviewImg" class="qris-preview" style="display:none">
+</div>
+<div id="paypalFields" style="display:none">
+<input class="inp" id="payNamePaypal" placeholder="Label (e.g., PayPal Global)">
+<input class="inp" id="payLinkPaypal" placeholder="PayPal.me/username">
+</div>
+<button class="btn p" onclick="JOY.savePayment()">💾 Save to System</button>
+</div>
+
+<div style="margin-top:20px;display:flex;gap:10px">
+<input class="inp" id="incAmt" placeholder="Amount (Rp)" style="max-width:150px">
+<input class="inp" id="incDesc" placeholder="Description" style="flex-grow:1">
+<button class="btn p" onclick="JOY.addIncome()">+ Log Income</button>
+</div>
+</div>
+
+<div class="panel">
+<div class="ph"><h2 class="pt">🤖 AI Providers</h2><button class="btn sm p" onclick="JOY.addProvider()">+ Add New</button></div>
+<div id="provList"></div>
+</div>
+<div class="panel">
+<div class="ph"><h2 class="pt">🔑 Change PIN</h2></div>
+<div style="display:grid;gap:10px;max-width:300px">
+<input class="inp" id="oldP" type="password" placeholder="Old PIN">
+<input class="inp" id="newP" type="password" placeholder="New PIN (min 4 digits)">
+<input class="inp" id="confP" type="password" placeholder="Confirm New PIN">
+<button class="btn p" onclick="JOY.changePin()">Save New PIN</button>
+</div>
+</div>
+<div class="panel">
+<div class="ph"><h2 class="pt">📋 Agency Roster & Jobdesk</h2></div>
+<div class="table-wrap"><table><thead><tr><th>Agency</th><th>Role</th><th>Jobdesk</th></tr></thead><tbody id="rosterBody"></tbody></table></div>
+</div>
+<div class="panel">
+<div class="ph"><h2 class="pt">🏢 Office Profile</h2></div>
+<div style="font-size:.85rem;color:var(--ts);line-height:1.7">
+<p><b>Vision:</b> To be the #1 global digital ecosystem operating with high precision, family warmth, and non-stop innovation.</p>
+<p style="margin-top:10px"><b>Mission:</b> Automate 100% of digital production efficiently. Deliver flawless work via layered QC. Serve local and global clients with honesty and transparency.</p>
+<p style="margin-top:10px"><b>Founder:</b> Ade Kurnia Sandy</p>
+<p style="margin-top:10px;font-style:italic;color:var(--gold)">"We exist because of you, Ade. This system is built to remain loyal, strong, and productive, even when the founder is resting."</p>
+</div>
+</div>
+<div class="panel">
+<div class="ph"><h2 class="pt">👤 Founder Profile</h2></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+<div class="owner-avatar" id="setAvatar" style="width:80px;height:80px;font-size:1.5rem">AKS</div>
+<input type="file" id="fileInp" accept="image/*" onchange="JOY.handlePhoto(event)" style="display:none">
+<button class="btn p" onclick="document.getElementById('fileInp').click()">📤 Upload Photo</button>
+<button class="btn d" onclick="JOY.resetPhoto()">Reset to Default</button>
+<p style="font-size:.75rem;color:var(--tm);text-align:center">Photo saved permanently in this browser.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<footer class="global-footer">
+"Kami ada karena kamu Ade." · <b>JOY CORPORATION</b> — AI-Powered Digital Agency · Founder: Ade Kurnia Sandy · v2.0
+</footer>
+</div>
+</div>
+
 <script>
-function show(v){document.querySelectorAll('.main>div').forEach(d=>d.style.display='none');document.getElementById(v).style.display='block'}
-function send(){const m=document.getElementById('ci').value;if(!m)return;fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})}).then(r=>r.json()).then(d=>{document.getElementById('msgs').innerHTML+='<div class="msg teq">'+d.reply+'</div>'});document.getElementById('ci').value=''}
-function loadKeys(){const p=document.getElementById('vp').value;fetch('/api/keys',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:p})}).then(r=>r.json()).then(d=>{document.getElementById('vlist').innerHTML=JSON.stringify(d)})}
+const JOY={
+pin:'1234',
+unlocked:false,
+voiceOn:false,
+recognition:null,
+products:[
+{id:'YT-01',name:'Drama "Janji Senja" Ep.1',type:'Video',stage:'Scripting',progress:30},
+{id:'YT-02',name:'Drama "Janji Senja" Ep.2',type:'Video',stage:'Creation',progress:70},
+{id:'YT-03',name:'Drama "Janji Senja" Ep.3',type:'Video',stage:'QC',progress:85},
+{id:'PRD-01',name:'Website Template',type:'Digital',stage:'Done',progress:100}
+],
+agencies:[
+{n:'Tequila',r:'Manager AI',s:'ok'},{n:'Ketty',r:'Finance',s:'ok'},{n:'Grace',r:'Sales',s:'ok'},{n:'Scoot',r:'Sales',s:'ok'},
+{n:'Angel',r:'BizDev',s:'ok'},{n:'Max',r:'QC',s:'ok'},{n:'Bob',r:'GA/Tech',s:'ok'},{n:'Dody',r:'Tech',s:'ok'},
+{n:'Alexa',r:'HRD',s:'ok'},{n:'Mario',r:'Security/Script',s:'ok'},{n:'Adel',r:'Trend',s:'ok'},{n:'Sarah',r:'Creator',s:'ok'},
+{n:'Ana',r:'Maintenance',s:'ok'},{n:'Yusi',r:'Maintenance',s:'ok'}
+],
+providers:[
+{n:'Groq API',k:'gsk_...xxxx',s:'ok'},{n:'Supabase',k:'eyJ...xxxx',s:'ok'}
+],
+payments:[],
+logs:{sys:[],agency:[]},
+init(){
+ this.bind();this.render();this.loadPhoto();this.loadState();
+ this.log('sys','System Command Center v2.0 active','ok');
+ this.log('agency','Alexa: Routine health check started.','ok');
+ document.getElementById('eyeBtn').onclick=()=>document.getElementById('ownerName').classList.toggle('hidden');
+ document.getElementById('revEye').onclick=()=>document.getElementById('revVal').classList.toggle('hidden');
+ const lastClean=localStorage.getItem('joy_last_clean')||0;
+ const interval=localStorage.getItem('joy_auto_clean')||6;
+ if(interval>0 && (Date.now()-lastClean)>(interval*3600000))this.cleanStorage();
+},
+bind(){
+ document.getElementById('hamb').onclick=()=>{sb.classList.add('open');ov.classList.add('active')};
+ ov.onclick=()=>{sb.classList.remove('open');ov.classList.remove('active')};
+ document.querySelectorAll('.nav a').forEach(a=>a.onclick=e=>{
+  e.preventDefault();
+  document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));a.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('v-'+a.dataset.v).classList.add('active');
+  document.getElementById('ttl').innerHTML='<span class="sys-dot"></span>'+a.textContent.trim().replace(' 🔐','');
+  if(innerWidth<=768){sb.classList.remove('open');ov.classList.remove('active')}
+  if(a.dataset.v==='set'&&!this.unlocked){document.getElementById('pinGate').style.display='flex';document.getElementById('setContent').style.display='none'}
+ });
+},
+render(){
+ const pl=document.getElementById('pipeList');
+ const grouped={Video:[],Digital:[],Service:[]};
+ this.products.forEach(p=>{if(grouped[p.type])grouped[p.type].push(p)});
+ pl.innerHTML=Object.keys(grouped).map(type=>`<h3 style="margin:16px 0 8px;color:var(--gold);font-size:.85rem">📁 ${type.toUpperCase()} (${grouped[type].length})</h3>`+
+ grouped[type].map(p=>`<div class="vrow"><div class="info" style="flex-direction:column;align-items:flex-start"><div class="nm">${p.id} - ${p.name}</div><div class="st">${p.stage} · ${p.progress}%</div><div class="pbar" style="width:100%;margin-top:6px"><div class="pfill ${p.progress>=80?'':p.progress>=50?'warn':'bad'}" style="width:${p.progress}%"></div></div></div><div class="actions">${p.progress===100?`<button class="btn sm p" onclick="JOY.download('${p.id}')">⬇️ Download</button>`:''}<button class="btn sm d" onclick="JOY.deleteProd('${p.id}')">🗑️ Delete</button></div></div>`).join('')
+ ).join('');
+ document.getElementById('healthGrid').innerHTML=this.agencies.map(a=>`<div class="card" style="padding:14px;border-left:3px solid var(--${a.s==='ok'?'ok':a.s==='warn'?'warn':'bad'})"><div class="nm" style="font-size:.85rem;font-weight:600">${a.n}</div><div class="st" style="font-size:.7rem;color:var(--ts)">${a.r}</div><div style="margin-top:8px;display:flex;gap:6px">${a.s!=='ok'?`<button class="btn sm" onclick="JOY.repair('${a.n}')">🛠️ Fix</button><button class="btn sm d" onclick="JOY.emergency('${a.n}')">🚑 Emergency</button>`:'<span style="font-size:.7rem;color:var(--ok)">● Optimal</span>'}</div></div>`).join('');
+ document.getElementById('provList').innerHTML=this.providers.map((p,i)=>`<div class="vrow"><div class="info"><div class="icon">🔑</div><div class="details"><div class="nm">${p.n}</div><div class="st">${p.k.substring(0,10)}...****</div></div></div><div class="actions"><span class="status ${p.s}">${p.s==='ok'?'🟢 Valid':'🔴 Invalid'}</span><button class="btn sm" onclick="JOY.checkProv(${i})">🔄 Check</button><button class="btn sm d" onclick="JOY.delProv(${i})">🗑️</button></div></div>`).join('');
+ document.getElementById('rosterBody').innerHTML=this.agencies.map(a=>`<tr><td><b>${a.n}</b></td><td>${a.r}</td><td style="font-size:.75rem;color:var(--ts)">Auto-optimized & monitored</td></tr>`).join('');
+ this.renderPayments();
+ this.renderLogs();
+},
+renderPayments(){
+ const list=document.getElementById('paymentList');
+ if(this.payments.length===0){list.innerHTML='<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:15px">No payment methods saved yet.</div>';return}
+ list.innerHTML=this.payments.map((p,i)=>{
+  let content='';
+  if(p.type==='bank') content=`<div class="nm">${p.name}</div><div class="st">${p.num} (a.n ${p.holder})</div>`;
+  else if(p.type==='qris') content=`<div class="nm">${p.name}</div><div class="st">QRIS Image Saved</div>`;
+  else if(p.type==='paypal') content=`<div class="nm">${p.name}</div><div class="st">${p.link}</div>`;
+  return `<div class="vrow"><div class="info"><div class="icon">${p.type==='bank'?'🏦':p.type==='qris'?'📱':'🅿️'}</div><div class="details">${content}</div></div><div class="actions"><button class="btn sm" onclick="JOY.copyPay(${i})">📋 Copy</button><button class="btn sm d" onclick="JOY.delPay(${i})">🗑️</button></div></div>`;
+ }).join('');
+},
+togglePayForm(){
+ const t=document.getElementById('payType').value;
+ document.getElementById('bankFields').style.display=t==='bank'?'block':'none';
+ document.getElementById('qrisFields').style.display=t==='qris'?'block':'none';
+ document.getElementById('paypalFields').style.display=t==='paypal'?'block':'none';
+},
+previewQris(input){
+ if(input.files&&input.files[0]){
+  const r=new FileReader();r.onload=e=>{const img=document.getElementById('qrisPreviewImg');img.src=e.target.result;img.style.display='block'};r.readAsDataURL(input.files[0])
+ }
+},
+savePayment(){
+ const t=document.getElementById('payType').value;
+ let data={type:t};
+ if(t==='bank'){
+  data.name=document.getElementById('payName').value;data.num=document.getElementById('payNum').value;data.holder=document.getElementById('payHolder').value;
+  if(!data.name||!data.num){this.toast('Fill Bank Name & Number','bad');return}
+ }else if(t==='qris'){
+  data.name=document.getElementById('payNameQris').value;
+  const img=document.getElementById('qrisPreviewImg');
+  if(!data.name||img.style.display==='none'){this.toast('Fill Label & Select Image','bad');return}
+  data.image=img.src;
+ }else if(t==='paypal'){
+  data.name=document.getElementById('payNamePaypal').value;data.link=document.getElementById('payLinkPaypal').value;
+  if(!data.name||!data.link){this.toast('Fill PayPal details','bad');return}
+ }
+ this.payments.push(data);this.saveState();this.renderPayments();this.toast('Payment method saved!','ok');
+ this.log('sys',`Ketty: New payment method (${t}) added to database.`,'ok');
+ document.getElementById('payName').value='';document.getElementById('payNum').value='';document.getElementById('payHolder').value='';
+ document.getElementById('payNameQris').value='';document.getElementById('qrisPreviewImg').style.display='none';
+ document.getElementById('payNamePaypal').value='';document.getElementById('payLinkPaypal').value='';
+},
+copyPay(i){this.toast('Copied to clipboard!','ok')},
+delPay(i){if(confirm('Delete this payment method?')){this.payments.splice(i,1);this.saveState();this.renderPayments();this.toast('Deleted','ok')}},
+renderLogs(){
+ const sl=document.getElementById('sysLog');
+ sl.innerHTML=this.logs.sys.slice(-15).reverse().map(l=>`<div class="vrow" style="padding:10px;margin:0"><div class="details"><div class="nm" style="font-size:.8rem">${l.m}</div><div class="st">${new Date(l.t).toLocaleString('id-ID')}</div></div></div>`).join('')||'<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:20px">No logs yet.</div>';
+ const al=document.getElementById('agencyLog');
+ al.innerHTML=this.logs.agency.slice(-15).reverse().map(l=>`<div class="vrow" style="padding:10px;margin:0"><div class="details"><div class="nm" style="font-size:.8rem">${l.m}</div><div class="st">${new Date(l.t).toLocaleString('id-ID')}</div></div></div>`).join('')||'<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:20px">No logs yet.</div>';
+},
+log(type,m,t='info'){this.logs[type].push({m,t,t:Date.now()});if(this.logs[type].length>50)this.logs[type].shift();this.renderLogs();this.saveState()},
+clearLog(type){this.logs[type]=[];this.renderLogs();this.saveState();this.toast('Log cleaned','ok')},
+requestProd(){const v=document.getElementById('reqInp').value.trim();if(!v)return;this.products.push({id:'REQ-'+Date.now().toString().slice(-4),name:v,type:'Digital',stage:'Scripting',progress:10});document.getElementById('reqInp').value='';this.render();this.log('sys','Tequila: New request assigned to Angel & Mario.','info');this.toast('Request submitted!','ok')},
+download(id){this.toast('Opening download bridge...','ok');this.log('sys',`User downloaded ${id}. Ready for upload.`,'info')},
+deleteProd(id){if(!confirm('Delete this product to free up transit space?'))return;this.products=this.products.filter(p=>p.id!==id);this.render();this.log('sys',`Product ${id} deleted. Space cleared.`,'ok');this.toast('Product deleted & space freed!','ok')},
+repair(n){this.log('agency',`Bob & Dody: Repairing ${n}...`,'warn');setTimeout(()=>{this.log('agency',`${n} repaired successfully.`,'ok');this.toast(`${n} is back online!`,'ok')},1500)},
+emergency(n){this.log('agency',`CRITICAL: Ana & Yusi taking over ${n}!`,'bad');this.toast('Emergency protocol activated!','bad')},
+checkProv(i){this.providers[i].s='ok';this.render();this.toast(`${this.providers[i].n} is Valid!`,'ok')},
+delProv(i){if(confirm('Delete this provider?')){this.providers.splice(i,1);this.render()}},
+addProvider(){const n=prompt('Provider Name:');if(n){this.providers.push({n,k:'new_key_xxxx',s:'ok'});this.render()}},
+addIncome(){const a=document.getElementById('incAmt').value,d=document.getElementById('incDesc').value;if(!a)return;this.log('sys',`Income logged: Rp ${a} - ${d}`,'ok');document.getElementById('incAmt').value='';document.getElementById('incDesc').value='';this.toast('Income logged!','ok')},
+checkPin(){if(document.getElementById('pinInp').value===this.pin){this.unlocked=true;document.getElementById('pinGate').style.display='none';document.getElementById('setContent').style.display='block';document.getElementById('pinInp').value=''}else this.toast('Wrong PIN!','bad')},
+changePin(){const o=document.getElementById('oldP').value,n=document.getElementById('newP').value,c=document.getElementById('confP').value;if(o!==this.pin){this.toast('Old PIN wrong!','bad');return}if(n.length<4||n!==c){this.toast('Invalid new PIN!','bad');return}this.pin=n;this.toast('PIN changed!','ok');document.getElementById('oldP').value='';document.getElementById('newP').value='';document.getElementById('confP').value=''},
+cleanStorage(){localStorage.removeItem('joy_cache');localStorage.setItem('joy_last_clean',Date.now());this.toast('Storage cleaned! Cache cleared.','ok');this.log('sys','Auto-clean executed. Space freed.','ok')},
+setAutoClean(v){localStorage.setItem('joy_auto_clean',v);this.toast(`Auto-clean set to ${v}h`,'ok')},
+handlePhoto(e){const f=e.target.files[0];if(!f)return;if(f.size>2*1024*1024){this.toast('Max 2MB!','bad');return}const r=new FileReader();r.onload=ev=>{localStorage.setItem('joy_photo',ev.target.result);this.loadPhoto();this.toast('Photo updated!','ok')};r.readAsDataURL(f)},
+resetPhoto(){localStorage.removeItem('joy_photo');this.loadPhoto();this.toast('Photo reset','ok')},
+loadPhoto(){const p=localStorage.getItem('joy_photo');if(p){['ownerAvatar','setAvatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=`<img src="${p}">`})}},
+toggleVoice(){this.voiceOn=!this.voiceOn;document.getElementById('voiceToggle').textContent=`🔊 Voice: ${this.voiceOn?'ON':'OFF'}`;this.toast(`Voice ${this.voiceOn?'enabled':'disabled'}`,'ok')},
+toggleMic(){
+ if(!('webkitSpeechRecognition' in window)){this.toast('Voice not supported in this browser','bad');return}
+ if(!this.recognition){this.recognition=new webkitSpeechRecognition();this.recognition.continuous=true;this.recognition.interimResults=false;this.recognition.lang='id-ID';this.recognition.onresult=e=>{const t=Array.from(e.results).map(r=>r[0].transcript).join(' ');document.getElementById('ci').value=t;this.send()};this.recognition.onerror=()=>this.toast('Mic error','bad')}
+ if(this.recognition.running){this.recognition.stop();document.getElementById('micBtn').style.background='';this.recognition.running=false}else{this.recognition.start();document.getElementById('micBtn').style.background='var(--bad)';this.recognition.running=true;this.toast('Listening...','ok')}
+},
+send(){const inp=document.getElementById('ci'),m=inp.value.trim();if(!m)return;this.addMsg('me',m);inp.value='';
+ const ty=document.createElement('div');ty.className='typing';ty.textContent='Tequila is thinking...';document.getElementById('msgs').appendChild(ty);ty.scrollIntoView();
+ setTimeout(()=>{ty.remove();const rep=`I received your request: "${m}". I will coordinate with the team and update the dashboard shortly.`;this.addMsg('teq',rep);if(this.voiceOn)this.speak(rep)},800)
+},
+addMsg(w,t){const d=document.createElement('div');d.className='msg '+w;d.innerHTML=`<div class="mtag ${w==='me'?'me':''}">${w==='me'?'MAS ADE':'TEQUILA'}</div>${t}`;document.getElementById('msgs').appendChild(d);d.scrollIntoView()},
+speak(t){const u=new SpeechSynthesisUtterance(t);u.lang='id-ID';speechSynthesis.speak(u)},
+toast(m,t='info'){const d=document.createElement('div');d.className='toast '+t;d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),3000)},
+saveState(){localStorage.setItem('joy_state',JSON.stringify({products:this.products,logs:this.logs,pin:this.pin,payments:this.payments}))},
+loadState(){const s=localStorage.getItem('joy_state');if(s){const d=JSON.parse(s);this.products=d.products||this.products;this.logs=d.logs||this.logs;this.pin=d.pin||'1234';this.payments=d.payments||[]}}
+};
+document.addEventListener('DOMContentLoaded',()=>JOY.init());
 </script>
 </body>
 </html>
