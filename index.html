@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>JOY CORPORATION — Command Center v2.0</title>
+<title>JOY CORPORATION — Command Center v2.1</title>
 <style>
 :root{--bg:#121212;--side:#18181b;--card:#1e1e24;--hover:#27272a;--inp:#1a1a1f;--brd:#2a2a30;--tp:#e4e4e7;--ts:#a1a1aa;--tm:#71717a;--acc:#52525b;--accA:#3f3f46;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--info:#60a5fa;--teq:#f59e0b;--gold:#d4af37}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -117,14 +117,14 @@ tr:last-child td{border-bottom:none}
 <aside class="sidebar" id="sb">
 <div class="brand">
 <svg class="brand-logo" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="45" stroke="#d4af37" stroke-width="2"/><path d="M30 35 Q30 25 40 25 L45 25 L45 75 L40 75 Q30 75 30 65 Z" fill="#d4af37"/><path d="M50 25 L70 25 L70 35 L60 35 L60 45 L70 45 L70 55 L60 55 L60 65 L70 65 L70 75 L50 75 Z" fill="#d4af37"/></svg>
-<div class="brand-text">JOY CORPORATION<span>Command Center v2.0</span></div>
+<div class="brand-text">JOY CORPORATION<span>Command Center v2.1</span></div>
 </div>
 <ul class="nav">
 <li><a class="active" data-v="dash"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard</a></li>
 <li><a data-v="pipe"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Product Pipeline</a></li>
 <li><a data-v="health"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Agency Health</a></li>
 <li><a data-v="chat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat Manager</a></li>
-<li><a data-v="set"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Settings 🔐</a></li>
+<li><a data-v="set"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Pengaturan 🔐</a></li>
 </ul>
 </aside>
 <div class="ov" id="ov"></div>
@@ -151,25 +151,25 @@ tr:last-child td{border-bottom:none}
 <div class="grid">
 <div class="card">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-<h3 style="margin:0">Revenue Today</h3>
+<h3 style="margin:0">Pendapatan Hari Ini</h3>
 <button class="eye-btn" id="revEye" style="margin:0"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
 </div>
 <div class="v ok" id="revVal">Rp 0</div>
-<div class="c">+12% from yesterday</div>
+<div class="c">+12% dari kemarin</div>
 </div>
-<div class="card"><h3>Active Assets</h3><div class="v">13</div><div class="c">3 Video + 10 Digital</div></div>
-<div class="card"><h3>Production Progress</h3><div class="v warn" id="progVal">45%</div><div class="c">Avg. across pipeline</div></div>
-<div class="card"><h3>AI Usage</h3><div class="v" id="aiVal">24%</div><div class="c">Reset in 18 hours</div></div>
+<div class="card"><h3>Aset Aktif</h3><div class="v">13</div><div class="c">3 Video + 10 Digital</div></div>
+<div class="card"><h3>Progres Produksi</h3><div class="v warn" id="progVal">45%</div><div class="c">Rata-rata pipeline</div></div>
+<div class="card"><h3>Penggunaan AI</h3><div class="v" id="aiVal">24%</div><div class="c">Reset dalam 18 jam</div></div>
 </div>
 <div class="panel">
-<div class="ph"><div><h2 class="pt">Request New Product</h2><p class="ps">Tequila will assign to Angel & Mario automatically.</p></div></div>
+<div class="ph"><div><h2 class="pt">Request Produk Baru</h2><p class="ps">Tequila akan otomatis meneruskan ke Angel & Mario.</p></div></div>
 <div style="display:flex;gap:10px;flex-wrap:wrap">
-<input class="inp" id="reqInp" placeholder="e.g., 3 YouTube drama videos that make people cry" style="flex-grow:1">
-<button class="btn p" onclick="JOY.requestProd()">Submit Request</button>
+<input class="inp" id="reqInp" placeholder="Contoh: 3 video YouTube drama percintaan yang bikin baper" style="flex-grow:1">
+<button class="btn p" onclick="JOY.requestProd()">Kirim Request</button>
 </div>
 </div>
 <div class="panel">
-<div class="ph"><h2 class="pt">System Activity Log</h2><button class="btn sm" onclick="JOY.clearLog('sys')">Clean</button></div>
+<div class="ph"><h2 class="pt">Log Aktivitas Sistem</h2><button class="btn sm" onclick="JOY.clearLog('sys')">Bersihkan</button></div>
 <div id="sysLog" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:7px"></div>
 </div>
 </div>
@@ -177,7 +177,7 @@ tr:last-child td{border-bottom:none}
 <!-- PIPELINE -->
 <div class="view" id="v-pipe">
 <div class="panel">
-<div class="ph"><h2 class="pt">Production Pipeline</h2><p class="ps">Transit Station: Download ➔ Upload to YT ➔ Delete to free space.</p></div>
+<div class="ph"><h2 class="pt">Production Pipeline</h2><p class="ps">Stasiun Transit: Download ➔ Upload ke YT ➔ Hapus untuk hemat ruang.</p></div>
 <div id="pipeList"></div>
 </div>
 </div>
@@ -185,11 +185,11 @@ tr:last-child td{border-bottom:none}
 <!-- HEALTH -->
 <div class="view" id="v-health">
 <div class="panel">
-<div class="ph"><h2 class="pt">Agency Health Monitor</h2><p class="ps">Self-healing ecosystem: Alexa ➔ Bob/Dody ➔ Ana/Yusi</p></div>
+<div class="ph"><h2 class="pt">Monitor Kesehatan Agency</h2><p class="ps">Ekosistem Self-healing: Alexa ➔ Bob/Dody ➔ Ana/Yusi</p></div>
 <div class="grid" id="healthGrid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"></div>
 </div>
 <div class="panel">
-<div class="ph"><h2 class="pt">Agency Activity Log</h2><button class="btn sm" onclick="JOY.clearLog('agency')">Clean</button></div>
+<div class="ph"><h2 class="pt">Log Aktivitas Agency</h2><button class="btn sm" onclick="JOY.clearLog('agency')">Bersihkan</button></div>
 <div id="agencyLog" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:7px"></div>
 </div>
 </div>
@@ -197,15 +197,15 @@ tr:last-child td{border-bottom:none}
 <!-- CHAT -->
 <div class="view" id="v-chat">
 <div class="panel" style="padding:0;overflow:hidden">
-<div class="ph" style="padding:16px 20px;margin:0"><div><h2 class="pt">Chat with Tequila</h2><p class="ps">Manager AI · Groq Llama 3.1</p></div>
-<button class="btn sm" id="voiceToggle" onclick="JOY.toggleVoice()">🔊 Voice: OFF</button>
+<div class="ph" style="padding:16px 20px;margin:0"><div><h2 class="pt">Chat dengan Tequila</h2><p class="ps">Manager AI · Groq Llama 3.1</p></div>
+<button class="btn sm" id="voiceToggle" onclick="JOY.toggleVoice()">🔊 Suara: MATI</button>
 </div>
 <div class="chatbox" style="border:none;border-radius:0">
 <div class="msgs" id="msgs"></div>
 <div class="cbar">
 <button class="btn" id="micBtn" onclick="JOY.toggleMic()" style="min-width:42px;justify-content:center">🎤</button>
-<input class="inp" id="ci" placeholder="Type or speak..." onkeydown="if(event.key==='Enter')JOY.send()" style="margin:0">
-<button class="btn p" onclick="JOY.send()">Send</button>
+<input class="inp" id="ci" placeholder="Ketik atau bicara..." onkeydown="if(event.key==='Enter')JOY.send()" style="margin:0">
+<button class="btn p" onclick="JOY.send()">Kirim</button>
 </div>
 </div>
 </div>
@@ -215,102 +215,102 @@ tr:last-child td{border-bottom:none}
 <div class="view" id="v-set">
 <div id="pinGate" class="pin-gate">
 <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-<h3>Settings Locked</h3>
-<p>Enter PIN to access Treasure, Providers, and Config.</p>
-<input class="inp" id="pinInp" type="password" placeholder="Enter PIN" style="max-width:200px;text-align:center;margin-bottom:12px">
-<button class="btn p" onclick="JOY.checkPin()">Unlock</button>
+<h3>Pengaturan Terkunci</h3>
+<p>Masukkan PIN untuk akses Treasure, Provider, dan Konfigurasi.</p>
+<input class="inp" id="pinInp" type="password" placeholder="Masukkan PIN" style="max-width:200px;text-align:center;margin-bottom:12px">
+<button class="btn p" onclick="JOY.checkPin()">Buka Kunci</button>
 </div>
 <div id="setContent" style="display:none">
 <div class="panel">
-<div class="ph"><h2 class="pt">📦 Storage Monitor</h2></div>
+<div class="ph"><h2 class="pt">📦 Monitor Penyimpanan</h2></div>
 <div style="margin-bottom:16px">
-<div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:8px"><span>Used: <b id="storUsed">0 MB</b></span><span>Total: 50 MB</span></div>
+<div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:8px"><span>Terpakai: <b id="storUsed">0 MB</b></span><span>Total: 50 MB</span></div>
 <div class="pbar"><div class="pfill" id="storBar" style="width:0%"></div></div>
-<div style="font-size:.75rem;color:var(--ts);margin-top:8px">Free: <b id="storFree">50 MB</b></div>
+<div style="font-size:.75rem;color:var(--ts);margin-top:8px">Sisa: <b id="storFree">50 MB</b></div>
 </div>
 <div style="display:flex;gap:10px;flex-wrap:wrap">
-<button class="btn" onclick="JOY.cleanStorage()">🧹 Clean Now</button>
+<button class="btn" onclick="JOY.cleanStorage()">🧹 Bersihkan Sekarang</button>
 <select class="inp" id="autoClean" onchange="JOY.setAutoClean(this.value)" style="max-width:200px">
-<option value="0">Manual Only</option><option value="3">Auto-clean every 3h</option><option value="6" selected>Auto-clean every 6h</option><option value="12">Auto-clean every 12h</option>
+<option value="0">Manual Saja</option><option value="3">Otomatis setiap 3 jam</option><option value="6" selected>Otomatis setiap 6 jam</option><option value="12">Otomatis setiap 12 jam</option>
 </select>
 </div>
 </div>
 
 <div class="panel">
-<div class="ph"><h2 class="pt">💎 Treasure (Finance)</h2></div>
+<div class="ph"><h2 class="pt">💎 Treasure (Keuangan)</h2></div>
 <div class="grid" style="margin-bottom:16px">
-<div class="card"><h3>Balance This Month</h3><div class="v ok">Rp 0</div></div>
-<div class="card"><h3>Total Income</h3><div class="v">Rp 0</div></div>
+<div class="card"><h3>Saldo Bulan Ini</h3><div class="v ok">Rp 0</div></div>
+<div class="card"><h3>Total Pendapatan</h3><div class="v">Rp 0</div></div>
 </div>
-<h3 style="font-size:.85rem;color:var(--gold);margin-bottom:12px">Saved Payment Methods</h3>
+<h3 style="font-size:.85rem;color:var(--gold);margin-bottom:12px">Metode Pembayaran Tersimpan</h3>
 <div id="paymentList"></div>
 
-<h4 style="margin:20px 0 10px;font-size:.85rem;color:var(--ts);border-top:1px solid var(--brd);padding-top:15px">+ Add New Payment Method</h4>
+<h4 style="margin:20px 0 10px;font-size:.85rem;color:var(--ts);border-top:1px solid var(--brd);padding-top:15px">+ Tambah Metode Pembayaran Baru</h4>
 <div style="display:grid;gap:10px">
 <select class="inp" id="payType" onchange="JOY.togglePayForm()">
-<option value="bank">🏦 Bank Account (Local)</option>
-<option value="qris">📱 QRIS (Image Upload)</option>
-<option value="paypal">🅿️ PayPal Link (Global)</option>
+<option value="bank">🏦 Rekening Bank (Lokal)</option>
+<option value="qris">📱 QRIS (Upload Gambar)</option>
+<option value="paypal">🅿️ Link PayPal (Global)</option>
 </select>
 <div id="bankFields">
-<input class="inp" id="payName" placeholder="Bank Name (e.g., Mandiri)">
-<input class="inp" id="payNum" placeholder="Account Number">
-<input class="inp" id="payHolder" placeholder="Account Holder Name">
+<input class="inp" id="payName" placeholder="Nama Bank (Contoh: Mandiri)">
+<input class="inp" id="payNum" placeholder="Nomor Rekening">
+<input class="inp" id="payHolder" placeholder="Nama Pemilik Rekening">
 </div>
 <div id="qrisFields" style="display:none">
-<input class="inp" id="payNameQris" placeholder="Label (e.g., QRIS Joy Corp)">
+<input class="inp" id="payNameQris" placeholder="Label (Contoh: QRIS Joy Corp)">
 <input type="file" id="payQrisFile" accept="image/*" style="display:none" onchange="JOY.previewQris(this)">
-<button class="btn" onclick="document.getElementById('payQrisFile').click()">📤 Select QRIS Image</button>
+<button class="btn" onclick="document.getElementById('payQrisFile').click()">📤 Pilih Gambar QRIS</button>
 <img id="qrisPreviewImg" class="qris-preview" style="display:none">
 </div>
 <div id="paypalFields" style="display:none">
-<input class="inp" id="payNamePaypal" placeholder="Label (e.g., PayPal Global)">
-<input class="inp" id="payLinkPaypal" placeholder="PayPal.me/username">
+<input class="inp" id="payNamePaypal" placeholder="Label (Contoh: PayPal Global)">
+<input class="inp" id="payLinkPaypal" placeholder="PayPal.me/username atau Email">
 </div>
-<button class="btn p" onclick="JOY.savePayment()">💾 Save to System</button>
+<button class="btn p" onclick="JOY.savePayment()">💾 Simpan ke Sistem</button>
 </div>
 
 <div style="margin-top:20px;display:flex;gap:10px">
-<input class="inp" id="incAmt" placeholder="Amount (Rp)" style="max-width:150px">
-<input class="inp" id="incDesc" placeholder="Description" style="flex-grow:1">
-<button class="btn p" onclick="JOY.addIncome()">+ Log Income</button>
+<input class="inp" id="incAmt" placeholder="Jumlah (Rp)" style="max-width:150px">
+<input class="inp" id="incDesc" placeholder="Keterangan" style="flex-grow:1">
+<button class="btn p" onclick="JOY.addIncome()">+ Catat Pemasukan</button>
 </div>
 </div>
 
 <div class="panel">
-<div class="ph"><h2 class="pt">🤖 AI Providers</h2><button class="btn sm p" onclick="JOY.addProvider()">+ Add New</button></div>
+<div class="ph"><h2 class="pt">🤖 AI Providers</h2><button class="btn sm p" onclick="JOY.addProvider()">+ Tambah Baru</button></div>
 <div id="provList"></div>
 </div>
 <div class="panel">
-<div class="ph"><h2 class="pt">🔑 Change PIN</h2></div>
+<div class="ph"><h2 class="pt">🔑 Ganti PIN</h2></div>
 <div style="display:grid;gap:10px;max-width:300px">
-<input class="inp" id="oldP" type="password" placeholder="Old PIN">
-<input class="inp" id="newP" type="password" placeholder="New PIN (min 4 digits)">
-<input class="inp" id="confP" type="password" placeholder="Confirm New PIN">
-<button class="btn p" onclick="JOY.changePin()">Save New PIN</button>
+<input class="inp" id="oldP" type="password" placeholder="PIN Lama">
+<input class="inp" id="newP" type="password" placeholder="PIN Baru (min 4 digit)">
+<input class="inp" id="confP" type="password" placeholder="Konfirmasi PIN Baru">
+<button class="btn p" onclick="JOY.changePin()">Simpan PIN Baru</button>
 </div>
 </div>
 <div class="panel">
-<div class="ph"><h2 class="pt">📋 Agency Roster & Jobdesk</h2></div>
-<div class="table-wrap"><table><thead><tr><th>Agency</th><th>Role</th><th>Jobdesk</th></tr></thead><tbody id="rosterBody"></tbody></table></div>
+<div class="ph"><h2 class="pt">📋 Daftar Agency & Jobdesk</h2></div>
+<div class="table-wrap"><table><thead><tr><th>Agency</th><th>Peran</th><th>Jobdesk</th></tr></thead><tbody id="rosterBody"></tbody></table></div>
 </div>
 <div class="panel">
-<div class="ph"><h2 class="pt">🏢 Office Profile</h2></div>
+<div class="ph"><h2 class="pt">🏢 Profil Kantor</h2></div>
 <div style="font-size:.85rem;color:var(--ts);line-height:1.7">
-<p><b>Vision:</b> To be the #1 global digital ecosystem operating with high precision, family warmth, and non-stop innovation.</p>
-<p style="margin-top:10px"><b>Mission:</b> Automate 100% of digital production efficiently. Deliver flawless work via layered QC. Serve local and global clients with honesty and transparency.</p>
+<p><b>Visi:</b> Menjadi ekosistem digital global nomor satu yang beroperasi dengan presisi tinggi, kehangatan keluarga, dan inovasi tanpa henti.</p>
+<p style="margin-top:10px"><b>Misi:</b> Mengotomatisasi 100% proses produksi digital secara efisien. Memberikan hasil karya yang bebas cacat melalui QC berlapis. Melayani pelanggan lokal dan global dengan jujur dan transparan.</p>
 <p style="margin-top:10px"><b>Founder:</b> Ade Kurnia Sandy</p>
-<p style="margin-top:10px;font-style:italic;color:var(--gold)">"We exist because of you, Ade. This system is built to remain loyal, strong, and productive, even when the founder is resting."</p>
+<p style="margin-top:10px;font-style:italic;color:var(--gold)">"Kami ada karena kamu Ade. Sistem ini dibangun agar tetap setia, kuat, dan terus berkarya, bahkan saat sang pendiri sedang beristirahat."</p>
 </div>
 </div>
 <div class="panel">
-<div class="ph"><h2 class="pt">👤 Founder Profile</h2></div>
+<div class="ph"><h2 class="pt">👤 Profil Founder</h2></div>
 <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
 <div class="owner-avatar" id="setAvatar" style="width:80px;height:80px;font-size:1.5rem">AKS</div>
 <input type="file" id="fileInp" accept="image/*" onchange="JOY.handlePhoto(event)" style="display:none">
-<button class="btn p" onclick="document.getElementById('fileInp').click()">📤 Upload Photo</button>
-<button class="btn d" onclick="JOY.resetPhoto()">Reset to Default</button>
-<p style="font-size:.75rem;color:var(--tm);text-align:center">Photo saved permanently in this browser.</p>
+<button class="btn p" onclick="document.getElementById('fileInp').click()">📤 Upload Foto</button>
+<button class="btn d" onclick="JOY.resetPhoto()">Reset ke Default</button>
+<p style="font-size:.75rem;color:var(--tm);text-align:center">Foto disimpan permanen di browser ini.</p>
 </div>
 </div>
 </div>
@@ -318,7 +318,7 @@ tr:last-child td{border-bottom:none}
 </main>
 
 <footer class="global-footer">
-"Kami ada karena kamu Ade." · <b>JOY CORPORATION</b> — AI-Powered Digital Agency · Founder: Ade Kurnia Sandy · v2.0
+"Kami ada karena kamu Ade." · <b>JOY CORPORATION</b> — AI-Powered Digital Agency · Founder: Ade Kurnia Sandy · v2.1
 </footer>
 </div>
 </div>
@@ -330,15 +330,15 @@ unlocked:false,
 voiceOn:false,
 recognition:null,
 products:[
-{id:'YT-01',name:'Drama "Janji Senja" Ep.1',type:'Video',stage:'Scripting',progress:30},
-{id:'YT-02',name:'Drama "Janji Senja" Ep.2',type:'Video',stage:'Creation',progress:70},
-{id:'YT-03',name:'Drama "Janji Senja" Ep.3',type:'Video',stage:'QC',progress:85},
-{id:'PRD-01',name:'Website Template',type:'Digital',stage:'Done',progress:100}
+{id:'YT-01',name:'Drama "Janji Senja" Ep.1',type:'Video',stage:'Bedah & Skrip',progress:30},
+{id:'YT-02',name:'Drama "Janji Senja" Ep.2',type:'Video',stage:'Kreasi',progress:70},
+{id:'YT-03',name:'Drama "Janji Senja" Ep.3',type:'Video',stage:'QC Berlapis',progress:85},
+{id:'PRD-01',name:'Template Website',type:'Digital',stage:'Selesai',progress:100}
 ],
 agencies:[
-{n:'Tequila',r:'Manager AI',s:'ok'},{n:'Ketty',r:'Finance',s:'ok'},{n:'Grace',r:'Sales',s:'ok'},{n:'Scoot',r:'Sales',s:'ok'},
-{n:'Angel',r:'BizDev',s:'ok'},{n:'Max',r:'QC',s:'ok'},{n:'Bob',r:'GA/Tech',s:'ok'},{n:'Dody',r:'Tech',s:'ok'},
-{n:'Alexa',r:'HRD',s:'ok'},{n:'Mario',r:'Security/Script',s:'ok'},{n:'Adel',r:'Trend',s:'ok'},{n:'Sarah',r:'Creator',s:'ok'},
+{n:'Tequila',r:'Manager AI',s:'ok'},{n:'Ketty',r:'Keuangan',s:'ok'},{n:'Grace',r:'Penjualan',s:'ok'},{n:'Scoot',r:'Penjualan',s:'ok'},
+{n:'Angel',r:'BizDev',s:'ok'},{n:'Max',r:'QC',s:'ok'},{n:'Bob',r:'GA/Tech',s:'ok'},{n:'Dody',r:'Teknis',s:'ok'},
+{n:'Alexa',r:'HRD',s:'ok'},{n:'Mario',r:'Security/Script',s:'ok'},{n:'Adel',r:'Riset Trend',s:'ok'},{n:'Sarah',r:'Kreator',s:'ok'},
 {n:'Ana',r:'Maintenance',s:'ok'},{n:'Yusi',r:'Maintenance',s:'ok'}
 ],
 providers:[
@@ -348,15 +348,14 @@ payments:[],
 logs:{sys:[],agency:[]},
 
 init(){
- // URUTAN KRITIS: load data DULUAN, baru render
  this.bind();
  this.loadPhoto();
  this.loadState();
  this.render();
  this.setupEyeButtons();
  this.checkAutoClean();
- this.log('sys','System Command Center v2.0 active','ok');
- this.log('agency','Alexa: Routine health check started.','ok');
+ this.log('sys','Sistem Command Center v2.1 aktif dan berjalan optimal.','ok');
+ this.log('agency','Alexa: Pengecekan kesehatan rutin dimulai.','ok');
 },
 
 bind(){
@@ -380,23 +379,16 @@ bind(){
 },
 
 setupEyeButtons(){
- // Pasang event listener mata revenue & owner SETELAH render
  const ownerBtn=document.getElementById('eyeBtn');
  const revBtn=document.getElementById('revEye');
- if(ownerBtn){
-  ownerBtn.onclick=()=>document.getElementById('ownerName').classList.toggle('hidden');
- }
- if(revBtn){
-  revBtn.onclick=()=>document.getElementById('revVal').classList.toggle('hidden');
- }
+ if(ownerBtn) ownerBtn.onclick=()=>document.getElementById('ownerName').classList.toggle('hidden');
+ if(revBtn) revBtn.onclick=()=>document.getElementById('revVal').classList.toggle('hidden');
 },
 
 checkAutoClean(){
  const lastClean=parseInt(localStorage.getItem('joy_last_clean')||'0');
  const interval=parseInt(localStorage.getItem('joy_auto_clean')||'6');
- if(interval>0 && (Date.now()-lastClean)>(interval*3600000)){
-  this.cleanStorage();
- }
+ if(interval>0 && (Date.now()-lastClean)>(interval*3600000)) this.cleanStorage();
 },
 
 render(){
@@ -414,38 +406,38 @@ renderPipeline(){
  const grouped={Video:[],Digital:[],Service:[]};
  this.products.forEach(p=>{if(grouped[p.type])grouped[p.type].push(p)});
  pl.innerHTML=Object.keys(grouped).map(type=>`<h3 style="margin:16px 0 8px;color:var(--gold);font-size:.85rem">📁 ${type.toUpperCase()} (${grouped[type].length})</h3>`+
- grouped[type].map(p=>`<div class="vrow"><div class="info" style="flex-direction:column;align-items:flex-start"><div class="nm">${p.id} - ${p.name}</div><div class="st">${p.stage} · ${p.progress}%</div><div class="pbar" style="width:100%;margin-top:6px"><div class="pfill ${p.progress>=80?'':p.progress>=50?'warn':'bad'}" style="width:${p.progress}%"></div></div></div><div class="actions">${p.progress===100?`<button class="btn sm p" onclick="JOY.download('${p.id}')">⬇️ Download</button>`:''}<button class="btn sm d" onclick="JOY.deleteProd('${p.id}')">🗑️ Delete</button></div></div>`).join('')
+ grouped[type].map(p=>`<div class="vrow"><div class="info" style="flex-direction:column;align-items:flex-start"><div class="nm">${p.id} - ${p.name}</div><div class="st">${p.stage} · ${p.progress}%</div><div class="pbar" style="width:100%;margin-top:6px"><div class="pfill ${p.progress>=80?'':p.progress>=50?'warn':'bad'}" style="width:${p.progress}%"></div></div></div><div class="actions">${p.progress===100?`<button class="btn sm p" onclick="JOY.download('${p.id}')">⬇️ Download</button>`:''}<button class="btn sm d" onclick="JOY.deleteProd('${p.id}')">🗑️ Hapus</button></div></div>`).join('')
  ).join('');
 },
 
 renderHealth(){
  const hg=document.getElementById('healthGrid');
  if(!hg)return;
- hg.innerHTML=this.agencies.map(a=>`<div class="card" style="padding:14px;border-left:3px solid var(--${a.s==='ok'?'ok':a.s==='warn'?'warn':'bad'})"><div class="nm" style="font-size:.85rem;font-weight:600">${a.n}</div><div class="st" style="font-size:.7rem;color:var(--ts)">${a.r}</div><div style="margin-top:8px;display:flex;gap:6px">${a.s!=='ok'?`<button class="btn sm" onclick="JOY.repair('${a.n}')">🛠️ Fix</button><button class="btn sm d" onclick="JOY.emergency('${a.n}')">🚑 Emergency</button>`:'<span style="font-size:.7rem;color:var(--ok)">● Optimal</span>'}</div></div>`).join('');
+ hg.innerHTML=this.agencies.map(a=>`<div class="card" style="padding:14px;border-left:3px solid var(--${a.s==='ok'?'ok':a.s==='warn'?'warn':'bad'})"><div class="nm" style="font-size:.85rem;font-weight:600">${a.n}</div><div class="st" style="font-size:.7rem;color:var(--ts)">${a.r}</div><div style="margin-top:8px;display:flex;gap:6px">${a.s!=='ok'?`<button class="btn sm" onclick="JOY.repair('${a.n}')">🛠️ Perbaiki</button><button class="btn sm d" onclick="JOY.emergency('${a.n}')">🚑 Darurat</button>`:'<span style="font-size:.7rem;color:var(--ok)">● Prima</span>'}</div></div>`).join('');
 },
 
 renderProviders(){
  const pl=document.getElementById('provList');
  if(!pl)return;
- pl.innerHTML=this.providers.map((p,i)=>`<div class="vrow"><div class="info"><div class="icon">🔑</div><div class="details"><div class="nm">${p.n}</div><div class="st">${p.k.substring(0,10)}...****</div></div></div><div class="actions"><span class="status ${p.s}">${p.s==='ok'?'🟢 Valid':'🔴 Invalid'}</span><button class="btn sm" onclick="JOY.checkProv(${i})">🔄 Check</button><button class="btn sm d" onclick="JOY.delProv(${i})">🗑️</button></div></div>`).join('');
+ pl.innerHTML=this.providers.map((p,i)=>`<div class="vrow"><div class="info"><div class="icon">🔑</div><div class="details"><div class="nm">${p.n}</div><div class="st">${p.k.substring(0,10)}...****</div></div></div><div class="actions"><span class="status ${p.s}">${p.s==='ok'?'🟢 Valid':'🔴 Invalid'}</span><button class="btn sm" onclick="JOY.checkProv(${i})">🔄 Cek</button><button class="btn sm d" onclick="JOY.delProv(${i})">🗑️</button></div></div>`).join('');
 },
 
 renderRoster(){
  const rb=document.getElementById('rosterBody');
  if(!rb)return;
- rb.innerHTML=this.agencies.map(a=>`<tr><td><b>${a.n}</b></td><td>${a.r}</td><td style="font-size:.75rem;color:var(--ts)">Auto-optimized & monitored</td></tr>`).join('');
+ rb.innerHTML=this.agencies.map(a=>`<tr><td><b>${a.n}</b></td><td>${a.r}</td><td style="font-size:.75rem;color:var(--ts)">Dioptimalkan & dipantau otomatis</td></tr>`).join('');
 },
 
 renderPayments(){
  const list=document.getElementById('paymentList');
  if(!list)return;
- if(this.payments.length===0){list.innerHTML='<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:15px">No payment methods saved yet.</div>';return}
+ if(this.payments.length===0){list.innerHTML='<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:15px">Belum ada metode pembayaran tersimpan.</div>';return}
  list.innerHTML=this.payments.map((p,i)=>{
   let content='';
   if(p.type==='bank') content=`<div class="nm">${p.name}</div><div class="st">${p.num} (a.n ${p.holder})</div>`;
-  else if(p.type==='qris') content=`<div class="nm">${p.name}</div><div class="st">QRIS Image Saved</div>`;
+  else if(p.type==='qris') content=`<div class="nm">${p.name}</div><div class="st">Gambar QRIS Tersimpan</div>`;
   else if(p.type==='paypal') content=`<div class="nm">${p.name}</div><div class="st">${p.link}</div>`;
-  return `<div class="vrow"><div class="info"><div class="icon">${p.type==='bank'?'🏦':p.type==='qris'?'📱':'🅿️'}</div><div class="details">${content}</div></div><div class="actions"><button class="btn sm" onclick="JOY.copyPay(${i})">📋 Copy</button><button class="btn sm d" onclick="JOY.delPay(${i})">🗑️</button></div></div>`;
+  return `<div class="vrow"><div class="info"><div class="icon">${p.type==='bank'?'🏦':p.type==='qris'?'📱':'🅿️'}</div><div class="details">${content}</div></div><div class="actions"><button class="btn sm" onclick="JOY.copyPay(${i})">📋 Salin</button><button class="btn sm d" onclick="JOY.delPay(${i})">🗑️</button></div></div>`;
  }).join('');
 },
 
@@ -453,10 +445,10 @@ renderLogs(){
  const sl=document.getElementById('sysLog');
  const al=document.getElementById('agencyLog');
  if(sl){
-  sl.innerHTML=this.logs.sys.slice(-15).reverse().map(l=>`<div class="vrow" style="padding:10px;margin:0"><div class="details"><div class="nm" style="font-size:.8rem">${l.m}</div><div class="st">${new Date(l.t).toLocaleString('id-ID')}</div></div></div>`).join('')||'<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:20px">No logs yet.</div>';
+  sl.innerHTML=this.logs.sys.slice(-15).reverse().map(l=>`<div class="vrow" style="padding:10px;margin:0"><div class="details"><div class="nm" style="font-size:.8rem">${l.m}</div><div class="st">${new Date(l.t).toLocaleString('id-ID')}</div></div></div>`).join('')||'<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:20px">Belum ada log.</div>';
  }
  if(al){
-  al.innerHTML=this.logs.agency.slice(-15).reverse().map(l=>`<div class="vrow" style="padding:10px;margin:0"><div class="details"><div class="nm" style="font-size:.8rem">${l.m}</div><div class="st">${new Date(l.t).toLocaleString('id-ID')}</div></div></div>`).join('')||'<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:20px">No logs yet.</div>';
+  al.innerHTML=this.logs.agency.slice(-15).reverse().map(l=>`<div class="vrow" style="padding:10px;margin:0"><div class="details"><div class="nm" style="font-size:.8rem">${l.m}</div><div class="st">${new Date(l.t).toLocaleString('id-ID')}</div></div></div>`).join('')||'<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:20px">Belum ada log.</div>';
  }
 },
 
@@ -478,18 +470,18 @@ savePayment(){
  let data={type:t};
  if(t==='bank'){
   data.name=document.getElementById('payName').value;data.num=document.getElementById('payNum').value;data.holder=document.getElementById('payHolder').value;
-  if(!data.name||!data.num){this.toast('Fill Bank Name & Number','bad');return}
+  if(!data.name||!data.num){this.toast('Isi Nama Bank & Nomor Rekening','bad');return}
  }else if(t==='qris'){
   data.name=document.getElementById('payNameQris').value;
   const img=document.getElementById('qrisPreviewImg');
-  if(!data.name||img.style.display==='none'){this.toast('Fill Label & Select Image','bad');return}
+  if(!data.name||img.style.display==='none'){this.toast('Isi Label & Pilih Gambar','bad');return}
   data.image=img.src;
  }else if(t==='paypal'){
   data.name=document.getElementById('payNamePaypal').value;data.link=document.getElementById('payLinkPaypal').value;
-  if(!data.name||!data.link){this.toast('Fill PayPal details','bad');return}
+  if(!data.name||!data.link){this.toast('Isi detail PayPal','bad');return}
  }
- this.payments.push(data);this.saveState();this.renderPayments();this.toast('Payment method saved!','ok');
- this.log('sys',`Ketty: New payment method (${t}) added to database.`,'ok');
+ this.payments.push(data);this.saveState();this.renderPayments();this.toast('Metode pembayaran disimpan!','ok');
+ this.log('sys',`Ketty: Metode pembayaran baru (${t}) ditambahkan ke database.`,'ok');
  document.getElementById('payName').value='';document.getElementById('payNum').value='';document.getElementById('payHolder').value='';
  document.getElementById('payNameQris').value='';document.getElementById('qrisPreviewImg').style.display='none';
  document.getElementById('payNamePaypal').value='';document.getElementById('payLinkPaypal').value='';
@@ -502,10 +494,10 @@ copyPay(i){
  else if(p.type==='paypal') text=p.link;
  else text=p.name;
  if(navigator.clipboard){navigator.clipboard.writeText(text)}
- this.toast('Copied to clipboard!','ok');
+ this.toast('Disalin ke clipboard!','ok');
 },
 
-delPay(i){if(confirm('Delete this payment method?')){this.payments.splice(i,1);this.saveState();this.renderPayments();this.toast('Deleted','ok')}},
+delPay(i){if(confirm('Hapus metode pembayaran ini?')){this.payments.splice(i,1);this.saveState();this.renderPayments();this.toast('Dihapus','ok')}},
 
 log(type,m,t='info'){
  this.logs[type].push({m,t,t:Date.now()});
@@ -514,47 +506,47 @@ log(type,m,t='info'){
  this.saveState();
 },
 
-clearLog(type){this.logs[type]=[];this.renderLogs();this.saveState();this.toast('Log cleaned','ok')},
+clearLog(type){this.logs[type]=[];this.renderLogs();this.saveState();this.toast('Log dibersihkan','ok')},
 
 requestProd(){
  const v=document.getElementById('reqInp').value.trim();
  if(!v)return;
- this.products.push({id:'REQ-'+Date.now().toString().slice(-4),name:v,type:'Digital',stage:'Scripting',progress:10});
+ this.products.push({id:'REQ-'+Date.now().toString().slice(-4),name:v,type:'Digital',stage:'Bedah & Skrip',progress:10});
  document.getElementById('reqInp').value='';
  this.renderPipeline();
- this.log('sys','Tequila: New request assigned to Angel & Mario.','info');
- this.toast('Request submitted!','ok');
+ this.log('sys','Tequila: Request baru diteruskan ke Angel & Mario untuk dibedah.','info');
+ this.toast('Request dikirim!','ok');
 },
 
-download(id){this.toast('Opening download bridge...','ok');this.log('sys',`User downloaded ${id}. Ready for upload.`,'info')},
+download(id){this.toast('Membuka jembatan download...','ok');this.log('sys',`User mendownload ${id}. Siap diupload.`,'info')},
 
 deleteProd(id){
- if(!confirm('Delete this product to free up transit space?'))return;
+ if(!confirm('Hapus produk ini untuk mengosongkan ruang transit?'))return;
  this.products=this.products.filter(p=>p.id!==id);
  this.renderPipeline();
- this.log('sys',`Product ${id} deleted. Space cleared.`,'ok');
- this.toast('Product deleted & space freed!','ok');
+ this.log('sys',`Produk ${id} dihapus. Ruang dikosongkan.`,'ok');
+ this.toast('Produk dihapus & ruang lega!','ok');
 },
 
 repair(n){
- this.log('agency',`Bob & Dody: Repairing ${n}...`,'warn');
- setTimeout(()=>{this.log('agency',`${n} repaired successfully.`,'ok');this.toast(`${n} is back online!`,'ok')},1500);
+ this.log('agency',`Bob & Dody: Memperbaiki ${n}...`,'warn');
+ setTimeout(()=>{this.log('agency',`${n} berhasil diperbaiki.`,'ok');this.toast(`${n} sudah online kembali!`,'ok')},1500);
 },
 
-emergency(n){this.log('agency',`CRITICAL: Ana & Yusi taking over ${n}!`,'bad');this.toast('Emergency protocol activated!','bad')},
+emergency(n){this.log('agency',`KRITIS: Ana & Yusi mengambil alih ${n}!`,'bad');this.toast('Protokol darurat diaktifkan!','bad')},
 
-checkProv(i){this.providers[i].s='ok';this.renderProviders();this.toast(`${this.providers[i].n} is Valid!`,'ok')},
+checkProv(i){this.providers[i].s='ok';this.renderProviders();this.toast(`${this.providers[i].n} Valid!`,'ok')},
 
-delProv(i){if(confirm('Delete this provider?')){this.providers.splice(i,1);this.renderProviders()}},
+delProv(i){if(confirm('Hapus provider ini?')){this.providers.splice(i,1);this.renderProviders()}},
 
-addProvider(){const n=prompt('Provider Name:');if(n){this.providers.push({n,k:'new_key_xxxx',s:'ok'});this.renderProviders()}},
+addProvider(){const n=prompt('Nama Provider:');if(n){this.providers.push({n,k:'new_key_xxxx',s:'ok'});this.renderProviders()}},
 
 addIncome(){
  const a=document.getElementById('incAmt').value,d=document.getElementById('incDesc').value;
  if(!a)return;
- this.log('sys',`Income logged: Rp ${a} - ${d}`,'ok');
+ this.log('sys',`Pemasukan dicatat: Rp ${a} - ${d}`,'ok');
  document.getElementById('incAmt').value='';document.getElementById('incDesc').value='';
- this.toast('Income logged!','ok');
+ this.toast('Pemasukan dicatat!','ok');
 },
 
 checkPin(){
@@ -563,14 +555,14 @@ checkPin(){
   document.getElementById('pinGate').style.display='none';
   document.getElementById('setContent').style.display='block';
   document.getElementById('pinInp').value='';
- }else this.toast('Wrong PIN!','bad');
+ }else this.toast('PIN salah!','bad');
 },
 
 changePin(){
  const o=document.getElementById('oldP').value,n=document.getElementById('newP').value,c=document.getElementById('confP').value;
- if(o!==this.pin){this.toast('Old PIN wrong!','bad');return}
- if(n.length<4||n!==c){this.toast('Invalid new PIN!','bad');return}
- this.pin=n;this.toast('PIN changed!','ok');
+ if(o!==this.pin){this.toast('PIN lama salah!','bad');return}
+ if(n.length<4||n!==c){this.toast('PIN baru tidak valid!','bad');return}
+ this.pin=n;this.toast('PIN berhasil diubah!','ok');
  document.getElementById('oldP').value='';document.getElementById('newP').value='';document.getElementById('confP').value='';
  this.saveState();
 },
@@ -578,19 +570,19 @@ changePin(){
 cleanStorage(){
  localStorage.removeItem('joy_cache');
  localStorage.setItem('joy_last_clean',Date.now());
- this.toast('Storage cleaned! Cache cleared.','ok');
- this.log('sys','Auto-clean executed. Space freed.','ok');
+ this.toast('Penyimpanan dibersihkan! Cache dihapus.','ok');
+ this.log('sys','Pembersihan otomatis dijalankan. Ruang dikosongkan.','ok');
 },
 
-setAutoClean(v){localStorage.setItem('joy_auto_clean',v);this.toast(`Auto-clean set to ${v}h`,'ok')},
+setAutoClean(v){localStorage.setItem('joy_auto_clean',v);this.toast(`Pembersihan otomatis diatur ke ${v} jam`,'ok')},
 
 handlePhoto(e){
  const f=e.target.files[0];if(!f)return;
- if(f.size>2*1024*1024){this.toast('Max 2MB!','bad');return}
- const r=new FileReader();r.onload=ev=>{localStorage.setItem('joy_photo',ev.target.result);this.loadPhoto();this.toast('Photo updated!','ok')};r.readAsDataURL(f);
+ if(f.size>2*1024*1024){this.toast('Maksimal 2MB!','bad');return}
+ const r=new FileReader();r.onload=ev=>{localStorage.setItem('joy_photo',ev.target.result);this.loadPhoto();this.toast('Foto diperbarui!','ok')};r.readAsDataURL(f);
 },
 
-resetPhoto(){localStorage.removeItem('joy_photo');this.loadPhoto();this.toast('Photo reset','ok')},
+resetPhoto(){localStorage.removeItem('joy_photo');this.loadPhoto();this.toast('Foto direset','ok')},
 
 loadPhoto(){
  const p=localStorage.getItem('joy_photo');
@@ -604,12 +596,12 @@ loadPhoto(){
 
 toggleVoice(){
  this.voiceOn=!this.voiceOn;
- document.getElementById('voiceToggle').textContent=`🔊 Voice: ${this.voiceOn?'ON':'OFF'}`;
- this.toast(`Voice ${this.voiceOn?'enabled':'disabled'}`,'ok');
+ document.getElementById('voiceToggle').textContent=`🔊 Suara: ${this.voiceOn?'NYALA':'MATI'}`;
+ this.toast(`Suara ${this.voiceOn?'diaktifkan':'dimatikan'}`,'ok');
 },
 
 toggleMic(){
- if(!('webkitSpeechRecognition' in window)){this.toast('Voice not supported in this browser','bad');return}
+ if(!('webkitSpeechRecognition' in window)){this.toast('Suara tidak didukung di browser ini','bad');return}
  if(!this.recognition){
   this.recognition=new webkitSpeechRecognition();
   this.recognition.continuous=true;
@@ -620,7 +612,7 @@ toggleMic(){
    document.getElementById('ci').value=t;
    this.send();
   };
-  this.recognition.onerror=()=>this.toast('Mic error','bad');
+  this.recognition.onerror=()=>this.toast('Error mic','bad');
  }
  if(this.recognition.running){
   this.recognition.stop();
@@ -630,7 +622,7 @@ toggleMic(){
   this.recognition.start();
   document.getElementById('micBtn').style.background='var(--bad)';
   this.recognition.running=true;
-  this.toast('Listening...','ok');
+  this.toast('Mendengarkan...','ok');
  }
 },
 
@@ -639,11 +631,12 @@ send(){
  if(!m)return;
  this.addMsg('me',m);
  inp.value='';
- const ty=document.createElement('div');ty.className='typing';ty.textContent='Tequila is thinking...';
+ const ty=document.createElement('div');ty.className='typing';ty.textContent='Tequila sedang memproses...';
  document.getElementById('msgs').appendChild(ty);ty.scrollIntoView();
  setTimeout(()=>{
   ty.remove();
-  const rep=`I received your request: "${m}". I will coordinate with the team and update the dashboard shortly.`;
+  // TEQUILA BICARA BAHASA INDONESIA
+  const rep = `Baik, Mas Ade. Perintah "${m}" sudah saya terima. Saya akan langsung koordinasikan ke tim terkait dan memantau progresnya. Ada hal lain yang perlu saya siapkan?`;
   this.addMsg('teq',rep);
   if(this.voiceOn)this.speak(rep);
  },800);
@@ -690,4 +683,4 @@ loadState(){
 document.addEventListener('DOMContentLoaded',()=>JOY.init());
 </script>
 </body>
-</html>
+ </html>
