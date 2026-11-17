@@ -197,7 +197,7 @@ tr:last-child td{border-bottom:none}
 <!-- CHAT -->
 <div class="view" id="v-chat">
 <div class="panel" style="padding:0;overflow:hidden">
-<div class="ph" style="padding:16px 20px;margin:0"><div><h2 class="pt">Chat dengan Tequila</h2><p class="ps">Manager AI · Groq Llama 3.1</p></div>
+<div class="ph" style="padding:16px 20px;margin:0"><div><h2 class="pt">Chat dengan Tequila</h2><p class="ps">Manager AI · Terhubung ke Server Groq</p></div>
 <button class="btn sm" id="voiceToggle" onclick="JOY.toggleVoice()">🔊 Suara: MATI</button>
 </div>
 <div class="chatbox" style="border:none;border-radius:0">
@@ -354,7 +354,7 @@ init(){
  this.render();
  this.setupEyeButtons();
  this.checkAutoClean();
- this.log('sys','Sistem Command Center v2.1 aktif dan berjalan optimal.','ok');
+ this.log('sys','Sistem Command Center v2.1 aktif. Terhubung ke backend.', 'ok');
  this.log('agency','Alexa: Pengecekan kesehatan rutin dimulai.','ok');
 },
 
@@ -626,21 +626,50 @@ toggleMic(){
  }
 },
 
-send(){
- const inp=document.getElementById('ci'),m=inp.value.trim();
+// === INI ADALAH MESIN ASLI (REAL API INTEGRATION) ===
+async send(){
+ const inp=document.getElementById('ci');
+ const m=inp.value.trim();
  if(!m)return;
+ 
  this.addMsg('me',m);
  inp.value='';
- const ty=document.createElement('div');ty.className='typing';ty.textContent='Tequila sedang memproses...';
- document.getElementById('msgs').appendChild(ty);ty.scrollIntoView();
- setTimeout(()=>{
+ 
+ const ty=document.createElement('div');
+ ty.className='typing';
+ ty.textContent='Tequila sedang berpikir...';
+ document.getElementById('msgs').appendChild(ty);
+ ty.scrollIntoView();
+
+ try {
+  // Mengirim request ke backend API Mas Ade yang ada di GitHub (/api/chat)
+  const response = await fetch('/api/chat', {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json' },
+   body: JSON.stringify({ 
+    message: m,
+    history: this.logs.sys.slice(-3) 
+   })
+  });
+
+  const data = await response.json();
   ty.remove();
-  // TEQUILA BICARA BAHASA INDONESIA
-  const rep = `Baik, Mas Ade. Perintah "${m}" sudah saya terima. Saya akan langsung koordinasikan ke tim terkait dan memantau progresnya. Ada hal lain yang perlu saya siapkan?`;
-  this.addMsg('teq',rep);
-  if(this.voiceOn)this.speak(rep);
- },800);
+
+  // Menangani berbagai format response dari backend
+  const reply = data.reply || data.response || data.message || data.choices?.[0]?.message?.content || "Maaf Mas Ade, sistem tidak merespon dengan format yang benar.";
+  
+  this.addMsg('teq', reply);
+  if(this.voiceOn) this.speak(reply);
+  
+  this.log('sys', `Tequila memproses: "${m.substring(0, 30)}..."`, 'info');
+
+ } catch (error) {
+  ty.remove();
+  this.addMsg('teq', 'Maaf Mas Ade, gagal terhubung ke server API. Pastikan file api/chat.js sudah terdeploy dengan benar di Vercel dan Groq API Key sudah aktif.');
+  console.error('Chat API Error:', error);
+ }
 },
+// =================================================
 
 addMsg(w,t){
  const d=document.createElement('div');d.className='msg '+w;
@@ -683,4 +712,4 @@ loadState(){
 document.addEventListener('DOMContentLoaded',()=>JOY.init());
 </script>
 </body>
- </html>
+                                                                      </html>
