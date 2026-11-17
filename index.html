@@ -346,44 +346,99 @@ providers:[
 ],
 payments:[],
 logs:{sys:[],agency:[]},
+
 init(){
- this.bind();this.render();this.loadPhoto();this.loadState();
+ // URUTAN KRITIS: load data DULUAN, baru render
+ this.bind();
+ this.loadPhoto();
+ this.loadState();
+ this.render();
+ this.setupEyeButtons();
+ this.checkAutoClean();
  this.log('sys','System Command Center v2.0 active','ok');
  this.log('agency','Alexa: Routine health check started.','ok');
- document.getElementById('eyeBtn').onclick=()=>document.getElementById('ownerName').classList.toggle('hidden');
- document.getElementById('revEye').onclick=()=>document.getElementById('revVal').classList.toggle('hidden');
- const lastClean=localStorage.getItem('joy_last_clean')||0;
- const interval=localStorage.getItem('joy_auto_clean')||6;
- if(interval>0 && (Date.now()-lastClean)>(interval*3600000))this.cleanStorage();
 },
+
 bind(){
+ const sb=document.getElementById('sb');
+ const ov=document.getElementById('ov');
  document.getElementById('hamb').onclick=()=>{sb.classList.add('open');ov.classList.add('active')};
  ov.onclick=()=>{sb.classList.remove('open');ov.classList.remove('active')};
  document.querySelectorAll('.nav a').forEach(a=>a.onclick=e=>{
   e.preventDefault();
-  document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));a.classList.add('active');
+  document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));
+  a.classList.add('active');
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('v-'+a.dataset.v).classList.add('active');
   document.getElementById('ttl').innerHTML='<span class="sys-dot"></span>'+a.textContent.trim().replace(' 🔐','');
-  if(innerWidth<=768){sb.classList.remove('open');ov.classList.remove('active')}
-  if(a.dataset.v==='set'&&!this.unlocked){document.getElementById('pinGate').style.display='flex';document.getElementById('setContent').style.display='none'}
+  if(window.innerWidth<=768){sb.classList.remove('open');ov.classList.remove('active')}
+  if(a.dataset.v==='set'&&!this.unlocked){
+   document.getElementById('pinGate').style.display='flex';
+   document.getElementById('setContent').style.display='none';
+  }
  });
 },
+
+setupEyeButtons(){
+ // Pasang event listener mata revenue & owner SETELAH render
+ const ownerBtn=document.getElementById('eyeBtn');
+ const revBtn=document.getElementById('revEye');
+ if(ownerBtn){
+  ownerBtn.onclick=()=>document.getElementById('ownerName').classList.toggle('hidden');
+ }
+ if(revBtn){
+  revBtn.onclick=()=>document.getElementById('revVal').classList.toggle('hidden');
+ }
+},
+
+checkAutoClean(){
+ const lastClean=parseInt(localStorage.getItem('joy_last_clean')||'0');
+ const interval=parseInt(localStorage.getItem('joy_auto_clean')||'6');
+ if(interval>0 && (Date.now()-lastClean)>(interval*3600000)){
+  this.cleanStorage();
+ }
+},
+
 render(){
+ this.renderPipeline();
+ this.renderHealth();
+ this.renderProviders();
+ this.renderRoster();
+ this.renderPayments();
+ this.renderLogs();
+},
+
+renderPipeline(){
  const pl=document.getElementById('pipeList');
+ if(!pl)return;
  const grouped={Video:[],Digital:[],Service:[]};
  this.products.forEach(p=>{if(grouped[p.type])grouped[p.type].push(p)});
  pl.innerHTML=Object.keys(grouped).map(type=>`<h3 style="margin:16px 0 8px;color:var(--gold);font-size:.85rem">📁 ${type.toUpperCase()} (${grouped[type].length})</h3>`+
  grouped[type].map(p=>`<div class="vrow"><div class="info" style="flex-direction:column;align-items:flex-start"><div class="nm">${p.id} - ${p.name}</div><div class="st">${p.stage} · ${p.progress}%</div><div class="pbar" style="width:100%;margin-top:6px"><div class="pfill ${p.progress>=80?'':p.progress>=50?'warn':'bad'}" style="width:${p.progress}%"></div></div></div><div class="actions">${p.progress===100?`<button class="btn sm p" onclick="JOY.download('${p.id}')">⬇️ Download</button>`:''}<button class="btn sm d" onclick="JOY.deleteProd('${p.id}')">🗑️ Delete</button></div></div>`).join('')
  ).join('');
- document.getElementById('healthGrid').innerHTML=this.agencies.map(a=>`<div class="card" style="padding:14px;border-left:3px solid var(--${a.s==='ok'?'ok':a.s==='warn'?'warn':'bad'})"><div class="nm" style="font-size:.85rem;font-weight:600">${a.n}</div><div class="st" style="font-size:.7rem;color:var(--ts)">${a.r}</div><div style="margin-top:8px;display:flex;gap:6px">${a.s!=='ok'?`<button class="btn sm" onclick="JOY.repair('${a.n}')">🛠️ Fix</button><button class="btn sm d" onclick="JOY.emergency('${a.n}')">🚑 Emergency</button>`:'<span style="font-size:.7rem;color:var(--ok)">● Optimal</span>'}</div></div>`).join('');
- document.getElementById('provList').innerHTML=this.providers.map((p,i)=>`<div class="vrow"><div class="info"><div class="icon">🔑</div><div class="details"><div class="nm">${p.n}</div><div class="st">${p.k.substring(0,10)}...****</div></div></div><div class="actions"><span class="status ${p.s}">${p.s==='ok'?'🟢 Valid':'🔴 Invalid'}</span><button class="btn sm" onclick="JOY.checkProv(${i})">🔄 Check</button><button class="btn sm d" onclick="JOY.delProv(${i})">🗑️</button></div></div>`).join('');
- document.getElementById('rosterBody').innerHTML=this.agencies.map(a=>`<tr><td><b>${a.n}</b></td><td>${a.r}</td><td style="font-size:.75rem;color:var(--ts)">Auto-optimized & monitored</td></tr>`).join('');
- this.renderPayments();
- this.renderLogs();
 },
+
+renderHealth(){
+ const hg=document.getElementById('healthGrid');
+ if(!hg)return;
+ hg.innerHTML=this.agencies.map(a=>`<div class="card" style="padding:14px;border-left:3px solid var(--${a.s==='ok'?'ok':a.s==='warn'?'warn':'bad'})"><div class="nm" style="font-size:.85rem;font-weight:600">${a.n}</div><div class="st" style="font-size:.7rem;color:var(--ts)">${a.r}</div><div style="margin-top:8px;display:flex;gap:6px">${a.s!=='ok'?`<button class="btn sm" onclick="JOY.repair('${a.n}')">🛠️ Fix</button><button class="btn sm d" onclick="JOY.emergency('${a.n}')">🚑 Emergency</button>`:'<span style="font-size:.7rem;color:var(--ok)">● Optimal</span>'}</div></div>`).join('');
+},
+
+renderProviders(){
+ const pl=document.getElementById('provList');
+ if(!pl)return;
+ pl.innerHTML=this.providers.map((p,i)=>`<div class="vrow"><div class="info"><div class="icon">🔑</div><div class="details"><div class="nm">${p.n}</div><div class="st">${p.k.substring(0,10)}...****</div></div></div><div class="actions"><span class="status ${p.s}">${p.s==='ok'?'🟢 Valid':'🔴 Invalid'}</span><button class="btn sm" onclick="JOY.checkProv(${i})">🔄 Check</button><button class="btn sm d" onclick="JOY.delProv(${i})">🗑️</button></div></div>`).join('');
+},
+
+renderRoster(){
+ const rb=document.getElementById('rosterBody');
+ if(!rb)return;
+ rb.innerHTML=this.agencies.map(a=>`<tr><td><b>${a.n}</b></td><td>${a.r}</td><td style="font-size:.75rem;color:var(--ts)">Auto-optimized & monitored</td></tr>`).join('');
+},
+
 renderPayments(){
  const list=document.getElementById('paymentList');
+ if(!list)return;
  if(this.payments.length===0){list.innerHTML='<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:15px">No payment methods saved yet.</div>';return}
  list.innerHTML=this.payments.map((p,i)=>{
   let content='';
@@ -393,17 +448,31 @@ renderPayments(){
   return `<div class="vrow"><div class="info"><div class="icon">${p.type==='bank'?'🏦':p.type==='qris'?'📱':'🅿️'}</div><div class="details">${content}</div></div><div class="actions"><button class="btn sm" onclick="JOY.copyPay(${i})">📋 Copy</button><button class="btn sm d" onclick="JOY.delPay(${i})">🗑️</button></div></div>`;
  }).join('');
 },
+
+renderLogs(){
+ const sl=document.getElementById('sysLog');
+ const al=document.getElementById('agencyLog');
+ if(sl){
+  sl.innerHTML=this.logs.sys.slice(-15).reverse().map(l=>`<div class="vrow" style="padding:10px;margin:0"><div class="details"><div class="nm" style="font-size:.8rem">${l.m}</div><div class="st">${new Date(l.t).toLocaleString('id-ID')}</div></div></div>`).join('')||'<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:20px">No logs yet.</div>';
+ }
+ if(al){
+  al.innerHTML=this.logs.agency.slice(-15).reverse().map(l=>`<div class="vrow" style="padding:10px;margin:0"><div class="details"><div class="nm" style="font-size:.8rem">${l.m}</div><div class="st">${new Date(l.t).toLocaleString('id-ID')}</div></div></div>`).join('')||'<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:20px">No logs yet.</div>';
+ }
+},
+
 togglePayForm(){
  const t=document.getElementById('payType').value;
  document.getElementById('bankFields').style.display=t==='bank'?'block':'none';
  document.getElementById('qrisFields').style.display=t==='qris'?'block':'none';
  document.getElementById('paypalFields').style.display=t==='paypal'?'block':'none';
 },
+
 previewQris(input){
  if(input.files&&input.files[0]){
   const r=new FileReader();r.onload=e=>{const img=document.getElementById('qrisPreviewImg');img.src=e.target.result;img.style.display='block'};r.readAsDataURL(input.files[0])
  }
 },
+
 savePayment(){
  const t=document.getElementById('payType').value;
  let data={type:t};
@@ -425,48 +494,199 @@ savePayment(){
  document.getElementById('payNameQris').value='';document.getElementById('qrisPreviewImg').style.display='none';
  document.getElementById('payNamePaypal').value='';document.getElementById('payLinkPaypal').value='';
 },
-copyPay(i){this.toast('Copied to clipboard!','ok')},
-delPay(i){if(confirm('Delete this payment method?')){this.payments.splice(i,1);this.saveState();this.renderPayments();this.toast('Deleted','ok')}},
-renderLogs(){
- const sl=document.getElementById('sysLog');
- sl.innerHTML=this.logs.sys.slice(-15).reverse().map(l=>`<div class="vrow" style="padding:10px;margin:0"><div class="details"><div class="nm" style="font-size:.8rem">${l.m}</div><div class="st">${new Date(l.t).toLocaleString('id-ID')}</div></div></div>`).join('')||'<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:20px">No logs yet.</div>';
- const al=document.getElementById('agencyLog');
- al.innerHTML=this.logs.agency.slice(-15).reverse().map(l=>`<div class="vrow" style="padding:10px;margin:0"><div class="details"><div class="nm" style="font-size:.8rem">${l.m}</div><div class="st">${new Date(l.t).toLocaleString('id-ID')}</div></div></div>`).join('')||'<div style="color:var(--tm);font-size:.8rem;text-align:center;padding:20px">No logs yet.</div>';
+
+copyPay(i){
+ const p=this.payments[i];
+ let text='';
+ if(p.type==='bank') text=`${p.name} - ${p.num} (a.n ${p.holder})`;
+ else if(p.type==='paypal') text=p.link;
+ else text=p.name;
+ if(navigator.clipboard){navigator.clipboard.writeText(text)}
+ this.toast('Copied to clipboard!','ok');
 },
-log(type,m,t='info'){this.logs[type].push({m,t,t:Date.now()});if(this.logs[type].length>50)this.logs[type].shift();this.renderLogs();this.saveState()},
+
+delPay(i){if(confirm('Delete this payment method?')){this.payments.splice(i,1);this.saveState();this.renderPayments();this.toast('Deleted','ok')}},
+
+log(type,m,t='info'){
+ this.logs[type].push({m,t,t:Date.now()});
+ if(this.logs[type].length>50)this.logs[type].shift();
+ this.renderLogs();
+ this.saveState();
+},
+
 clearLog(type){this.logs[type]=[];this.renderLogs();this.saveState();this.toast('Log cleaned','ok')},
-requestProd(){const v=document.getElementById('reqInp').value.trim();if(!v)return;this.products.push({id:'REQ-'+Date.now().toString().slice(-4),name:v,type:'Digital',stage:'Scripting',progress:10});document.getElementById('reqInp').value='';this.render();this.log('sys','Tequila: New request assigned to Angel & Mario.','info');this.toast('Request submitted!','ok')},
+
+requestProd(){
+ const v=document.getElementById('reqInp').value.trim();
+ if(!v)return;
+ this.products.push({id:'REQ-'+Date.now().toString().slice(-4),name:v,type:'Digital',stage:'Scripting',progress:10});
+ document.getElementById('reqInp').value='';
+ this.renderPipeline();
+ this.log('sys','Tequila: New request assigned to Angel & Mario.','info');
+ this.toast('Request submitted!','ok');
+},
+
 download(id){this.toast('Opening download bridge...','ok');this.log('sys',`User downloaded ${id}. Ready for upload.`,'info')},
-deleteProd(id){if(!confirm('Delete this product to free up transit space?'))return;this.products=this.products.filter(p=>p.id!==id);this.render();this.log('sys',`Product ${id} deleted. Space cleared.`,'ok');this.toast('Product deleted & space freed!','ok')},
-repair(n){this.log('agency',`Bob & Dody: Repairing ${n}...`,'warn');setTimeout(()=>{this.log('agency',`${n} repaired successfully.`,'ok');this.toast(`${n} is back online!`,'ok')},1500)},
+
+deleteProd(id){
+ if(!confirm('Delete this product to free up transit space?'))return;
+ this.products=this.products.filter(p=>p.id!==id);
+ this.renderPipeline();
+ this.log('sys',`Product ${id} deleted. Space cleared.`,'ok');
+ this.toast('Product deleted & space freed!','ok');
+},
+
+repair(n){
+ this.log('agency',`Bob & Dody: Repairing ${n}...`,'warn');
+ setTimeout(()=>{this.log('agency',`${n} repaired successfully.`,'ok');this.toast(`${n} is back online!`,'ok')},1500);
+},
+
 emergency(n){this.log('agency',`CRITICAL: Ana & Yusi taking over ${n}!`,'bad');this.toast('Emergency protocol activated!','bad')},
-checkProv(i){this.providers[i].s='ok';this.render();this.toast(`${this.providers[i].n} is Valid!`,'ok')},
-delProv(i){if(confirm('Delete this provider?')){this.providers.splice(i,1);this.render()}},
-addProvider(){const n=prompt('Provider Name:');if(n){this.providers.push({n,k:'new_key_xxxx',s:'ok'});this.render()}},
-addIncome(){const a=document.getElementById('incAmt').value,d=document.getElementById('incDesc').value;if(!a)return;this.log('sys',`Income logged: Rp ${a} - ${d}`,'ok');document.getElementById('incAmt').value='';document.getElementById('incDesc').value='';this.toast('Income logged!','ok')},
-checkPin(){if(document.getElementById('pinInp').value===this.pin){this.unlocked=true;document.getElementById('pinGate').style.display='none';document.getElementById('setContent').style.display='block';document.getElementById('pinInp').value=''}else this.toast('Wrong PIN!','bad')},
-changePin(){const o=document.getElementById('oldP').value,n=document.getElementById('newP').value,c=document.getElementById('confP').value;if(o!==this.pin){this.toast('Old PIN wrong!','bad');return}if(n.length<4||n!==c){this.toast('Invalid new PIN!','bad');return}this.pin=n;this.toast('PIN changed!','ok');document.getElementById('oldP').value='';document.getElementById('newP').value='';document.getElementById('confP').value=''},
-cleanStorage(){localStorage.removeItem('joy_cache');localStorage.setItem('joy_last_clean',Date.now());this.toast('Storage cleaned! Cache cleared.','ok');this.log('sys','Auto-clean executed. Space freed.','ok')},
+
+checkProv(i){this.providers[i].s='ok';this.renderProviders();this.toast(`${this.providers[i].n} is Valid!`,'ok')},
+
+delProv(i){if(confirm('Delete this provider?')){this.providers.splice(i,1);this.renderProviders()}},
+
+addProvider(){const n=prompt('Provider Name:');if(n){this.providers.push({n,k:'new_key_xxxx',s:'ok'});this.renderProviders()}},
+
+addIncome(){
+ const a=document.getElementById('incAmt').value,d=document.getElementById('incDesc').value;
+ if(!a)return;
+ this.log('sys',`Income logged: Rp ${a} - ${d}`,'ok');
+ document.getElementById('incAmt').value='';document.getElementById('incDesc').value='';
+ this.toast('Income logged!','ok');
+},
+
+checkPin(){
+ if(document.getElementById('pinInp').value===this.pin){
+  this.unlocked=true;
+  document.getElementById('pinGate').style.display='none';
+  document.getElementById('setContent').style.display='block';
+  document.getElementById('pinInp').value='';
+ }else this.toast('Wrong PIN!','bad');
+},
+
+changePin(){
+ const o=document.getElementById('oldP').value,n=document.getElementById('newP').value,c=document.getElementById('confP').value;
+ if(o!==this.pin){this.toast('Old PIN wrong!','bad');return}
+ if(n.length<4||n!==c){this.toast('Invalid new PIN!','bad');return}
+ this.pin=n;this.toast('PIN changed!','ok');
+ document.getElementById('oldP').value='';document.getElementById('newP').value='';document.getElementById('confP').value='';
+ this.saveState();
+},
+
+cleanStorage(){
+ localStorage.removeItem('joy_cache');
+ localStorage.setItem('joy_last_clean',Date.now());
+ this.toast('Storage cleaned! Cache cleared.','ok');
+ this.log('sys','Auto-clean executed. Space freed.','ok');
+},
+
 setAutoClean(v){localStorage.setItem('joy_auto_clean',v);this.toast(`Auto-clean set to ${v}h`,'ok')},
-handlePhoto(e){const f=e.target.files[0];if(!f)return;if(f.size>2*1024*1024){this.toast('Max 2MB!','bad');return}const r=new FileReader();r.onload=ev=>{localStorage.setItem('joy_photo',ev.target.result);this.loadPhoto();this.toast('Photo updated!','ok')};r.readAsDataURL(f)},
+
+handlePhoto(e){
+ const f=e.target.files[0];if(!f)return;
+ if(f.size>2*1024*1024){this.toast('Max 2MB!','bad');return}
+ const r=new FileReader();r.onload=ev=>{localStorage.setItem('joy_photo',ev.target.result);this.loadPhoto();this.toast('Photo updated!','ok')};r.readAsDataURL(f);
+},
+
 resetPhoto(){localStorage.removeItem('joy_photo');this.loadPhoto();this.toast('Photo reset','ok')},
-loadPhoto(){const p=localStorage.getItem('joy_photo');if(p){['ownerAvatar','setAvatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=`<img src="${p}">`})}},
-toggleVoice(){this.voiceOn=!this.voiceOn;document.getElementById('voiceToggle').textContent=`🔊 Voice: ${this.voiceOn?'ON':'OFF'}`;this.toast(`Voice ${this.voiceOn?'enabled':'disabled'}`,'ok')},
+
+loadPhoto(){
+ const p=localStorage.getItem('joy_photo');
+ if(p){
+  ['ownerAvatar','setAvatar'].forEach(id=>{
+   const el=document.getElementById(id);
+   if(el)el.innerHTML=`<img src="${p}">`;
+  });
+ }
+},
+
+toggleVoice(){
+ this.voiceOn=!this.voiceOn;
+ document.getElementById('voiceToggle').textContent=`🔊 Voice: ${this.voiceOn?'ON':'OFF'}`;
+ this.toast(`Voice ${this.voiceOn?'enabled':'disabled'}`,'ok');
+},
+
 toggleMic(){
  if(!('webkitSpeechRecognition' in window)){this.toast('Voice not supported in this browser','bad');return}
- if(!this.recognition){this.recognition=new webkitSpeechRecognition();this.recognition.continuous=true;this.recognition.interimResults=false;this.recognition.lang='id-ID';this.recognition.onresult=e=>{const t=Array.from(e.results).map(r=>r[0].transcript).join(' ');document.getElementById('ci').value=t;this.send()};this.recognition.onerror=()=>this.toast('Mic error','bad')}
- if(this.recognition.running){this.recognition.stop();document.getElementById('micBtn').style.background='';this.recognition.running=false}else{this.recognition.start();document.getElementById('micBtn').style.background='var(--bad)';this.recognition.running=true;this.toast('Listening...','ok')}
+ if(!this.recognition){
+  this.recognition=new webkitSpeechRecognition();
+  this.recognition.continuous=true;
+  this.recognition.interimResults=false;
+  this.recognition.lang='id-ID';
+  this.recognition.onresult=e=>{
+   const t=Array.from(e.results).map(r=>r[0].transcript).join(' ');
+   document.getElementById('ci').value=t;
+   this.send();
+  };
+  this.recognition.onerror=()=>this.toast('Mic error','bad');
+ }
+ if(this.recognition.running){
+  this.recognition.stop();
+  document.getElementById('micBtn').style.background='';
+  this.recognition.running=false;
+ }else{
+  this.recognition.start();
+  document.getElementById('micBtn').style.background='var(--bad)';
+  this.recognition.running=true;
+  this.toast('Listening...','ok');
+ }
 },
-send(){const inp=document.getElementById('ci'),m=inp.value.trim();if(!m)return;this.addMsg('me',m);inp.value='';
- const ty=document.createElement('div');ty.className='typing';ty.textContent='Tequila is thinking...';document.getElementById('msgs').appendChild(ty);ty.scrollIntoView();
- setTimeout(()=>{ty.remove();const rep=`I received your request: "${m}". I will coordinate with the team and update the dashboard shortly.`;this.addMsg('teq',rep);if(this.voiceOn)this.speak(rep)},800)
+
+send(){
+ const inp=document.getElementById('ci'),m=inp.value.trim();
+ if(!m)return;
+ this.addMsg('me',m);
+ inp.value='';
+ const ty=document.createElement('div');ty.className='typing';ty.textContent='Tequila is thinking...';
+ document.getElementById('msgs').appendChild(ty);ty.scrollIntoView();
+ setTimeout(()=>{
+  ty.remove();
+  const rep=`I received your request: "${m}". I will coordinate with the team and update the dashboard shortly.`;
+  this.addMsg('teq',rep);
+  if(this.voiceOn)this.speak(rep);
+ },800);
 },
-addMsg(w,t){const d=document.createElement('div');d.className='msg '+w;d.innerHTML=`<div class="mtag ${w==='me'?'me':''}">${w==='me'?'MAS ADE':'TEQUILA'}</div>${t}`;document.getElementById('msgs').appendChild(d);d.scrollIntoView()},
+
+addMsg(w,t){
+ const d=document.createElement('div');d.className='msg '+w;
+ d.innerHTML=`<div class="mtag ${w==='me'?'me':''}">${w==='me'?'MAS ADE':'TEQUILA'}</div>${t}`;
+ document.getElementById('msgs').appendChild(d);d.scrollIntoView();
+},
+
 speak(t){const u=new SpeechSynthesisUtterance(t);u.lang='id-ID';speechSynthesis.speak(u)},
-toast(m,t='info'){const d=document.createElement('div');d.className='toast '+t;d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),3000)},
-saveState(){localStorage.setItem('joy_state',JSON.stringify({products:this.products,logs:this.logs,pin:this.pin,payments:this.payments}))},
-loadState(){const s=localStorage.getItem('joy_state');if(s){const d=JSON.parse(s);this.products=d.products||this.products;this.logs=d.logs||this.logs;this.pin=d.pin||'1234';this.payments=d.payments||[]}}
+
+toast(m,t='info'){
+ const d=document.createElement('div');d.className='toast '+t;d.textContent=m;
+ document.body.appendChild(d);setTimeout(()=>d.remove(),3000);
+},
+
+saveState(){
+ try{
+  localStorage.setItem('joy_state',JSON.stringify({
+   products:this.products,
+   logs:this.logs,
+   pin:this.pin,
+   payments:this.payments
+  }));
+ }catch(e){console.error('Save state error:',e)}
+},
+
+loadState(){
+ try{
+  const s=localStorage.getItem('joy_state');
+  if(s){
+   const d=JSON.parse(s);
+   if(d.products)this.products=d.products;
+   if(d.logs)this.logs=d.logs;
+   if(d.pin)this.pin=d.pin;
+   if(d.payments)this.payments=d.payments;
+  }
+ }catch(e){console.error('Load state error:',e)}
+}
 };
+
 document.addEventListener('DOMContentLoaded',()=>JOY.init());
 </script>
 </body>
