@@ -1538,5 +1538,123 @@ document.getElementById('apiUnlockPin') && document.getElementById('apiUnlockPin
 // === BOOT ===
 JOY.init();
 </script>
+  <script>
+// fix.js - tambalan JOY CORPORATION v5
+// Isi: kunci terbaca benar, model Gemini otomatis diperbarui, error jelas per provider
+(function () {
+  var lc = function (s) { return String(s || '').toLowerCase(); };
+
+  JOY.AI._findKey = function (p) {
+    var key = null, v = lc(p.vendor), pl = lc(p.label);
+    JOY.DB.keys.forEach(function (k) {
+      var l = lc(k.label);
+      if (!l) return;
+      if (l === pl || (v && (v.indexOf(l) !== -1 || l.indexOf(v) !== -1))) key = k.val;
+    });
+    return key;
+  };
+
+  JOY.AI._callProvider = async function (p, message, sys) {
+    var v = lc(p.vendor), t0 = Date.now();
+
+    async function openaiStyle(url, key, model) {
+      var headers = { 'Content-Type': 'application/json' };
+      if (key) headers['Authorization'] = 'Bearer ' + key;
+      var r = await JOY.AI._fetchWithTimeout(url, {
+        method: 'POST', headers: headers,
+        body: JSON.stringify({ model: model, messages: [{ role: 'system', content: sys }, { role: 'user', content: message }] })
+      });
+      if (!r.ok) {
+        var d = ''; try { d = (await r.text()).slice(0, 120); } catch (e) {}
+        throw new Error('HTTP ' + r.status + ' ' + d);
+      }
+      var j = await r.json();
+      var t = j.choices && j.choices[0] && j.choices[0].message ? j.choices[0].message.content : '';
+      if (!t) throw new Error('jawaban kosong');
+      return { text: t, latency: Date.now() - t0 };
+    }
+
+    if (v.indexOf('pollinations') !== -1) {
+      return openaiStyle('https://text.pollinations.ai/openai', null, p.model || 'openai');
+    }
+
+    var key = JOY.AI._findKey(p);
+    if (!key) throw new Error('kunci API belum ada');
+
+    if (v.indexOf('groq') !== -1) {
+      return openaiStyle('https://api.groq.com/openai/v1/chat/completions', key, p.model);
+    }
+    if (v.indexOf('openrouter') !== -1) {
+      return openaiStyle('https://openrouter.ai/api/v1/chat/completions', key, p.model);
+    }
+    if (v.indexOf('hugging') !== -1) {
+      return openaiStyle('https://router.huggingface.co/v1/chat/completions', key, p.model);
+    }
+    if (v.indexOf('gemini') !== -1 || v.indexOf('google') !== -1) {
+      var model = /1\.5/.test(p.model) ? 'gemini-2.5-flash' : p.model;
+      var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(key);
+      var r = await JOY.AI._fetchWithTimeout(url, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: sys + '\n\nUser: ' + message }] }] })
+      });
+      if (!r.ok) {
+        var d = ''; try { d = (await r.text()).slice(0, 120); } catch (e) {}
+        throw new Error('HTTP ' + r.status + ' ' + d);
+      }
+      var j = await r.json();
+      var t = j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts && j.candidates[0].content.parts[0] ? j.candidates[0].content.parts[0].text : '';
+      if (!t) throw new Error('jawaban kosong');
+      return { text: t, latency: Date.now() - t0 };
+    }
+    throw new Error('vendor ' + p.vendor + ' tidak didukung');
+  };
+
+  JOY.AI.call = async function (message, persona) {
+    persona = persona || 'Tequila';
+    var order = { primary: 1, backup: 2, emergency: 3 };
+    var provs = JOY.DB.providers.slice().sort(function (a, b) { return (order[a.role] || 9) - (order[b.role] || 9); });
+    var sys = 'Anda adalah ' + persona + ', bagian dari tim JOY CORPORATION. Owner: Ade Kurnia Sandy. Jawab dalam bahasa Indonesia, profesional, singkat, dan cerdas. Konteks: Saldo saat ini ' + JOY.Utils.fmtRp(JOY.Finance.getBalance()) + ', target hari ini ' + (JOY.DB.target.history[JOY.Utils.today()] || 0) + '/' + JOY.DB.target.daily + '. Ada ' + JOY.DB.assets.length + ' asset produk dan ' + JOY.DB.agents.filter(function (a) { return a.status === 'active'; }).length + ' agen aktif.';
+    var errs = [];
+    for (var i = 0; i < provs.length; i++) {
+      var p = provs[i];
+      try {
+        var r = await JOY.AI._callProvider(p, message, sys);
+        p.latency = r.latency; p.status = 'ok'; p.lastCheck = Date.now();
+        JOY.save();
+        return { text: r.text, provider: p.label };
+      } catch (e) {
+        p.status = 'warn'; p.lastCheck = Date.now();
+        errs.push(p.label + ' (' + p.vendor + '): ' + e.message);
+      }
+    }
+    JOY.save();
+    return { text: 'Maaf, semua AI gagal. Rincian:\n' + errs.join('\n'), provider: 'Offline' };
+  };
+
+  JOY.Health.run = async function (silent) {
+    if (!silent) JOY.App.toast('Memulai health check...', 'info');
+    var results = [], ok = 0, fail = 0;
+    for (var i = 0; i < JOY.DB.providers.length; i++) {
+      var p = JOY.DB.providers[i], t0 = Date.now(), st = 'ok';
+      await new Promise(function (r) { setTimeout(r, 100); });
+      if (lc(p.vendor).indexOf('pollinations') === -1 && !JOY.AI._findKey(p)) st = 'warn';
+      p.status = st; p.latency = Date.now() - t0; p.lastCheck = Date.now();
+      if (st === 'ok') ok++; else fail++;
+      results.push({ label: p.label, vendor: p.vendor, status: st, latency: p.latency, ts: Date.now() });
+    }
+    var ratio = fail / (JOY.DB.providers.length || 1);
+    var sys = 'ok', lab = 'Optimal';
+    if (ratio >= 0.5) { sys = 'danger'; lab = 'Kendala'; }
+    else if (ratio > 0) { sys = 'warn'; lab = 'Teknis'; }
+    JOY.DB.health = { lastRun: Date.now(), status: sys, apiOk: ok, apiFail: fail, results: results };
+    JOY.save();
+    document.getElementById('sysIndicator').innerHTML = '<span class="dot ' + sys + ' pulse-dot"></span><span id="sysLabel" style="font-size:11px;color:var(--' + sys + ');">' + lab + '</span>';
+    if (!silent) JOY.App.toast('Health check selesai: ' + ok + ' OK, ' + fail + ' masalah', 'ok');
+    JOY.Health.render();
+  };
+
+  JOY.Health.run(true);
+})();
+</script>
 </body>
 </html>
