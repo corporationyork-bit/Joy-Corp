@@ -1655,6 +1655,34 @@ JOY.init();
 
   JOY.Health.run(true);
 })();
+</script><script>
+// tambalan 2: model Groq & Gemini terbaru
+(function () {
+  var old = JOY.AI._callProvider;
+  JOY.AI._callProvider = async function (p, message, sys) {
+    var v = String(p.vendor || '').toLowerCase();
+    if (v.indexOf('groq') !== -1) {
+      var q = Object.assign({}, p, { model: 'openai/gpt-oss-120b' });
+      try {
+        return await old.call(this, q, message, sys);
+      } catch (e) {
+        q = Object.assign({}, p, { model: 'openai/gpt-oss-20b' });
+        return await old.call(this, q, message, sys);
+      }
+    }
+    if (v.indexOf('gemini') !== -1 || v.indexOf('google') !== -1) {
+      var list = ['gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite', 'gemini-3-flash-preview'];
+      var lastErr = null;
+      for (var i = 0; i < list.length; i++) {
+        try {
+          return await old.call(this, Object.assign({}, p, { model: list[i] }), message, sys);
+        } catch (e) { lastErr = e; }
+      }
+      throw lastErr;
+    }
+    return old.call(this, p, message, sys);
+  };
+})();
 </script>
 </body>
 </html>
