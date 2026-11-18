@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>JOY CORPORATION v6</title>
+<title>JOY CORPORATION v5</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   tailwind.config = {
     theme: {
@@ -516,30 +515,10 @@ window.addEventListener('load', function() {
   document.getElementById('sidebar').classList.add('closed');
 });
 
-// === SUPABASE CONFIG ===
-const SUPABASE_URL = 'https://qqqkvnzrzfwkqktwwxar.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 const JOY = {
   DB: null,
-  LS_KEY: 'joy_corp_v6_db',
+  LS_KEY: 'joy_corp_v5_db',
   
-  Cloud: {
-    async save(table, data) {
-      try {
-        const { error } = await supabase.from(table).insert([data]);
-        if (error) console.warn('Supabase save error:', error.message);
-      } catch (e) { console.warn('Cloud save failed:', e); }
-    },
-    async load(table) {
-      try {
-        const { data, error } = await supabase.from(table).select('*').order('created_at', { ascending: false });
-        if (error) return [];
-        return data || [];
-      } catch (e) { return []; }
-    }
-  },
   init() {
     const raw = localStorage.getItem(this.LS_KEY);
     if (!raw) {
@@ -616,14 +595,7 @@ const JOY = {
   },
 
   id() { return Math.random().toString(36).slice(2,10); },
-  save() { 
-    localStorage.setItem(this.LS_KEY, JSON.stringify(this.DB)); 
-    // Dual write: simpan juga ke Supabase di background (tidak mengganggu UI)
-    // Kita simpan agents & transactions sebagai contoh sinkronisasi
-    if(this.DB.agents && this.DB.agents.length > 0) {
-       // Logika sync bisa ditambah nanti di Step 3
-    }
-  },
+  save() { localStorage.setItem(this.LS_KEY, JSON.stringify(this.DB)); },
   
   Utils: {
     fmtRp: n => 'Rp ' + (n||0).toLocaleString('id-ID'),
@@ -1171,4 +1143,4 @@ document.getElementById('apiUnlockPin') && document.getElementById('apiUnlockPin
 JOY.init();
 </script>
 </body>
-</html>
+                </html>
