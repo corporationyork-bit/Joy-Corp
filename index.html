@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>JOY CORPORATION v6</title>
+<title>JOY CORPORATION v6.1</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
@@ -44,77 +44,61 @@
   ::-webkit-scrollbar-track{background:transparent}
   ::-webkit-scrollbar-thumb{background:#2a2a2e;border-radius:10px}
   ::-webkit-scrollbar-thumb:hover{background:#3f3f46}
-
   button, .btn, .btn-accent, .btn-danger, .nav-item, a, input, select, textarea, details>summary {
     cursor: pointer !important;
     -webkit-tap-highlight-color: rgba(212,165,116,0.15);
     touch-action: manipulation;
   }
   input, select, textarea { font-size: 16px !important; }
-
   .nav-item{transition:all .18s ease;padding:10px 16px;margin:0 8px;border-radius:8px;display:flex;align-items:center;gap:10px;color:var(--text-muted);text-decoration:none;font-size:13.5px;}
   .nav-item:hover{background:var(--bg-hover);color:var(--text)}
   .nav-item.active{background:var(--accent-bg);color:var(--accent);font-weight:500}
-
   .card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:12px;overflow:hidden;}
   .card-h{background:transparent;border-bottom:1px solid var(--border-subtle);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
-
   .btn{background:var(--bg-hover);border:1px solid var(--border);color:var(--text);padding:9px 14px;border-radius:8px;display:inline-block;text-align:center;font-size:13px;transition:all .15s}
   .btn:hover{background:#222228;border-color:#3f3f46}
   .btn-accent{background:var(--accent-bg);border:1px solid rgba(212,165,116,0.25);color:var(--accent);}
   .btn-accent:hover{background:rgba(212,165,116,0.14);border-color:rgba(212,165,116,0.4)}
   .btn-danger{background:rgba(201,138,138,0.08);border:1px solid rgba(201,138,138,0.25);color:var(--danger);}
   .btn-danger:hover{background:rgba(201,138,138,0.14)}
-
   .input{background:#0c0c0e;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;width:100%;outline:none;transition:border-color .15s}
   .input:focus{border-color:var(--accent)}
   .input::placeholder{color:var(--text-dim)}
-
   .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text-muted)}
   .badge.ok{color:#9ab89a;border-color:#2d3a2d;background:#121a14}
   .badge.warn{color:#c9a87a;border-color:#3a3224;background:#1a1610}
   .badge.danger{color:#c98a8a;border-color:#3a2424;background:#1a1414}
   .badge.info{color:var(--text-muted);border-color:var(--border);background:var(--bg-elevated)}
-
   table{width:100%;border-collapse:collapse}
   th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--border-subtle);font-size:13px; word-break: break-word;}
   th{color:var(--text-dim);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
-
   .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
   .dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.danger{background:var(--danger)}.dot.idle{background:#555}
   .pulse-dot{animation:pulse 1.8s ease-in-out infinite}
   @keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
-
   .chat-msg{padding:11px 15px;border-radius:12px;max-width:85%;font-size:14px;line-height:1.55}
   .chat-user{background:var(--bg-hover);border:1px solid var(--border);margin-left:auto;border-bottom-right-radius:3px}
   .chat-ai{background:var(--bg-elevated);border:1px solid var(--border-subtle);margin-right:auto;border-bottom-left-radius:3px}
-
   .section{display:none}.section.active{display:block}
   .divider{height:1px;background:var(--border-subtle);margin:18px 0}
-
   .stat{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:12px;padding:18px;}
   .stat-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
   .stat-val{font-size:24px;color:#f4f4f5;font-weight:600;letter-spacing:-0.02em}
   .stat-sub{font-size:11px;color:var(--text-dim);margin-top:5px}
-
   .log-line{font-family:JetBrains Mono,ui-monospace,monospace;font-size:12px;padding:7px 0;border-bottom:1px dashed #1a1a1e;color:var(--text-muted)}
   .log-line .ts{color:var(--text-dim)}.log-line .ag{color:var(--accent)}.log-line .act{color:var(--text)}
-
   details>summary{cursor:pointer;list-style:none;padding:12px 16px;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:10px}
   details>summary::-webkit-details-marker{display:none}
   details[open]>summary{border-bottom-left-radius:0;border-bottom-right-radius:0;background:var(--bg-elevated)}
   details .body{padding:16px;background:#0c0c0e;border:1px solid var(--border-subtle);border-top:0;border-bottom-left-radius:10px;border-bottom-right-radius:10px}
-
   #sidebar{width:260px;background:var(--bg-elevated);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;flex-shrink:0;}
   #sidebar.closed{display:none;}
-
   #overlay{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);z-index:30;}
   #overlay.show{display:block;}
   #modal{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.8);z-index:50;padding:20px;overflow-y:auto;}
   #modal.show{display:block;}
   #toast{position:absolute;bottom:20px;right:20px;z-index:100;pointer-events:none;}
   #toast > div{pointer-events:auto;}
-
   @media (min-width: 1024px){
     #hamburger{display:none}
     #sidebar{display:flex !important;}
@@ -137,9 +121,7 @@
 </style>
 </head>
 <body>
-
 <div id="overlay" onclick="JOY.App.closeSidebar()"></div>
-
 <aside id="sidebar" class="closed">
   <div style="padding:18px 16px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;">
     <div style="display:flex;align-items:center;gap:11px;min-width:0;flex:1;">
@@ -152,7 +134,6 @@
     </div>
     <button id="closeSidebarBtn" onclick="JOY.App.closeSidebar()" style="background:none;border:none;color:var(--text-dim);font-size:16px;padding:4px 6px;flex-shrink:0;">✕</button>
   </div>
-  
   <div style="padding:11px 16px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;">
     <div style="font-size:10px;color:var(--text-dim);letter-spacing:0.06em;">STATUS</div>
     <div id="sysIndicator" style="display:flex;align-items:center;gap:7px;">
@@ -160,7 +141,6 @@
       <span id="sysLabel" style="font-size:11px;color:var(--ok);">Optimal</span>
     </div>
   </div>
-
   <nav style="flex:1;overflow-y:auto;padding:10px 0;">
     <div style="padding:10px 16px 4px;font-size:10px;color:var(--text-dim);letter-spacing:0.07em;">OPERATIONS</div>
     <a class="nav-item" data-target="target"><span>⌖</span><span>Target Harian</span></a>
@@ -168,17 +148,14 @@
     <a class="nav-item" data-target="asset"><span>▤</span><span>Asset Produk</span></a>
     <a class="nav-item" data-target="agency"><span>⚙</span><span>Agency Network</span></a>
     <a class="nav-item" data-target="log"><span>≡</span><span>Log Real-time</span></a>
-
     <div style="padding:14px 16px 4px;font-size:10px;color:var(--text-dim);letter-spacing:0.07em;">FINANCE</div>
     <a class="nav-item" data-target="saldo"><span>◉</span><span>Saldo & Keuangan</span></a>
     <a class="nav-item" data-target="payment"><span>◊</span><span>Pembayaran</span></a>
-
     <div style="padding:14px 16px 4px;font-size:10px;color:var(--text-dim);letter-spacing:0.07em;">AI STACK</div>
     <a class="nav-item" data-target="chat"><span>◈</span><span>Chat Manager</span></a>
     <a class="nav-item" data-target="aiprovider"><span>⬢</span><span>AI Provider</span></a>
     <a class="nav-item" data-target="apiconfig"><span>⚿</span><span>API Config</span></a>
     <a class="nav-item" data-target="health"><span>✚</span><span>Health Check</span></a>
-
     <div style="padding:14px 16px 4px;font-size:10px;color:var(--text-dim);letter-spacing:0.07em;">SYSTEM</div>
     <a class="nav-item" data-target="rules"><span>§</span><span>Peraturan</span></a>
     <a class="nav-item" data-target="storage"><span>▦</span><span>Penyimpanan</span></a>
@@ -191,7 +168,6 @@
     <div style="font-size:10px;color:var(--text-dim);margin-top:4px;display:flex;align-items:center;gap:6px;"><span class="dot ok"></span> Tequila · Online</div>
   </div>
 </aside>
-
 <main style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
   <header style="position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border-subtle);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
     <div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1;">
@@ -212,9 +188,7 @@
       </div>
     </div>
   </header>
-
   <div style="padding:16px;flex:1;overflow-y:auto;">
-    
     <section id="saldo" class="section">
       <div class="grid-3" style="margin-bottom:16px;">
         <div class="stat"><div class="stat-label">Total Pemasukan (Bulan Ini)</div><div class="stat-val" style="color:#7a9a7a;" id="sIncome">Rp 0</div><div class="stat-sub" id="sIncomeCount">0 transaksi</div></div>
@@ -237,7 +211,6 @@
         </div>
       </div>
     </section>
-
     <section id="agency" class="section">
       <div class="card" style="margin-bottom:16px;">
         <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Pipeline Otomatis JOY CORP</div><span class="badge ok"><span class="dot ok pulse-dot"></span> Live</span></div>
@@ -254,37 +227,19 @@
         <div class="card"><div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Tambah Agen</div></div><div style="padding:20px;">
           <div style="margin-bottom:12px;"><input id="agName" class="input" placeholder="Nama (contoh: Sanny)"/></div>
           <div style="margin-bottom:12px;"><select id="agRole" class="input">
-            <option>Manager / CAO</option>
-            <option>Research</option>
-            <option>Validation</option>
-            <option>Production</option>
-            <option>Marketing Tech</option>
-            <option>Closing</option>
-            <option>Market Observer</option>
-            <option>Creator / Copy</option>
-            <option>Tech / Script</option>
-            <option>QC & Publisher</option>
-            <option>Sales Executive</option>
-            <option>Business Development</option>
-            <option>Finance</option>
-            <option>HRD</option>
-            <option>GA / Ops</option>
-            <option>Tech Support</option>
-            <option>AI Medis</option>
+            <option>Manager / CAO</option><option>Research</option><option>Validation</option><option>Production</option><option>Marketing Tech</option><option>Closing</option><option>Market Observer</option><option>Creator / Copy</option><option>Tech / Script</option><option>QC & Publisher</option><option>Sales Executive</option><option>Business Development</option><option>Finance</option><option>HRD</option><option>GA / Ops</option><option>Tech Support</option><option>AI Medis</option>
           </select></div>
           <div style="margin-bottom:12px;"><input id="agModel" class="input" placeholder="Model AI"/></div>
           <button onclick="JOY.Agency.add()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;font-weight:500;">Simpan</button>
         </div></div>
       </div>
     </section>
-
     <section id="asset" class="section">
       <div class="card">
         <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Gudang Asset Produk</div><button onclick="JOY.Asset.openAdd()" class="btn-accent" style="padding:6px 12px;font-size:12px;">+ Manual</button></div>
         <div style="padding:20px;"><div id="assetGrid" class="asset-grid"></div></div>
       </div>
     </section>
-
     <section id="progress" class="section">
       <div class="grid-2" style="margin-bottom:16px;">
         <div class="card">
@@ -297,7 +252,6 @@
         </div>
       </div>
     </section>
-
     <section id="target" class="section active">
       <div class="grid-3" style="margin-bottom:16px;">
         <div class="stat"><div class="stat-label">Target Harian</div><div class="stat-val">5 produk</div></div>
@@ -306,14 +260,12 @@
       </div>
       <div class="card"><div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Riwayat 14 Hari</div></div><div style="padding:20px;"><div id="tgBars" style="display:flex;align-items:flex-end;gap:8px;height:160px;margin-bottom:16px;"></div><table class="tbl-card"><thead><tr><th>Tanggal</th><th>Produk</th><th>Target</th><th>Status</th></tr></thead><tbody id="tgTable"></tbody></table></div></div>
     </section>
-
     <section id="log" class="section">
       <div class="card">
         <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Log Real-time (Hanya Aktivitas Nyata)</div><button onclick="JOY.Log.clear()" style="background:none;border:none;color:#7a7a7a;font-size:11px;">Bersihkan</button></div>
         <div style="padding:20px;"><div id="liveLog" style="max-height:60vh;overflow-y:auto;"></div></div>
       </div>
     </section>
-
     <section id="aiprovider" class="section">
       <div class="card" style="margin-bottom:16px;">
         <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">AI Provider & Fallback Chain (5 Lapis)</div><button onclick="JOY.Provider.openAdd()" class="btn-accent" style="padding:6px 12px;font-size:12px;">+ Provider</button></div>
@@ -324,23 +276,13 @@
         <div style="padding:20px;font-size:14px;color:#d4d4d4;" id="fallbackChain">Belum ada rantai fallback.</div>
       </div>
     </section>
-
     <section id="chat" class="section">
       <div class="card" style="height:calc(100vh - 160px);display:flex;flex-direction:column;">
         <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:8px;min-width:0;">
             <div style="font-size:14px;font-weight:500;color:#ededed;">Chat Manager</div>
             <select id="chatPersona" class="input" style="width:auto;padding:4px 8px;font-size:12px;">
-              <option value="Tequila">Tequila (Manager)</option>
-              <option value="Sanny">Sanny (Finance)</option>
-              <option value="Della">Della (Riset)</option>
-              <option value="Scout">Scout (Research)</option>
-              <option value="Michelle">Michelle (QC)</option>
-              <option value="Grace">Grace (Sales)</option>
-              <option value="Elten">Elten (Sales)</option>
-              <option value="Angela">Angela (B2B)</option>
-              <option value="Sarah">Sarah (Creator)</option>
-              <option value="Yuliana">Yuliana (AI Medis)</option>
+              <option value="Tequila">Tequila (Manager)</option><option value="Sanny">Sanny (Finance)</option><option value="Della">Della (Riset)</option><option value="Scout">Scout (Research)</option><option value="Michelle">Michelle (QC)</option><option value="Grace">Grace (Sales)</option><option value="Elten">Elten (Sales)</option><option value="Angela">Angela (B2B)</option><option value="Sarah">Sarah (Creator)</option><option value="Yuliana">Yuliana (AI Medis)</option>
             </select>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
@@ -355,7 +297,6 @@
         </div>
       </div>
     </section>
-
     <section id="apiconfig" class="section">
       <div id="apiLockScreen" class="card" style="padding:40px 20px;text-align:center;">
         <div style="font-size:28px;margin-bottom:12px;">⚿</div>
@@ -377,7 +318,6 @@
         </div>
       </div>
     </section>
-
     <section id="health" class="section">
       <div class="grid-3" style="margin-bottom:16px;">
         <div class="stat"><div class="stat-label">Status Sistem</div><div class="stat-val" id="hStatus">—</div><div class="stat-sub" id="hStatusSub">Menunggu pengecekan</div></div>
@@ -389,14 +329,12 @@
         <div style="padding:20px;"><table class="tbl-card"><thead><tr><th>Komponen</th><th>Status</th><th>Detail</th></tr></thead><tbody id="healthTable"></tbody></table></div>
       </div>
     </section>
-
     <section id="rules" class="section">
       <div class="card">
         <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Peraturan Internal</div><button onclick="JOY.Rules.openAdd()" class="btn-accent" style="padding:6px 12px;font-size:12px;">+ Peraturan</button></div>
         <div style="padding:20px;" id="ruleList"></div>
       </div>
     </section>
-
     <section id="pin" class="section">
       <div class="card" style="max-width:640px;">
         <div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Ganti PIN Operator</div></div>
@@ -409,7 +347,6 @@
         </div>
       </div>
     </section>
-
     <section id="payment" class="section">
       <div class="card">
         <div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Metode Penerimaan Pembayaran (Global)</div></div>
@@ -438,7 +375,6 @@
         </div>
       </div>
     </section>
-
     <section id="storage" class="section">
       <div class="grid-3" style="margin-bottom:16px;">
         <div class="stat"><div class="stat-label">Penggunaan LocalStorage</div><div class="stat-val" id="stUsed">0 KB</div></div>
@@ -458,7 +394,6 @@
         </div>
       </div>
     </section>
-
     <section id="profile" class="section">
       <div class="grid-2">
         <div class="card">
@@ -484,10 +419,8 @@
         </div>
       </div>
     </section>
-
   </div>
 </main>
-
 <div id="modal">
   <div class="card" style="max-width:640px;margin:0 auto;">
     <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;">
@@ -497,7 +430,6 @@
     <div id="modalBody" style="padding:20px;"></div>
   </div>
 </div>
-
 <div id="toast"></div>
 <script>
 window.addEventListener('load', function() {
@@ -508,8 +440,8 @@ window.addEventListener('load', function() {
 
 const JOY = {
   DB: null,
-  LS_KEY: 'joy_corp_v6_db',
-  
+  LS_KEY: 'joy_corp_v61_db',
+
   init() {
     const raw = localStorage.getItem(this.LS_KEY);
     if (!raw) {
@@ -539,10 +471,7 @@ const JOY = {
         assets: [], progress: [], requests: [],
         providers: [
           {id:this.id(), label:'Primary', vendor:'Groq', model:'llama-3.3-70b-versatile', role:'primary', status:'ok', latency:0, lastCheck:null},
-          {id:this.id(), label:'Backup-1', vendor:'Google Gemini', model:'gemini-1.5-flash', role:'backup', status:'ok', latency:0, lastCheck:null},
-          {id:this.id(), label:'Backup-2', vendor:'OpenRouter', model:'meta-llama/llama-3-8b-instruct:free', role:'backup', status:'ok', latency:0, lastCheck:null},
-          {id:this.id(), label:'Backup-3', vendor:'HuggingFace', model:'mistralai/Mistral-7B-Instruct', role:'backup', status:'ok', latency:0, lastCheck:null},
-          {id:this.id(), label:'Emergency', vendor:'Pollinations', model:'openai', role:'emergency', status:'ok', latency:0, lastCheck:null}
+          {id:this.id(), label:'Backup-1', vendor:'Pollinations', model:'openai', role:'emergency', status:'ok', latency:0, lastCheck:null}
         ],
         chat: [], keys: [],
         rules: [],
@@ -555,7 +484,7 @@ const JOY = {
       };
       this.DB.rules = this.Rules.defaults();
       this.save();
-      this.Log.push('System', 'JOY Corporation v6 diinisialisasi. Semua sistem siap.');
+      this.Log.push('System', 'JOY Corporation v6.1 diinisialisasi. Groq AI siap.');
     } else {
       this.DB = this.normalize(JSON.parse(raw));
     }
@@ -564,7 +493,7 @@ const JOY = {
     setInterval(() => this.Optimize.run(true), 12 * 60 * 60 * 1000);
     setTimeout(() => this.Health.run(true), 3000);
   },
-  
+
   normalize: function(db) {
     if (!db) db = {};
     if (!db.transactions) db.transactions = [];
@@ -582,7 +511,6 @@ const JOY = {
     if (!db.health) db.health = {lastRun: null, status: 'ok', integrity: 100, storageUsed: 0};
     if (!db.optimize) db.optimize = {lastRun: null};
     if (typeof db.logo === 'undefined') db.logo = null;
-    // Pastikan semua asset punya product_link (untuk v6)
     db.assets.forEach(function(a) {
       if (typeof a.product_link === 'undefined') a.product_link = '';
     });
@@ -591,23 +519,130 @@ const JOY = {
 
   id() { return Math.random().toString(36).slice(2,10); },
   save() { localStorage.setItem(this.LS_KEY, JSON.stringify(this.DB)); },
-  
+
+  // === GROQ AI INTEGRATION ===
+  AI: {
+    _fetchWithTimeout: async function(url, options, timeout = 15000) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeout);
+      try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(id);
+        return response;
+      } catch (e) {
+        clearTimeout(id);
+        throw e;
+      }
+    },
+
+    _getGroqKey: function() {
+      for (var i = 0; i < JOY.DB.keys.length; i++) {
+        var k = JOY.DB.keys[i];
+        if (k.label.toLowerCase().indexOf('groq') !== -1) return k.val;
+      }
+      return null;
+    },
+
+    _getPollinationsKey: function() {
+      for (var i = 0; i < JOY.DB.keys.length; i++) {
+        var k = JOY.DB.keys[i];
+        if (k.label.toLowerCase().indexOf('pollinations') !== -1 || k.label.toLowerCase().indexOf('hugging') !== -1) return k.val;
+      }
+      return null;
+    },
+
+    _getSystemPrompt: function(persona) {
+      var activeAgents = JOY.DB.agents.filter(function(a){return a.status==='active';}).length;
+      var today = JOY.Utils.today();
+      var todayDone = JOY.DB.target.history[today] || 0;
+      var totalAssets = JOY.DB.assets.length;
+      var balance = JOY.Finance.getBalance();
+      var ownerName = 'Ade Kurnia Sandy';
+
+      var prompts = {
+        'Tequila': 'Kamu adalah Tequila, Chief AI Officer (CAO) JOY Corporation. Owner: '+ownerName+'. Jawab dengan profesional, ringkas, dan strategis. Data sistem: '+activeAgents+' agen aktif, '+totalAssets+' produk siap jual, target hari ini '+todayDone+'/5, saldo '+JOY.Utils.fmtRp(balance)+'.',
+        'Sanny': 'Kamu adalah Sanny, Finance JOY Corporation. Owner: '+ownerName+'. Fokus pada angka, margin, dan keamanan finansial. Data: saldo '+JOY.Utils.fmtRp(balance)+', '+JOY.DB.transactions.length+' transaksi tercatat. Jawab dengan akurat dan hati-hati.',
+        'Della': 'Kamu adalah Della, Market Observer JOY Corp. Fokus pada tren pasar US & EU. Bantu identifikasi peluang produk baru.',
+        'Scout': 'Kamu adalah Scout, Research JOY Corp. Fokus pada riset mendalam dan validasi ide sebelum produksi.',
+        'Michelle': 'Kamu adalah Michelle, QC & Publisher JOY Corp. Fokus pada kualitas produk. Ada '+totalAssets+' produk siap jual.',
+        'Grace': 'Kamu adalah Grace, Sales Executive JOY Corp. Fokus pada strategi penjualan dan konversi.',
+        'Elten': 'Kamu adalah Elten, Sales Executive JOY Corp. Fokus pada follow-up dan closing.',
+        'Angela': 'Kamu adalah Angela, Business Development JOY Corp. Fokus pada peluang B2B dan partnership.',
+        'Sarah': 'Kamu adalah Sarah, Creator & Copy JOY Corp. Fokus pada konten dan copywriting yang menarik.',
+        'Yuliana': 'Kamu adalah Yuliana, AI Medis JOY Corp. Fokus pada analisis data dan optimasi sistem.'
+      };
+      return prompts[persona] || prompts['Tequila'];
+    },
+
+    call: async function(message, persona) {
+      persona = persona || 'Tequila';
+      var sysPrompt = this._getSystemPrompt(persona);
+      var lastError = null;
+
+      // === Coba Groq dulu ===
+      var groqKey = this._getGroqKey();
+      if (groqKey) {
+        try {
+          var start = Date.now();
+          var res = await this._fetchWithTimeout('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + groqKey,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: 'llama-3.3-70b-versatile',
+              messages: [
+                { role: 'system', content: sysPrompt },
+                { role: 'user', content: message }
+              ],
+              temperature: 0.7,
+              max_tokens: 1024
+            })
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          var data = await res.json();
+          var text = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : '';
+          return { text: text, provider: 'Groq (Llama 3.3)', latency: Date.now() - start };
+        } catch (e) {
+          lastError = e;
+          console.warn('Groq gagal:', e.message);
+        }
+      }
+
+      // === Fallback ke Pollinations (gratis, tanpa key) ===
+      try {
+        var start2 = Date.now();
+        var encodedPrompt = encodeURIComponent(sysPrompt + '\n\nUser: ' + message);
+        var res2 = await this._fetchWithTimeout('https://text.pollinations.ai/' + encodedPrompt, { method: 'GET' });
+        if (!res2.ok) throw new Error('HTTP ' + res2.status);
+        var text2 = await res2.text();
+        return { text: text2 || 'Pollinations tidak merespons.', provider: 'Pollinations (Fallback)', latency: Date.now() - start2 };
+      } catch (e2) {
+        lastError = e2;
+        console.warn('Pollinations gagal:', e2.message);
+      }
+
+      return { text: 'Maaf Owner, AI sedang tidak tersedia. Pastikan Groq API Key sudah ditambahkan di menu API Config. Error: ' + (lastError ? lastError.message : 'unknown'), provider: 'Offline', latency: 0 };
+    }
+  },
+
   Utils: {
     fmtRp: n => 'Rp ' + (n||0).toLocaleString('id-ID'),
     fmtDate: d => new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}),
     fmtTime: d => new Date(d).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}),
     fmtDateTime: d => new Date(d).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}),
-    today: function() { 
+    today: function() {
       var d = new Date();
       d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-      return d.toISOString().slice(0,10); 
+      return d.toISOString().slice(0,10);
     },
     esc: function(s) {
       return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
         return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
       });
     },
-    copy: function(text) { 
+    copy: function(text) {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => JOY.App.toast('Disalin ke clipboard','ok'));
       } else {
@@ -630,21 +665,21 @@ const JOY = {
   },
 
   App: {
-    openSidebar: function() { 
+    openSidebar: function() {
       document.getElementById('sidebar').classList.remove('closed');
-      document.getElementById('overlay').classList.add('show'); 
+      document.getElementById('overlay').classList.add('show');
     },
-    closeSidebar: function() { 
+    closeSidebar: function() {
       document.getElementById('sidebar').classList.add('closed');
-      document.getElementById('overlay').classList.remove('show'); 
+      document.getElementById('overlay').classList.remove('show');
     },
-    openModal: function(title, html) { 
-      document.getElementById('modalTitle').textContent = title; 
-      document.getElementById('modalBody').innerHTML = html; 
-      document.getElementById('modal').classList.add('show'); 
+    openModal: function(title, html) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').innerHTML = html;
+      document.getElementById('modal').classList.add('show');
     },
-    closeModal: function() { 
-      document.getElementById('modal').classList.remove('show'); 
+    closeModal: function() {
+      document.getElementById('modal').classList.remove('show');
     },
     toast: function(msg, type) { JOY.Utils.toast(msg, type); },
     resetUI: function() {
@@ -674,8 +709,7 @@ const JOY = {
       if (file.size > 800000) return JOY.App.toast('Gambar terlalu besar (max ~800KB)','warn');
       var reader = new FileReader();
       reader.onload = function(e) {
-        var dataUrl = e.target.result;
-        JOY.DB.logo = dataUrl;
+        JOY.DB.logo = e.target.result;
         JOY.save();
         JOY.App.applyLogo();
         JOY.App.toast('Logo disimpan','ok');
@@ -697,8 +731,8 @@ const JOY = {
       }
     },
     renderAll: function() {
-      JOY.Finance.render(); JOY.Agency.render(); JOY.Asset.render(); JOY.Progress.render(); 
-      JOY.Target.render(); JOY.Log.render(); JOY.Provider.render(); JOY.Chat.render(); 
+      JOY.Finance.render(); JOY.Agency.render(); JOY.Asset.render(); JOY.Progress.render();
+      JOY.Target.render(); JOY.Log.render(); JOY.Provider.render(); JOY.Chat.render();
       JOY.Config.render(); JOY.Rules.render(); JOY.Storage.render(); JOY.Health.render();
       JOY.App.applyLogo();
     }
@@ -716,7 +750,7 @@ const JOY = {
       JOY.save();
       document.getElementById('exCat').value = ''; document.getElementById('exAmt').value = ''; document.getElementById('exNote').value = '';
       JOY.App.toast('Sanny mencatat pengeluaran','ok');
-      JOY.Log.push('Sanny', 'Mencatat pengeluaran operasional: '+cat+' — '+JOY.Utils.fmtRp(amt)+(note ? ' ('+note+')' : ''));
+      JOY.Log.push('Sanny', 'Mencatat pengeluaran: '+cat+' — '+JOY.Utils.fmtRp(amt)+(note ? ' ('+note+')' : ''));
       JOY.App.renderAll();
     },
     openApproveModal: function() {
@@ -739,7 +773,7 @@ const JOY = {
       JOY.App.closeModal();
       JOY.App.toast('Sanny menyetujui pembayaran · Produk dirilis','ok');
       JOY.Log.push('Sanny', 'Menyetujui pemasukan: '+JOY.Utils.fmtRp(p.amt)+' dari '+p.note);
-      JOY.Log.push('Michelle', 'Link download produk otomatis dikirim ke customer.');
+      JOY.Log.push('Michelle', 'Link download produk dikirim ke customer.');
       JOY.Log.push('Grace', 'Order dari "'+p.note+'" telah diproses.');
       document.getElementById('payApproveAmt').value=''; document.getElementById('payApproveNote').value='';
       JOY.App.renderAll();
@@ -771,10 +805,12 @@ const JOY = {
     add: function() {
       var name = document.getElementById('agName').value.trim();
       if(!name) return JOY.App.toast('Nama wajib','warn');
-      JOY.DB.agents.push({id:JOY.id(), name:name, role:document.getElementById('agRole').value, model:document.getElementById('agModel').value.trim()||'gpt-4o', status:'active'});
+      var role = document.getElementById('agRole').value;
+      var model = document.getElementById('agModel').value.trim()||'gpt-4o';
+      JOY.DB.agents.push({id:JOY.id(), name:name, role:role, model:model, status:'active'});
       JOY.save(); document.getElementById('agName').value=''; document.getElementById('agModel').value='';
       JOY.App.toast('Agen ditambahkan','ok');
-      JOY.Log.push('Tequila', 'Agen baru "'+name+'" ditambahkan ke tim ('+document.getElementById('agRole').value+').');
+      JOY.Log.push('Tequila', 'Agen baru "'+name+'" ditambahkan ke tim ('+role+').');
       JOY.Agency.render();
     },
     toggle: function(id) {
@@ -840,7 +876,7 @@ const JOY = {
       JOY.save();
       JOY.App.closeModal();
       JOY.App.toast('Request diterima Desi → tiket progress dibuat','ok');
-      JOY.Log.push('Desi', 'Menerima request "'+title+'" ('+market+'). Tiket kerja dibuat & diteruskan ke Della + Scout.');
+      JOY.Log.push('Desi', 'Menerima request "'+title+'" ('+market+'). Tiket kerja dibuat.');
       JOY.Log.push('Della', 'Mulai riset pasar untuk "'+title+'".');
       JOY.Progress.render();
       JOY.App.renderAll();
@@ -863,9 +899,8 @@ const JOY = {
       var oldPct = p.pct;
       p.pct = Math.min(100, Math.max(0, parseInt(pct)||0));
 
-      if (p.pct < 25) {
-        p.stage = 'Riset (Della + Scout)';
-      } else if (p.pct < 55) {
+      if (p.pct < 25) p.stage = 'Riset (Della + Scout)';
+      else if (p.pct < 55) {
         p.stage = 'Produksi (Builder + Sarah + Mario)';
         if (oldPct < 25 && p.pct >= 25) {
           JOY.Log.push('Builder', 'Mulai kerangka produk "'+p.name+'".');
@@ -873,25 +908,13 @@ const JOY = {
         }
       } else if (p.pct < 85) {
         p.stage = 'QC (Michelle)';
-        if (oldPct < 55 && p.pct >= 55) {
-          JOY.Log.push('Michelle', 'Menerima draft "'+p.name+'" untuk QC.');
-        }
-      } else if (p.pct < 100) {
-        p.stage = 'Final Check (Michelle)';
-      }
+        if (oldPct < 55 && p.pct >= 55) JOY.Log.push('Michelle', 'Menerima draft "'+p.name+'" untuk QC.');
+      } else if (p.pct < 100) p.stage = 'Final Check (Michelle)';
 
       if (p.pct >= 100 && !p.released) {
         p.released = true;
         p.stage = 'Selesai · Uploaded by Michelle';
-        JOY.DB.assets.unshift({
-          id: JOY.id(),
-          name: p.name,
-          price: 0,
-          product_link: '',
-          desc: 'Auto-uploaded by Michelle after QC Passed',
-          ts: Date.now(),
-          status: 'ready'
-        });
+        JOY.DB.assets.unshift({id: JOY.id(), name: p.name, price: 0, product_link: '', desc: 'Auto-uploaded by Michelle after QC Passed', ts: Date.now(), status: 'ready'});
         JOY.Log.push('Michelle', 'QC Lolos. Produk "'+p.name+'" berhasil di-upload ke Asset Produk.');
         JOY.Log.push('Grace', 'Produk "'+p.name+'" siap dijual. Menyiapkan materi sales.');
         JOY.Log.push('Sanny', 'Menghitung harga & margin optimal untuk "'+p.name+'".');
@@ -899,9 +922,7 @@ const JOY = {
         JOY.DB.target.history[today] = (JOY.DB.target.history[today] || 0) + 1;
         var req = JOY.DB.requests.find(function(r){ return r.title === p.name; });
         if (req) req.status = 'done';
-      } else if (p.pct < 100) {
-        p.released = false;
-      }
+      } else if (p.pct < 100) p.released = false;
 
       JOY.save();
       JOY.Progress.render();
@@ -918,7 +939,6 @@ const JOY = {
         });
         rtb.innerHTML = html;
       }
-
       var pl = document.getElementById('progressList');
       if(JOY.DB.progress.length===0) pl.innerHTML='<div style="text-align:center;color:#7a7a7a;padding:24px;">Belum ada produk dalam pengerjaan.</div>';
       else {
@@ -943,7 +963,6 @@ const JOY = {
         else break;
       }
       document.getElementById('tgStreak').textContent = streak;
-      
       var barsHtml = '', rowsHtml = '';
       for(var i=13; i>=0; i--) {
         var dd = new Date(); dd.setDate(dd.getDate()-i);
@@ -965,13 +984,13 @@ const JOY = {
       if(JOY.DB.log.length>200) JOY.DB.log = JOY.DB.log.slice(0,200);
       JOY.save(); JOY.Log.render();
     },
-    clear: function() { 
-      if(confirm('Bersihkan semua log?')) { 
-        JOY.DB.log=[]; 
-        JOY.save(); 
-        JOY.Log.render(); 
+    clear: function() {
+      if(confirm('Bersihkan semua log?')) {
+        JOY.DB.log=[];
+        JOY.save();
+        JOY.Log.render();
         JOY.App.toast('Log dibersihkan','ok');
-      } 
+      }
     },
     render: function() {
       var el = document.getElementById('liveLog');
@@ -986,14 +1005,15 @@ const JOY = {
 
   Provider: {
     openAdd: function() {
-      JOY.App.openModal('Tambah Provider', '<div><input id="pvLabel" class="input" placeholder="Label (Primary/Backup-1/Emergency)" style="margin-bottom:12px;"/><input id="pvVendor" class="input" placeholder="Vendor (Groq, Gemini, OpenRouter, HuggingFace, Pollinations)" style="margin-bottom:12px;"/><input id="pvModel" class="input" placeholder="Model" style="margin-bottom:12px;"/><select id="pvRole" class="input" style="margin-bottom:12px;"><option value="primary">Primary</option><option value="backup">Backup</option><option value="emergency">Emergency</option></select><button onclick="JOY.Provider.save()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;">Simpan</button></div>');
+      JOY.App.openModal('Tambah Provider', '<div><input id="pvLabel" class="input" placeholder="Label (Primary/Backup/Emergency)" style="margin-bottom:12px;"/><input id="pvVendor" class="input" placeholder="Vendor (Groq, Pollinations, dll)" style="margin-bottom:12px;"/><input id="pvModel" class="input" placeholder="Model" style="margin-bottom:12px;"/><select id="pvRole" class="input" style="margin-bottom:12px;"><option value="primary">Primary</option><option value="backup">Backup</option><option value="emergency">Emergency</option></select><button onclick="JOY.Provider.save()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;">Simpan</button></div>');
     },
     save: function() {
       var label = document.getElementById('pvLabel').value.trim();
       if(!label) return JOY.App.toast('Label wajib','warn');
-      JOY.DB.providers.push({id:JOY.id(), label:label, vendor:document.getElementById('pvVendor').value.trim(), model:document.getElementById('pvModel').value.trim(), role:document.getElementById('pvRole').value, status:'ok', latency:0, lastCheck:null});
+      var vendor = document.getElementById('pvVendor').value.trim();
+      JOY.DB.providers.push({id:JOY.id(), label:label, vendor:vendor, model:document.getElementById('pvModel').value.trim(), role:document.getElementById('pvRole').value, status:'ok', latency:0, lastCheck:null});
       JOY.save(); JOY.App.closeModal(); JOY.App.toast('Provider ditambahkan','ok');
-      JOY.Log.push('Yuliana', 'Provider baru "'+label+'" ('+document.getElementById('pvVendor').value.trim()+') ditambahkan ke rantai fallback.');
+      JOY.Log.push('Yuliana', 'Provider baru "'+label+'" ('+vendor+') ditambahkan ke rantai fallback.');
       JOY.Provider.render();
     },
     render: function() {
@@ -1009,56 +1029,76 @@ const JOY = {
         html += '<tr><td data-label="Urutan" style="color:#7a7a7a;font-family:JetBrains Mono,monospace;">#'+(idx+1)+'</td><td data-label="Label" style="color:#ededed;">'+JOY.Utils.esc(p.label)+'</td><td data-label="Vendor" style="color:#d4d4d4;">'+JOY.Utils.esc(p.vendor)+'</td><td data-label="Model" style="font-family:JetBrains Mono,monospace;font-size:11px;color:#d4d4d4;">'+JOY.Utils.esc(p.model)+'</td><td data-label="Status"><span class="badge '+st+'"><span class="dot '+st+'"></span>'+p.status+'</span></td><td data-label=""></td></tr>';
       });
       tb.innerHTML = html;
-      
       var chain = sorted.map(function(p){return p.label+' ('+p.vendor+')';}).join(' → ');
       document.getElementById('fallbackChain').innerHTML = '<div style="font-size:12px;color:#7a7a7a;margin-bottom:8px;">Urutan percobaan saat Primary gagal:</div><div style="font-family:JetBrains Mono,monospace;font-size:13px;color:#c9a27a;">'+chain+'</div>';
     }
   },
 
   Chat: {
-    send: function() {
+    send: async function() {
       var inp = document.getElementById('chatInput');
       var msg = inp.value.trim();
       if(!msg) return;
       var persona = document.getElementById('chatPersona').value;
+
+      // Tambah pesan user
       JOY.DB.chat.push({role:'user', content:JOY.Utils.esc(msg), ts:Date.now(), persona: persona});
-      inp.value=''; 
+      inp.value='';
       JOY.save();
-      
+
+      // Tambah pesan loading AI
       var tempId = 'temp_' + Date.now();
-      JOY.DB.chat.push({role:'ai', content:'<span class="pulse-dot">●</span> Memproses...', ts:Date.now(), id:tempId, persona: persona});
+      JOY.DB.chat.push({role:'ai', content:'<span class="pulse-dot">●</span> AI sedang berpikir...', ts:Date.now(), id:tempId, persona: persona});
       JOY.Chat.render();
 
-      setTimeout(() => {
-        var responses = {
-          'Tequila': 'Halo Owner. Saya Tequila, Manager JOY Corp. Sistem berjalan normal. Ada '+JOY.DB.agents.filter(function(a){return a.status==='active';}).length+' agen aktif. Target hari ini: '+(JOY.DB.target.history[JOY.Utils.today()]||0)+'/'+JOY.DB.target.daily+' produk.',
-          'Sanny': 'Halo. Saya Sanny, Finance JOY Corp. Saldo saat ini: '+JOY.Utils.fmtRp(JOY.Finance.getBalance())+'. Ada '+JOY.DB.transactions.length+' transaksi tercatat.',
-          'Della': 'Halo. Saya Della, Market Observer. Saya memantau tren pasar US & EU untuk identifikasi peluang produk baru.',
-          'Scout': 'Halo. Saya Scout, Research. Saya melakukan riset mendalam untuk validasi ide produk sebelum produksi.',
-          'Michelle': 'Halo. Saya Michelle, QC & Publisher. Saya memastikan setiap produk memenuhi standar sebelum dipublish. Ada '+JOY.DB.assets.length+' asset siap jual.',
-          'Grace': 'Halo. Saya Grace, Sales Executive. Saya siap membantu strategi penjualan dan follow-up prospect.',
-          'Elten': 'Halo. Saya Elten, Sales Executive. Fokus saya adalah konversi lead menjadi pembeli.',
-          'Angela': 'Halo. Saya Angela, Business Development. Saya mengidentifikasi peluang B2B dan partnership strategis.',
-          'Sarah': 'Halo. Saya Sarah, Creator & Copy. Saya membuat konten dan copywriting yang menarik untuk produk kita.',
-          'Yuliana': 'Halo. Saya Yuliana, AI Medis. Saya membantu analisis data kesehatan dan optimasi sistem.'
-        };
-        var response = responses[persona] || 'Halo, saya '+persona+'. Sistem JOY Corp berjalan normal.';
+      // Update status
+      var statusEl = document.getElementById('chatAiStatus');
+      if (statusEl) {
+        statusEl.innerHTML = '<span class="dot warn pulse-dot"></span> AI Bekerja';
+        statusEl.className = 'badge warn';
+      }
+
+      try {
+        var result = await JOY.AI.call(msg, persona);
+        // Hapus pesan loading
         JOY.DB.chat = JOY.DB.chat.filter(function(c){return c.id!==tempId;});
-        JOY.DB.chat.push({role:'ai', content:'<div style="font-size:10px;color:#c9a27a;margin-bottom:4px;">'+persona.toUpperCase()+'</div><div style="white-space:pre-wrap;">'+response+'</div>', ts:Date.now(), persona: persona});
-        JOY.save(); JOY.Chat.render();
-      }, 800);
+        // Tambah respons AI (FIX: hanya 1 nama persona)
+        JOY.DB.chat.push({
+          role:'ai',
+          content:'<div style="white-space:pre-wrap;">'+JOY.Utils.esc(result.text)+'</div><div style="font-size:10px;color:#7a7a7a;margin-top:6px;">via '+result.provider+' · '+result.latency+'ms</div>',
+          ts:Date.now(),
+          persona: persona
+        });
+        if (statusEl) {
+          statusEl.innerHTML = '<span class="dot ok pulse-dot"></span> AI Siap';
+          statusEl.className = 'badge ok';
+        }
+        JOY.Log.push(persona, 'Merespons chat Owner via '+result.provider+'.');
+      } catch (e) {
+        JOY.DB.chat = JOY.DB.chat.filter(function(c){return c.id!==tempId;});
+        JOY.DB.chat.push({role:'ai', content:'Maaf, terjadi kesalahan: '+JOY.Utils.esc(e.message), ts:Date.now(), persona: persona});
+        if (statusEl) {
+          statusEl.innerHTML = '<span class="dot danger pulse-dot"></span> AI Error';
+          statusEl.className = 'badge danger';
+        }
+      }
+
+      JOY.save();
+      JOY.Chat.render();
     },
     clear: function() { if(confirm('Bersihkan chat?')) { JOY.DB.chat=[]; JOY.save(); JOY.Chat.render(); } },
     render: function() {
       var box = document.getElementById('chatBox');
       if(JOY.DB.chat.length===0) {
-        box.innerHTML = '<div style="text-align:center;color:#7a7a7a;padding:40px;"><div style="font-size:32px;margin-bottom:8px;">◈</div><div style="font-size:14px;">Mulai percakapan dengan tim AI JOY CORP.</div><div style="font-size:12px;margin-top:8px;">Pilih persona dan tanyakan apa saja.</div></div>';
+        box.innerHTML = '<div style="text-align:center;color:#7a7a7a;padding:40px;"><div style="font-size:32px;margin-bottom:8px;">◈</div><div style="font-size:14px;">Mulai percakapan dengan tim AI JOY CORP.</div><div style="font-size:12px;margin-top:8px;">AI akan berpikir sungguhan via Groq/Pollinations.</div></div>';
         return;
       }
       var html = '';
       JOY.DB.chat.forEach(function(m) {
         var pName = m.persona || 'Tequila';
-        html += '<div style="display:flex;'+(m.role==='user'?'justify-content:flex-end':'justify-content:flex-start')+';margin-bottom:8px;"><div class="chat-msg '+(m.role==='user'?'chat-user':'chat-ai')+'">'+(m.role==='ai'?'<div style="font-size:10px;color:#c9a27a;margin-bottom:4px;letter-spacing:1px;">'+pName.toUpperCase()+'</div>':'')+'<div>'+m.content+'</div><div style="font-size:10px;color:#7a7a7a;margin-top:4px;">'+JOY.Utils.fmtTime(m.ts)+'</div></div></div>';
+        // FIX: hanya tampilkan nama persona 1x di header pesan AI
+        var headerHtml = m.role==='ai' ? '<div style="font-size:10px;color:#c9a27a;margin-bottom:4px;letter-spacing:1px;">'+JOY.Utils.esc(pName).toUpperCase()+'</div>' : '';
+        html += '<div style="display:flex;'+(m.role==='user'?'justify-content:flex-end':'justify-content:flex-start')+';margin-bottom:8px;"><div class="chat-msg '+(m.role==='user'?'chat-user':'chat-ai')+'">'+headerHtml+'<div>'+m.content+'</div><div style="font-size:10px;color:#7a7a7a;margin-top:4px;">'+JOY.Utils.fmtTime(m.ts)+'</div></div></div>';
       });
       box.innerHTML = html;
       box.scrollTop = box.scrollHeight;
@@ -1068,51 +1108,45 @@ const JOY = {
   Health: {
     run: function(silent) {
       if (!silent) JOY.App.toast('Memulai health check...','info');
-      
-      // Cek integritas data
       var issues = [];
       if (!JOY.DB.agents || JOY.DB.agents.length === 0) issues.push('Agen kosong');
       if (!JOY.DB.providers || JOY.DB.providers.length === 0) issues.push('Provider kosong');
       if (!JOY.DB.pin || JOY.DB.pin.length !== 6) issues.push('PIN tidak valid');
-      
-      var integrity = 100 - (issues.length * 20);
+      var groqKey = JOY.AI._getGroqKey();
+      if (!groqKey) issues.push('Groq Key belum ditambahkan');
+      var integrity = 100 - (issues.length * 15);
       if (integrity < 0) integrity = 0;
-      
-      // Cek storage
       var raw = localStorage.getItem(JOY.LS_KEY) || '';
       var bytes = new Blob([raw]).size;
       var storageUsed = bytes < 1024 ? bytes+' B' : (bytes/1024).toFixed(1)+' KB';
-      
       var sysStatus = 'ok', sysLabel = 'Optimal', sysColor = 'ok';
       if (integrity < 60) { sysStatus = 'danger'; sysLabel = 'Kendala'; sysColor = 'danger'; }
       else if (integrity < 80) { sysStatus = 'warn'; sysLabel = 'Perhatian'; sysColor = 'warn'; }
-      
       JOY.DB.health = {lastRun: Date.now(), status: sysStatus, integrity: integrity, storageUsed: storageUsed, issues: issues};
       JOY.save();
-      
       var indicator = document.getElementById('sysIndicator');
-      indicator.innerHTML = '<span class="dot '+sysColor+' pulse-dot"></span><span id="sysLabel" style="font-size:11px;color:'+sysColor+';">'+sysLabel+'</span>';
-      
+      if (indicator) indicator.innerHTML = '<span class="dot '+sysColor+' pulse-dot"></span><span id="sysLabel" style="font-size:11px;color:'+sysColor+';">'+sysLabel+'</span>';
       if (!silent) JOY.App.toast('Health check selesai. Integritas: '+integrity+'%','ok');
       JOY.Health.render();
-      if (issues.length > 0 && !silent) {
-        JOY.Log.push('Yuliana', 'Health check: ditemukan '+issues.length+' masalah ('+issues.join(', ')+').');
-      }
+      if (issues.length > 0 && !silent) JOY.Log.push('Yuliana', 'Health check: ditemukan '+issues.length+' masalah ('+issues.join(', ')+').');
     },
     render: function() {
       var h = JOY.DB.health;
       var hStatusEl = document.getElementById('hStatus');
+      if (!hStatusEl) return;
       hStatusEl.textContent = h.status === 'ok' ? 'Optimal' : h.status === 'warn' ? 'Perhatian' : 'Kendala';
       hStatusEl.style.color = h.status === 'ok' ? '#7a9a7a' : h.status === 'warn' ? '#b8956a' : '#a86a6a';
       document.getElementById('hStatusSub').textContent = h.lastRun ? 'Terakhir cek: '+JOY.Utils.fmtDateTime(h.lastRun) : 'Belum pernah dicek';
       document.getElementById('hIntegrity').textContent = h.integrity + '%';
       document.getElementById('hStorage').textContent = h.storageUsed || '—';
-      
       var tb = document.getElementById('healthTable');
+      if (!tb) return;
       var html = '';
       html += '<tr><td data-label="Komponen" style="color:#ededed;">Database LocalStorage</td><td data-label="Status"><span class="badge ok"><span class="dot ok"></span>OK</span></td><td data-label="Detail" style="color:#7a7a7a;font-size:12px;">'+(h.storageUsed||'—')+'</td></tr>';
       html += '<tr><td data-label="Komponen" style="color:#ededed;">Agen AI</td><td data-label="Status"><span class="badge '+(JOY.DB.agents.length>0?'ok':'danger')+'"><span class="dot '+(JOY.DB.agents.length>0?'ok':'danger')+'"></span>'+(JOY.DB.agents.length>0?'OK':'Kosong')+'</span></td><td data-label="Detail" style="color:#7a7a7a;font-size:12px;">'+JOY.DB.agents.length+' agen</td></tr>';
       html += '<tr><td data-label="Komponen" style="color:#ededed;">Provider AI</td><td data-label="Status"><span class="badge '+(JOY.DB.providers.length>0?'ok':'danger')+'"><span class="dot '+(JOY.DB.providers.length>0?'ok':'danger')+'"></span>'+(JOY.DB.providers.length>0?'OK':'Kosong')+'</span></td><td data-label="Detail" style="color:#7a7a7a;font-size:12px;">'+JOY.DB.providers.length+' provider</td></tr>';
+      var groqKey = JOY.AI._getGroqKey();
+      html += '<tr><td data-label="Komponen" style="color:#ededed;">Groq AI</td><td data-label="Status"><span class="badge '+(groqKey?'ok':'warn')+'"><span class="dot '+(groqKey?'ok':'warn')+'"></span>'+(groqKey?'Aktif':'Belum ada Key')+'</span></td><td data-label="Detail" style="color:#7a7a7a;font-size:12px;">'+(groqKey?'Terhubung':'Tambahkan di API Config')+'</td></tr>';
       html += '<tr><td data-label="Komponen" style="color:#ededed;">PIN Keamanan</td><td data-label="Status"><span class="badge '+(JOY.DB.pin&&JOY.DB.pin.length===6?'ok':'danger')+'"><span class="dot '+(JOY.DB.pin&&JOY.DB.pin.length===6?'ok':'danger')+'"></span>'+(JOY.DB.pin&&JOY.DB.pin.length===6?'OK':'Invalid')+'</span></td><td data-label="Detail" style="color:#7a7a7a;font-size:12px;">6 digit</td></tr>';
       html += '<tr><td data-label="Komponen" style="color:#ededed;">Integritas Data</td><td data-label="Status"><span class="badge '+(h.integrity>=80?'ok':h.integrity>=60?'warn':'danger')+'"><span class="dot '+(h.integrity>=80?'ok':h.integrity>=60?'warn':'danger')+'"></span>'+(h.integrity>=80?'OK':'Issue')+'</span></td><td data-label="Detail" style="color:#7a7a7a;font-size:12px;">'+h.integrity+'%'+(h.issues&&h.issues.length>0?' ('+h.issues.join(', ')+')':'')+'</td></tr>';
       tb.innerHTML = html;
@@ -1126,15 +1160,12 @@ const JOY = {
       var logBefore = JOY.DB.log.length;
       JOY.DB.log = JOY.DB.log.filter(function(l){return l.ts > thirtyDaysAgo;});
       var logRemoved = logBefore - JOY.DB.log.length;
-      
       var fourteenDaysAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
       var chatBefore = JOY.DB.chat.length;
       JOY.DB.chat = JOY.DB.chat.filter(function(c){return c.ts > fourteenDaysAgo;});
       var chatRemoved = chatBefore - JOY.DB.chat.length;
-      
       JOY.DB.optimize = {lastRun: Date.now(), logRemoved:logRemoved, chatRemoved:chatRemoved};
       JOY.save();
-      
       if (!silent) JOY.App.toast('Optimasi selesai. Log lama: '+logRemoved+', Chat lama: '+chatRemoved+' dihapus.','ok');
       JOY.Log.push('Panda', 'Optimasi sistem: '+logRemoved+' log lama & '+chatRemoved+' chat lama dibersihkan. Data inti 100% aman.');
     }
@@ -1164,7 +1195,7 @@ const JOY = {
     },
     openAdd: function() {
       if (!JOY.Config.unlocked) return JOY.App.toast('Buka kunci dulu','warn');
-      JOY.App.openModal('Tambah API Key', '<div><input id="kLabel" class="input" placeholder="Label (Groq, Gemini, OpenRouter, HuggingFace)" style="margin-bottom:12px;"/><select id="kType" class="input" style="margin-bottom:12px;"><option>API Key</option><option>Secret</option><option>Token</option><option>Client ID</option></select><input id="kVal" class="input" placeholder="sk-... / token" style="margin-bottom:12px;font-family:JetBrains Mono,monospace;"/><input id="kExp" type="date" class="input" style="margin-bottom:12px;"/><button onclick="JOY.Config.save()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;">Simpan</button></div>');
+      JOY.App.openModal('Tambah API Key', '<div><div style="font-size:12px;color:#c9a27a;margin-bottom:12px;padding:10px;background:rgba(212,165,116,0.08);border-radius:6px;">💡 Untuk mengaktifkan AI sungguhan, tambahkan key dengan label <b>Groq</b>. Key bisa didapat gratis di console.groq.com</div><input id="kLabel" class="input" placeholder="Label (Groq / Pollinations / dll)" style="margin-bottom:12px;"/><select id="kType" class="input" style="margin-bottom:12px;"><option>API Key</option><option>Secret</option><option>Token</option></select><input id="kVal" class="input" placeholder="sk-... / token" style="margin-bottom:12px;font-family:JetBrains Mono,monospace;"/><input id="kExp" type="date" class="input" style="margin-bottom:12px;"/><button onclick="JOY.Config.save()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;">Simpan</button></div>');
     },
     save: function() {
       var label = document.getElementById('kLabel').value.trim();
@@ -1190,15 +1221,14 @@ const JOY = {
     render: function() {
       var tb = document.getElementById('keyTable');
       if (!tb) return;
-      if(JOY.DB.keys.length===0) { 
-        tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#7a7a7a;padding:24px;">Belum ada kunci. Tambah agar Chat & Health Check bisa connect.</td></tr>'; 
-        return; 
+      if(JOY.DB.keys.length===0) {
+        tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#7a7a7a;padding:24px;">Belum ada kunci. Tambahkan Groq API Key untuk mengaktifkan AI sungguhan.</td></tr>';
+        return;
       }
       var html = '';
       JOY.DB.keys.forEach(function(k) {
         var mask = k.val.length < 12 ? '••••••••' : k.val.slice(0, 6) + '••••••' + k.val.slice(-4);
         var isExp = k.exp && new Date(k.exp).getTime() < Date.now();
-        
         html += '<tr>';
         html += '<td data-label="Label" style="color:#ededed;">'+JOY.Utils.esc(k.label)+'</td>';
         html += '<td data-label="Tipe"><span class="badge info">'+JOY.Utils.esc(k.type)+'</span></td>';
@@ -1222,7 +1252,7 @@ const JOY = {
         {id:JOY.id(), title:'Target Produksi Harian', body:'Minimum 5 produk digital siap jual per hari untuk pasar US & EU.\nSetiap produk yang lolos QC (Michelle) otomatis masuk Asset dan dihitung ke target harian.', ts:Date.now()},
         {id:JOY.id(), title:'Alur Kerja Agency', body:'1. Request produk → Desi buat tiket.\n2. Riset → Della + Scout.\n3. Produksi → Builder + Sarah + Mario.\n4. QC & Upload → Michelle.\n5. Sales → Grace, Elten, Closer, Angela.\n6. Finance → Sanny.', ts:Date.now()},
         {id:JOY.id(), title:'Akses API & Keamanan Data', body:'1. API Config terkunci PIN.\n2. Key hanya boleh ditambah/dilihat setelah buka kunci.\n3. Key tidak boleh dibagikan ke luar sistem.\n4. Backup database dilakukan rutin oleh Panda.', ts:Date.now()},
-        {id:JOY.id(), title:'Komunikasi & Chat AI', body:'Chat Manager memakai rantai fallback 5 lapis.\nPrimary gagal → otomatis pindah ke backup.\nSemua interaksi agen tercatat di Log Real-time.', ts:Date.now()},
+        {id:JOY.id(), title:'Komunikasi & Chat AI', body:'Chat Manager memakai Groq AI (Primary) dengan fallback Pollinations.\nPrimary gagal → otomatis pindah ke fallback.\nSemua interaksi agen tercatat di Log Real-time.', ts:Date.now()},
         {id:JOY.id(), title:'Kepemilikan & Keputusan', body:'Pemegang Kendali Utama: Ade Kurnia Sandy.\nKeputusan strategis final ada di Owner.\nTequila sebagai CAO mengawasi operasional harian.', ts:Date.now()}
       ];
     },
@@ -1300,7 +1330,7 @@ const JOY = {
         try {
           var data = JSON.parse(e.target.result);
           if(!confirm('Timpa database saat ini?')) return;
-          JOY.DB = JOY.normalize(data); 
+          JOY.DB = JOY.normalize(data);
           JOY.save(); JOY.App.renderAll(); JOY.App.toast('Database diimpor','ok');
           JOY.Log.push('Panda', 'Database diimpor dari backup JSON.');
         } catch(err) { JOY.App.toast('File tidak valid','danger'); }
@@ -1317,7 +1347,6 @@ document.querySelectorAll('.nav-item').forEach(function(el) {
     el.classList.add('active');
     document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
     document.getElementById(t).classList.add('active');
-    
     var titles = {
       saldo:['Saldo & Keuangan','Pencatatan arus kas & mutasi'],
       agency:['Agency Network','Hybrid Task Force · 19 Agen AI'],
@@ -1325,8 +1354,8 @@ document.querySelectorAll('.nav-item').forEach(function(el) {
       progress:['Progress & Request','Tiket kerja & pengerjaan'],
       target:['Target Harian','Minimum 5 produk per hari'],
       log:['Log Real-time','Hanya aktivitas nyata'],
-      aiprovider:['AI Provider','Rantai fallback 5 lapis'],
-      chat:['Chat Manager','Konsultasi dengan tim AI'],
+      aiprovider:['AI Provider','Rantai fallback 2 lapis'],
+      chat:['Chat Manager','Konsultasi AI sungguhan (Groq)'],
       apiconfig:['API Config','Manajemen kunci akses'],
       health:['Health Check','Status sistem & integritas'],
       rules:['Peraturan','Tata tertib internal'],
