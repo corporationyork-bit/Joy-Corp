@@ -1,1381 +1,219 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>JOY CORPORATION v6.1</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          matte: { 950:'#080808', 900:'#0f0f0f', 850:'#141414', 800:'#1a1a1a', 700:'#222222', 600:'#2c2c2c', 500:'#3a3a3a', 400:'#555555', 300:'#7a7a7a', 200:'#a3a3a3', 100:'#d4d4d4', 50:'#ededed' },
-          accent: { DEFAULT:'#c9a27a', soft:'#b8956a', deep:'#8a6f52' },
-          ok:'#7a9a7a', warn:'#b8956a', danger:'#a86a6a'
-        },
-        fontFamily: { sans:['Inter','system-ui','sans-serif'], mono:['JetBrains Mono','ui-monospace','monospace'] }
-      }
-    }
-  }
-</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>JOY CORPORATION - Control Center</title>
+<meta name="description" content="AI-powered digital product studio by Ade Kurnia Sandy">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root {
-    --bg: #09090b;
-    --bg-elevated: #0f0f12;
-    --bg-card: #121216;
-    --bg-hover: #1a1a1f;
-    --border: #27272a;
-    --border-subtle: #1f1f23;
-    --text: #e4e4e7;
-    --text-muted: #71717a;
-    --text-dim: #52525b;
-    --accent: #d4a574;
-    --accent-dim: #b8956a;
-    --accent-bg: rgba(212,165,116,0.08);
-    --ok: #86a886;
-    --warn: #c9a87a;
-    --danger: #c98a8a;
-  }
-  html,body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;margin:0;padding:0;overflow-x:hidden;height:100%;}
-  body{display:flex;flex-direction:row;min-height:100vh;position:relative;}
-  *{box-sizing:border-box;}
-  ::-webkit-scrollbar{width:5px;height:5px}
-  ::-webkit-scrollbar-track{background:transparent}
-  ::-webkit-scrollbar-thumb{background:#2a2a2e;border-radius:10px}
-  ::-webkit-scrollbar-thumb:hover{background:#3f3f46}
-  button, .btn, .btn-accent, .btn-danger, .nav-item, a, input, select, textarea, details>summary {
-    cursor: pointer !important;
-    -webkit-tap-highlight-color: rgba(212,165,116,0.15);
-    touch-action: manipulation;
-  }
-  input, select, textarea { font-size: 16px !important; }
-  .nav-item{transition:all .18s ease;padding:10px 16px;margin:0 8px;border-radius:8px;display:flex;align-items:center;gap:10px;color:var(--text-muted);text-decoration:none;font-size:13.5px;}
-  .nav-item:hover{background:var(--bg-hover);color:var(--text)}
-  .nav-item.active{background:var(--accent-bg);color:var(--accent);font-weight:500}
-  .card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:12px;overflow:hidden;}
-  .card-h{background:transparent;border-bottom:1px solid var(--border-subtle);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
-  .btn{background:var(--bg-hover);border:1px solid var(--border);color:var(--text);padding:9px 14px;border-radius:8px;display:inline-block;text-align:center;font-size:13px;transition:all .15s}
-  .btn:hover{background:#222228;border-color:#3f3f46}
-  .btn-accent{background:var(--accent-bg);border:1px solid rgba(212,165,116,0.25);color:var(--accent);}
-  .btn-accent:hover{background:rgba(212,165,116,0.14);border-color:rgba(212,165,116,0.4)}
-  .btn-danger{background:rgba(201,138,138,0.08);border:1px solid rgba(201,138,138,0.25);color:var(--danger);}
-  .btn-danger:hover{background:rgba(201,138,138,0.14)}
-  .input{background:#0c0c0e;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;width:100%;outline:none;transition:border-color .15s}
-  .input:focus{border-color:var(--accent)}
-  .input::placeholder{color:var(--text-dim)}
-  .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text-muted)}
-  .badge.ok{color:#9ab89a;border-color:#2d3a2d;background:#121a14}
-  .badge.warn{color:#c9a87a;border-color:#3a3224;background:#1a1610}
-  .badge.danger{color:#c98a8a;border-color:#3a2424;background:#1a1414}
-  .badge.info{color:var(--text-muted);border-color:var(--border);background:var(--bg-elevated)}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--border-subtle);font-size:13px; word-break: break-word;}
-  th{color:var(--text-dim);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
-  .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
-  .dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.danger{background:var(--danger)}.dot.idle{background:#555}
-  .pulse-dot{animation:pulse 1.8s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
-  .chat-msg{padding:11px 15px;border-radius:12px;max-width:85%;font-size:14px;line-height:1.55}
-  .chat-user{background:var(--bg-hover);border:1px solid var(--border);margin-left:auto;border-bottom-right-radius:3px}
-  .chat-ai{background:var(--bg-elevated);border:1px solid var(--border-subtle);margin-right:auto;border-bottom-left-radius:3px}
-  .section{display:none}.section.active{display:block}
-  .divider{height:1px;background:var(--border-subtle);margin:18px 0}
-  .stat{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:12px;padding:18px;}
-  .stat-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
-  .stat-val{font-size:24px;color:#f4f4f5;font-weight:600;letter-spacing:-0.02em}
-  .stat-sub{font-size:11px;color:var(--text-dim);margin-top:5px}
-  .log-line{font-family:JetBrains Mono,ui-monospace,monospace;font-size:12px;padding:7px 0;border-bottom:1px dashed #1a1a1e;color:var(--text-muted)}
-  .log-line .ts{color:var(--text-dim)}.log-line .ag{color:var(--accent)}.log-line .act{color:var(--text)}
-  details>summary{cursor:pointer;list-style:none;padding:12px 16px;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:10px}
-  details>summary::-webkit-details-marker{display:none}
-  details[open]>summary{border-bottom-left-radius:0;border-bottom-right-radius:0;background:var(--bg-elevated)}
-  details .body{padding:16px;background:#0c0c0e;border:1px solid var(--border-subtle);border-top:0;border-bottom-left-radius:10px;border-bottom-right-radius:10px}
-  #sidebar{width:260px;background:var(--bg-elevated);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;flex-shrink:0;}
-  #sidebar.closed{display:none;}
-  #overlay{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);z-index:30;}
-  #overlay.show{display:block;}
-  #modal{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.8);z-index:50;padding:20px;overflow-y:auto;}
-  #modal.show{display:block;}
-  #toast{position:absolute;bottom:20px;right:20px;z-index:100;pointer-events:none;}
-  #toast > div{pointer-events:auto;}
-  @media (min-width: 1024px){
-    #hamburger{display:none}
-    #sidebar{display:flex !important;}
-    #closeSidebarBtn{display:none !important;}
-  }
-  @media (max-width: 1023px){
-    #sidebar{position:absolute;top:0;left:0;bottom:0;z-index:40;}
-  }
-  @media (max-width: 640px){
-    .tbl-card thead{display:none}
-    .tbl-card tr{display:block;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;margin-bottom:10px}
-    .tbl-card td{display:flex;justify-content:space-between;align-items:center;border:0;padding:8px 0;font-size:13px; text-align: right;}
-    .tbl-card td::before{content:attr(data-label);color:var(--text-dim);font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin-right:12px;flex-shrink:0; text-align: left;}
-    .tbl-card td:last-child{justify-content:flex-end;margin-top:6px;padding-top:8px;border-top:1px dashed var(--border-subtle); gap: 8px;}
-  }
-  .grid-2{display:grid;gap:14px}@media (min-width: 1024px){.grid-2{grid-template-columns:repeat(2,1fr)}}
-  .grid-3{display:grid;gap:14px}@media (min-width: 768px){.grid-3{grid-template-columns:repeat(3,1fr)}}
-  .asset-grid{display:grid;gap:14px}@media (min-width: 640px){.asset-grid{grid-template-columns:repeat(2,1fr)}}@media (min-width: 1024px){.asset-grid{grid-template-columns:repeat(3,1fr)}}
-  .pipe-grid{display:grid;gap:12px}@media (min-width: 640px){.pipe-grid{grid-template-columns:repeat(2,1fr)}}@media (min-width: 1024px){.pipe-grid{grid-template-columns:repeat(5,1fr)}}
+:root{--bg:#0d0f12;--panel:#14171d;--card:#1a1e26;--border:#2a303c;--text:#e0e0e0;--muted:#8b92a0;--gold:#c5a059;--green:#4caf50;--red:#ef4444}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--panel);border-bottom:1px solid var(--border)}
+.brand{font-weight:800;letter-spacing:1px}
+.brand span{color:var(--gold)}
+.badge{font-size:.72rem;color:var(--muted)}
+.container{display:flex;min-height:calc(100vh - 61px)}
+.sidebar{width:230px;background:var(--panel);border-right:1px solid var(--border);padding:12px 0}
+.menu{padding:12px 18px;color:var(--muted);cursor:pointer;border-left:3px solid transparent}
+.menu:hover,.menu.active{background:var(--card);color:var(--gold);border-left-color:var(--gold)}
+.content{flex:1;padding:22px;overflow:auto}
+.section{display:none}
+.section.active{display:block}
+h2{color:var(--gold);margin-bottom:16px;font-size:1.15rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+.btn{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:.8rem}
+.btn-gold{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
+.btn-danger{border-color:var(--red);color:var(--red)}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:#fff;padding:10px;border-radius:6px;margin:6px 0 12px}
+label{font-size:.78rem;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
+.status{padding:3px 8px;border-radius:4px;font-size:.7rem;font-weight:700}
+.published{background:rgba(76,175,80,.2);color:var(--green)}
+.draft,.idea,.review,.qc{background:rgba(197,160,89,.2);color:var(--gold)}
+.pending{background:rgba(239,68,68,.2);color:var(--red)}
+.catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.product{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.product h3{color:#fff;font-size:.95rem;margin-bottom:6px}
+.price{color:var(--gold);font-weight:800;margin:8px 0}
+.notice{background:rgba(197,160,89,.12);border:1px solid var(--gold);padding:12px;border-radius:8px;font-size:.8rem;color:var(--muted)}
+@media(max-width:768px){.container{flex-direction:column}.sidebar{width:100%;display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--border)}.menu{white-space:nowrap;border-left:0;border-bottom:3px solid transparent}.menu.active{border-bottom-color:var(--gold)}.content{padding:14px}}
 </style>
 </head>
 <body>
-<div id="overlay" onclick="JOY.App.closeSidebar()"></div>
-<aside id="sidebar" class="closed">
-  <div style="padding:18px 16px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;">
-    <div style="display:flex;align-items:center;gap:11px;min-width:0;flex:1;">
-      <div id="brandLogo" onclick="document.getElementById('logoInput').click()" title="Klik untuk ganti logo" style="width:34px;height:34px;border-radius:9px;background:var(--accent-bg);border:1px solid rgba(212,165,116,0.2);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;font-size:15px;flex-shrink:0;cursor:pointer;overflow:hidden;background-size:cover;background-position:center;">J</div>
-      <input type="file" id="logoInput" accept="image/*" style="display:none;" onchange="JOY.App.changeLogo(event)"/>
-      <div style="min-width:0;">
-        <div style="font-size:13.5px;font-weight:600;color:#f4f4f5;letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">JOY CORPORATION</div>
-        <div style="font-size:10px;color:var(--accent);letter-spacing:0.02em;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Kami ada karena kamu Ade</div>
-      </div>
-    </div>
-    <button id="closeSidebarBtn" onclick="JOY.App.closeSidebar()" style="background:none;border:none;color:var(--text-dim);font-size:16px;padding:4px 6px;flex-shrink:0;">✕</button>
-  </div>
-  <div style="padding:11px 16px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;">
-    <div style="font-size:10px;color:var(--text-dim);letter-spacing:0.06em;">STATUS</div>
-    <div id="sysIndicator" style="display:flex;align-items:center;gap:7px;">
-      <span class="dot ok pulse-dot"></span>
-      <span id="sysLabel" style="font-size:11px;color:var(--ok);">Optimal</span>
-    </div>
-  </div>
-  <nav style="flex:1;overflow-y:auto;padding:10px 0;">
-    <div style="padding:10px 16px 4px;font-size:10px;color:var(--text-dim);letter-spacing:0.07em;">OPERATIONS</div>
-    <a class="nav-item" data-target="target"><span>⌖</span><span>Target Harian</span></a>
-    <a class="nav-item" data-target="progress"><span>◐</span><span>Progress & Request</span></a>
-    <a class="nav-item" data-target="asset"><span>▤</span><span>Asset Produk</span></a>
-    <a class="nav-item" data-target="agency"><span>⚙</span><span>Agency Network</span></a>
-    <a class="nav-item" data-target="log"><span>≡</span><span>Log Real-time</span></a>
-    <div style="padding:14px 16px 4px;font-size:10px;color:var(--text-dim);letter-spacing:0.07em;">FINANCE</div>
-    <a class="nav-item" data-target="saldo"><span>◉</span><span>Saldo & Keuangan</span></a>
-    <a class="nav-item" data-target="payment"><span>◊</span><span>Pembayaran</span></a>
-    <div style="padding:14px 16px 4px;font-size:10px;color:var(--text-dim);letter-spacing:0.07em;">AI STACK</div>
-    <a class="nav-item" data-target="chat"><span>◈</span><span>Chat Manager</span></a>
-    <a class="nav-item" data-target="aiprovider"><span>⬢</span><span>AI Provider</span></a>
-    <a class="nav-item" data-target="apiconfig"><span>⚿</span><span>API Config</span></a>
-    <a class="nav-item" data-target="health"><span>✚</span><span>Health Check</span></a>
-    <div style="padding:14px 16px 4px;font-size:10px;color:var(--text-dim);letter-spacing:0.07em;">SYSTEM</div>
-    <a class="nav-item" data-target="rules"><span>§</span><span>Peraturan</span></a>
-    <a class="nav-item" data-target="storage"><span>▦</span><span>Penyimpanan</span></a>
-    <a class="nav-item" data-target="pin"><span>⚲</span><span>Ganti PIN</span></a>
-    <a class="nav-item" data-target="profile"><span>◎</span><span>Profil</span></a>
+<header>
+  <div><div class="brand">JOY <span>CORPORATION</span></div><div class="badge">AI Product Studio · Global Market</div></div>
+  <div class="badge" id="authStatus">Checking session…</div>
+</header>
+
+<div class="container">
+  <nav class="sidebar">
+    <div class="menu active" data-tab="catalog">Public Catalog</div>
+    <div class="menu" data-tab="production">Production</div>
+    <div class="menu" data-tab="orders">Orders</div>
+    <div class="menu" data-tab="agency">Agency</div>
+    <div class="menu" data-tab="settings">Settings</div>
   </nav>
-  <div style="padding:14px 16px;border-top:1px solid var(--border-subtle);">
-    <div style="font-size:10px;color:var(--text-dim);">Operator</div>
-    <div style="font-size:13.5px;color:#f4f4f5;font-weight:500;margin-top:2px;">Ade Kurnia Sandy</div>
-    <div style="font-size:10px;color:var(--text-dim);margin-top:4px;display:flex;align-items:center;gap:6px;"><span class="dot ok"></span> Tequila · Online</div>
-  </div>
-</aside>
-<main style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
-  <header style="position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border-subtle);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
-    <div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1;">
-      <button id="hamburger" onclick="JOY.App.openSidebar()" style="background:var(--bg-hover);border:1px solid var(--border);color:var(--text);font-size:16px;padding:7px 11px;border-radius:8px;">☰</button>
-      <div style="min-width:0;flex:1;">
-        <div id="pageTitle" style="font-size:15px;font-weight:600;color:#f4f4f5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-0.01em;">Target Harian</div>
-        <div id="pageSub" style="font-size:12px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Minimum 5 produk per hari</div>
-      </div>
-      <button onclick="JOY.App.resetUI()" style="background:var(--bg-hover);border:1px solid var(--border);color:var(--accent);font-size:11px;padding:5px 9px;border-radius:6px;">Reset</button>
-    </div>
-    <div style="flex-shrink:0;">
-      <div id="ownerBadge" style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:999px;user-select:none;">
-        <div style="text-align:right;line-height:1.25;">
-          <div style="font-size:9px;color:var(--text-dim);letter-spacing:0.08em;text-transform:uppercase;">Pemegang Kendali Utama</div>
-          <div id="ownerName" style="font-size:13px;font-weight:600;color:#f4f4f5;letter-spacing:-0.01em;text-transform:uppercase;">ADE KURNIA SANDY</div>
-        </div>
-        <div id="eyeIcon" onclick="JOY.App.toggleName()" style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:16px;cursor:pointer;transition:all .2s;" title="Tutup / buka nama">◉</div>
-      </div>
-    </div>
-  </header>
-  <div style="padding:16px;flex:1;overflow-y:auto;">
-    <section id="saldo" class="section">
-      <div class="grid-3" style="margin-bottom:16px;">
-        <div class="stat"><div class="stat-label">Total Pemasukan (Bulan Ini)</div><div class="stat-val" style="color:#7a9a7a;" id="sIncome">Rp 0</div><div class="stat-sub" id="sIncomeCount">0 transaksi</div></div>
-        <div class="stat"><div class="stat-label">Pengeluaran Operasional</div><div class="stat-val" style="color:#a86a6a;" id="sExpense">Rp 0</div><div class="stat-sub" id="sExpenseCount">0 transaksi</div></div>
-        <div class="stat"><div class="stat-label">Estimasi Margin Bersih</div><div class="stat-val" style="color:#c9a27a;" id="sMargin">Rp 0</div><div class="stat-sub">Berdasarkan data Sanny</div></div>
-      </div>
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Catat Pengeluaran Operasional</div><span class="badge info">Sanny</span></div>
-          <div style="padding:20px;">
-            <div style="margin-bottom:12px;"><label style="font-size:11px;color:#7a7a7a;letter-spacing:1px;">KATEGORI</label><input id="exCat" class="input" style="margin-top:6px;" placeholder="Contoh: Biaya Groq API, Domain"/></div>
-            <div style="margin-bottom:12px;"><label style="font-size:11px;color:#7a7a7a;letter-spacing:1px;">JUMLAH (RP)</label><input id="exAmt" type="number" class="input" style="margin-top:6px;" placeholder="0"/></div>
-            <div style="margin-bottom:12px;"><label style="font-size:11px;color:#7a7a7a;letter-spacing:1px;">CATATAN</label><input id="exNote" class="input" style="margin-top:6px;" placeholder="Opsional"/></div>
-            <button onclick="JOY.Finance.addExpense()" class="btn-danger" style="width:100%;padding:12px;font-size:14px;font-weight:500;">Catat Pengeluaran</button>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Log Mutasi Keuangan</div><button onclick="JOY.Finance.clearLog()" style="background:none;border:none;color:#7a7a7a;font-size:11px;">Bersihkan</button></div>
-          <div style="max-height:420px;overflow-y:auto;"><table class="tbl-card"><thead><tr><th>Waktu</th><th>Tipe</th><th>Kategori</th><th>Jumlah</th><th></th></tr></thead><tbody id="trTable"></tbody></table></div>
-        </div>
-      </div>
+
+  <main class="content">
+    <section id="catalog" class="section active">
+      <h2>Public Catalog</h2>
+      <div class="notice">This page is for customers. Products become visible only after owner approval and QC.</div>
+      <div class="catalog-grid" id="catalogGrid"></div>
     </section>
+
+    <section id="production" class="section">
+      <h2>Production Pipeline</h2>
+      <div class="card">
+        <label>Product title</label><input id="pTitle" placeholder="AI Toolkit for Creators & Small Businesses">
+        <label>Product type</label>
+        <select id="pType"><option>toolkit</option><option>ebook</option><option>prompt-pack</option><option>template</option></select>
+        <label>Product idea</label><textarea id="pIdea" rows="3" placeholder="Describe the customer outcome and contents"></textarea>
+        <button class="btn btn-gold" onclick="createProductionItem()">Create production item</button>
+      </div>
+      <div class="card"><table><thead><tr><th>Title</th><th>Type</th><th>Status</th><th>Action</th></tr></thead><tbody id="productionBody"></tbody></table></div>
+    </section>
+
+    <section id="orders" class="section">
+      <h2>Orders</h2>
+      <div class="card"><table><thead><tr><th>Date</th><th>Product</th><th>Amount</th><th>Provider</th><th>Status</th></tr></thead><tbody id="ordersBody"></tbody></table></div>
+    </section>
+
     <section id="agency" class="section">
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Pipeline Otomatis JOY CORP</div><span class="badge ok"><span class="dot ok pulse-dot"></span> Live</span></div>
-        <div class="pipe-grid" style="padding:20px;">
-          <div style="padding:12px;background:#0f0f0f;border:1px solid #222222;border-radius:8px;"><div style="font-size:10px;color:#7a7a7a;letter-spacing:1px;">1. RISET</div><div style="font-size:14px;color:#ededed;margin-top:4px;">Della + Scout</div><div style="font-size:11px;color:#7a7a7a;margin-top:2px;">+ Validator</div></div>
-          <div style="padding:12px;background:#0f0f0f;border:1px solid #222222;border-radius:8px;"><div style="font-size:10px;color:#7a7a7a;letter-spacing:1px;">2. PRODUKSI</div><div style="font-size:14px;color:#ededed;margin-top:4px;">Builder + Sarah</div><div style="font-size:11px;color:#7a7a7a;margin-top:2px;">+ Mario</div></div>
-          <div style="padding:12px;background:#0f0f0f;border:1px solid #222222;border-radius:8px;"><div style="font-size:10px;color:#7a7a7a;letter-spacing:1px;">3. QC & UPLOAD</div><div style="font-size:14px;color:#ededed;margin-top:4px;">Michelle</div><div style="font-size:11px;color:#7a7a7a;margin-top:2px;">Auto Publish</div></div>
-          <div style="padding:12px;background:#0f0f0f;border:1px solid #222222;border-radius:8px;"><div style="font-size:10px;color:#7a7a7a;letter-spacing:1px;">4. SALES</div><div style="font-size:14px;color:#ededed;margin-top:4px;">Grace & Elten</div><div style="font-size:11px;color:#7a7a7a;margin-top:2px;">+ Closer + Angela</div></div>
-          <div style="padding:12px;background:#0f0f0f;border:1px solid #222222;border-radius:8px;"><div style="font-size:10px;color:#7a7a7a;letter-spacing:1px;">5. FINANCE</div><div style="font-size:14px;color:#ededed;margin-top:4px;">Sanny</div><div style="font-size:11px;color:#7a7a7a;margin-top:2px;">+ Marketer</div></div>
-        </div>
-      </div>
-      <div class="grid-2">
-        <div class="card"><div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Daftar Agen AI</div></div><div style="padding:20px;" id="agentList"></div></div>
-        <div class="card"><div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Tambah Agen</div></div><div style="padding:20px;">
-          <div style="margin-bottom:12px;"><input id="agName" class="input" placeholder="Nama (contoh: Sanny)"/></div>
-          <div style="margin-bottom:12px;"><select id="agRole" class="input">
-            <option>Manager / CAO</option><option>Research</option><option>Validation</option><option>Production</option><option>Marketing Tech</option><option>Closing</option><option>Market Observer</option><option>Creator / Copy</option><option>Tech / Script</option><option>QC & Publisher</option><option>Sales Executive</option><option>Business Development</option><option>Finance</option><option>HRD</option><option>GA / Ops</option><option>Tech Support</option><option>AI Medis</option>
-          </select></div>
-          <div style="margin-bottom:12px;"><input id="agModel" class="input" placeholder="Model AI"/></div>
-          <button onclick="JOY.Agency.add()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;font-weight:500;">Simpan</button>
-        </div></div>
-      </div>
-    </section>
-    <section id="asset" class="section">
+      <h2>Agency Workflow</h2>
       <div class="card">
-        <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Gudang Asset Produk</div><button onclick="JOY.Asset.openAdd()" class="btn-accent" style="padding:6px 12px;font-size:12px;">+ Manual</button></div>
-        <div style="padding:20px;"><div id="assetGrid" class="asset-grid"></div></div>
+        <p style="font-size:.85rem;color:var(--muted)">Aperol researches demand → Walker drafts → Hendrick’s prepares assets → Absolut runs QC checklist → You approve → Martini publishes.</p>
       </div>
+      <div class="card"><table><thead><tr><th>Agent</th><th>Real responsibility</th></tr></thead><tbody>
+        <tr><td>Aperol</td><td>Market research and product idea validation</td></tr>
+        <tr><td>Walker</td><td>Creates outlines, drafts, and sales copy</td></tr>
+        <tr><td>Hendrick’s</td><td>Prepares templates and final downloadable assets</td></tr>
+        <tr><td>Absolut</td><td>Runs the QC checklist; cannot publish without owner approval</td></tr>
+        <tr><td>Martini</td><td>Publishes approved products and tracks conversion</td></tr>
+        <tr><td>Hennessy</td><td>Reports revenue, refunds, and margins</td></tr>
+      </tbody></table></div>
     </section>
-    <section id="progress" class="section">
-      <div class="grid-2" style="margin-bottom:16px;">
-        <div class="card">
-          <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Request Produk Baru</div><button onclick="JOY.Progress.openRequest()" class="btn-accent" style="padding:6px 12px;font-size:12px;">+ Request</button></div>
-          <div style="padding:20px;"><table class="tbl-card"><thead><tr><th>Judul</th><th>Pasar</th><th>Status</th><th></th></tr></thead><tbody id="reqTable"></tbody></table></div>
-        </div>
-        <div class="card">
-          <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Progress Pengerjaan</div><button onclick="JOY.Progress.openAdd()" class="btn-accent" style="padding:6px 12px;font-size:12px;">+ Produk</button></div>
-          <div style="padding:20px;" id="progressList"></div>
-        </div>
-      </div>
-    </section>
-    <section id="target" class="section active">
-      <div class="grid-3" style="margin-bottom:16px;">
-        <div class="stat"><div class="stat-label">Target Harian</div><div class="stat-val">5 produk</div></div>
-        <div class="stat"><div class="stat-label">Tercapai Hari Ini</div><div class="stat-val" style="color:#c9a27a;" id="tgToday">0</div></div>
-        <div class="stat"><div class="stat-label">Streak</div><div class="stat-val" id="tgStreak">0</div><div class="stat-sub">hari berturut-turut ≥ 5</div></div>
-      </div>
-      <div class="card"><div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Riwayat 14 Hari</div></div><div style="padding:20px;"><div id="tgBars" style="display:flex;align-items:flex-end;gap:8px;height:160px;margin-bottom:16px;"></div><table class="tbl-card"><thead><tr><th>Tanggal</th><th>Produk</th><th>Target</th><th>Status</th></tr></thead><tbody id="tgTable"></tbody></table></div></div>
-    </section>
-    <section id="log" class="section">
+
+    <section id="settings" class="section">
+      <h2>Settings</h2>
       <div class="card">
-        <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Log Real-time (Hanya Aktivitas Nyata)</div><button onclick="JOY.Log.clear()" style="background:none;border:none;color:#7a7a7a;font-size:11px;">Bersihkan</button></div>
-        <div style="padding:20px;"><div id="liveLog" style="max-height:60vh;overflow-y:auto;"></div></div>
+        <label>Supabase URL</label><input id="supabaseUrl" placeholder="https://nszdjbnoikdvqquhxrhe.supabase.co">
+        <label>Supabase anon public key</label><input id="supabaseKey" placeholder="Paste anon public key only">
+        <button class="btn btn-gold" onclick="saveConfig()">Save connection</button>
+        <p class="notice" style="margin-top:12px">Never place service-role keys, PayPal secrets, Doku secrets, or AI provider keys in this browser app. Keep them in Vercel environment variables and Supabase Edge Function secrets.</p>
       </div>
     </section>
-    <section id="aiprovider" class="section">
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">AI Provider & Fallback Chain (5 Lapis)</div><button onclick="JOY.Provider.openAdd()" class="btn-accent" style="padding:6px 12px;font-size:12px;">+ Provider</button></div>
-        <div style="padding:20px;"><table class="tbl-card"><thead><tr><th>Urutan</th><th>Label</th><th>Vendor</th><th>Model</th><th>Status</th><th></th></tr></thead><tbody id="provTable"></tbody></table></div>
-      </div>
-      <div class="card">
-        <div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Fallback Chain Aktif</div></div>
-        <div style="padding:20px;font-size:14px;color:#d4d4d4;" id="fallbackChain">Belum ada rantai fallback.</div>
-      </div>
-    </section>
-    <section id="chat" class="section">
-      <div class="card" style="height:calc(100vh - 160px);display:flex;flex-direction:column;">
-        <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-          <div style="display:flex;align-items:center;gap:8px;min-width:0;">
-            <div style="font-size:14px;font-weight:500;color:#ededed;">Chat Manager</div>
-            <select id="chatPersona" class="input" style="width:auto;padding:4px 8px;font-size:12px;">
-              <option value="Tequila">Tequila (Manager)</option><option value="Sanny">Sanny (Finance)</option><option value="Della">Della (Riset)</option><option value="Scout">Scout (Research)</option><option value="Michelle">Michelle (QC)</option><option value="Grace">Grace (Sales)</option><option value="Elten">Elten (Sales)</option><option value="Angela">Angela (B2B)</option><option value="Sarah">Sarah (Creator)</option><option value="Yuliana">Yuliana (AI Medis)</option>
-            </select>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span id="chatAiStatus" class="badge ok"><span class="dot ok pulse-dot"></span> AI Siap</span>
-            <button onclick="JOY.Chat.clear()" style="background:none;border:none;color:#7a7a7a;font-size:11px;">Bersihkan</button>
-          </div>
-        </div>
-        <div id="chatBox" style="flex:1;overflow-y:auto;padding:20px;"></div>
-        <div style="padding:12px;border-top:1px solid #222222;display:flex;gap:8px;">
-          <input id="chatInput" class="input" placeholder="Tanyakan ke agen... (Enter untuk kirim)"/>
-          <button onclick="JOY.Chat.send()" class="btn-accent" style="padding:10px 16px;font-size:14px;">Kirim</button>
-        </div>
-      </div>
-    </section>
-    <section id="apiconfig" class="section">
-      <div id="apiLockScreen" class="card" style="padding:40px 20px;text-align:center;">
-        <div style="font-size:28px;margin-bottom:12px;">⚿</div>
-        <div style="font-size:15px;font-weight:500;color:#f4f4f5;margin-bottom:6px;">API Config Terkunci</div>
-        <div style="font-size:13px;color:var(--text-dim);margin-bottom:20px;">Masukkan PIN untuk membuka akses kunci API</div>
-        <input id="apiUnlockPin" type="password" maxlength="6" class="input" style="max-width:200px;margin:0 auto 14px;text-align:center;font-size:20px;letter-spacing:8px;font-family:JetBrains Mono,monospace;" placeholder="PIN"/>
-        <button onclick="JOY.Config.unlock()" class="btn-accent" style="padding:10px 24px;font-size:14px;">Buka Kunci</button>
-      </div>
-      <div id="apiContent" style="display:none;">
-        <div class="card">
-          <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;">
-            <div style="font-size:14px;font-weight:500;color:#ededed;">API Key / Config</div>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <button onclick="JOY.Config.lock()" class="btn" style="padding:5px 10px;font-size:11px;">Kunci Lagi</button>
-              <button onclick="JOY.Config.openAdd()" class="btn-accent" style="padding:6px 12px;font-size:12px;">+ Kunci</button>
-            </div>
-          </div>
-          <div style="padding:20px;"><table class="tbl-card"><thead><tr><th>Label</th><th>Tipe</th><th>Key</th><th>Valid</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="keyTable"></tbody></table></div>
-        </div>
-      </div>
-    </section>
-    <section id="health" class="section">
-      <div class="grid-3" style="margin-bottom:16px;">
-        <div class="stat"><div class="stat-label">Status Sistem</div><div class="stat-val" id="hStatus">—</div><div class="stat-sub" id="hStatusSub">Menunggu pengecekan</div></div>
-        <div class="stat"><div class="stat-label">Data Integritas</div><div class="stat-val" style="color:#7a9a7a;" id="hIntegrity">—</div><div class="stat-sub">Konsistensi data</div></div>
-        <div class="stat"><div class="stat-label">Storage Used</div><div class="stat-val" id="hStorage">—</div><div class="stat-sub">LocalStorage</div></div>
-      </div>
-      <div class="card">
-        <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Hasil Pengecekan Kesehatan</div><button onclick="JOY.Health.run()" class="btn-accent" style="padding:6px 12px;font-size:12px;">Cek Sekarang</button></div>
-        <div style="padding:20px;"><table class="tbl-card"><thead><tr><th>Komponen</th><th>Status</th><th>Detail</th></tr></thead><tbody id="healthTable"></tbody></table></div>
-      </div>
-    </section>
-    <section id="rules" class="section">
-      <div class="card">
-        <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:14px;font-weight:500;color:#ededed;">Peraturan Internal</div><button onclick="JOY.Rules.openAdd()" class="btn-accent" style="padding:6px 12px;font-size:12px;">+ Peraturan</button></div>
-        <div style="padding:20px;" id="ruleList"></div>
-      </div>
-    </section>
-    <section id="pin" class="section">
-      <div class="card" style="max-width:640px;">
-        <div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Ganti PIN Operator</div></div>
-        <div style="padding:20px;">
-          <div style="margin-bottom:12px;"><label style="font-size:11px;color:#7a7a7a;letter-spacing:1px;">PIN LAMA</label><input id="pinOld" type="password" maxlength="6" class="input" style="margin-top:6px;"/></div>
-          <div style="margin-bottom:12px;"><label style="font-size:11px;color:#7a7a7a;letter-spacing:1px;">PIN BARU (6 DIGIT)</label><input id="pinNew" type="password" maxlength="6" class="input" style="margin-top:6px;"/></div>
-          <div style="margin-bottom:12px;"><label style="font-size:11px;color:#7a7a7a;letter-spacing:1px;">KONFIRMASI</label><input id="pinConf" type="password" maxlength="6" class="input" style="margin-top:6px;"/></div>
-          <button onclick="JOY.System.changePin()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;font-weight:500;">Perbarui PIN</button>
-          <div id="pinMsg" style="font-size:12px;color:#7a7a7a;margin-top:8px;"></div>
-        </div>
-      </div>
-    </section>
-    <section id="payment" class="section">
-      <div class="card">
-        <div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Metode Penerimaan Pembayaran (Global)</div></div>
-        <div class="grid-2" style="padding:20px;">
-          <div style="padding:20px;background:#0f0f0f;border:1px solid #222222;border-radius:8px;">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span class="badge info">PayPal</span><span style="font-size:12px;color:#7a7a7a;">Global / US / EU</span></div>
-            <div style="font-size:14px;color:#ededed;margin-bottom:4px;">Link Pembayaran</div>
-            <div style="font-family:JetBrains Mono,monospace;font-size:12px;color:#c9a27a;background:#1a1a1a;padding:8px;border-radius:4px;word-break:break-all;">https://www.paypal.me/akurniasandy</div>
-            <button onclick="JOY.Utils.copy('https://www.paypal.me/akurniasandy')" class="btn" style="width:100%;margin-top:12px;padding:8px;font-size:12px;">Salin Link</button>
-          </div>
-          <div style="padding:20px;background:#0f0f0f;border:1px solid #222222;border-radius:8px;">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span class="badge info">Bank Mandiri</span><span style="font-size:12px;color:#7a7a7a;">Indonesia / ASEAN</span></div>
-            <div style="font-size:14px;color:#ededed;margin-bottom:4px;">Nomor Rekening</div>
-            <div style="font-family:JetBrains Mono,monospace;font-size:20px;color:#c9a27a;letter-spacing:2px;">1180013000012</div>
-            <div style="font-size:12px;color:#7a7a7a;margin-top:4px;">a.n. Ade Kurnia Sandy</div>
-            <button onclick="JOY.Utils.copy('1180013000012')" class="btn" style="width:100%;margin-top:12px;padding:8px;font-size:12px;">Salin Nomor</button>
-          </div>
-        </div>
-        <div style="padding:20px;border-top:1px solid #222222;">
-          <div style="font-size:14px;font-weight:500;color:#ededed;margin-bottom:12px;">Verifikasi Pembayaran Masuk</div>
-          <div class="grid-2" style="gap:12px;">
-            <input id="payApproveAmt" type="number" class="input" placeholder="Nominal yang masuk (Rp)"/>
-            <input id="payApproveNote" class="input" placeholder="Nama pembeli / Keterangan"/>
-          </div>
-          <button onclick="JOY.Finance.openApproveModal()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;font-weight:500;margin-top:12px;">Approve Payment (Wajib PIN)</button>
-        </div>
-      </div>
-    </section>
-    <section id="storage" class="section">
-      <div class="grid-3" style="margin-bottom:16px;">
-        <div class="stat"><div class="stat-label">Penggunaan LocalStorage</div><div class="stat-val" id="stUsed">0 KB</div></div>
-        <div class="stat"><div class="stat-label">Total Record</div><div class="stat-val" id="stRec">0</div></div>
-        <div class="stat"><div class="stat-label">Koleksi Data</div><div class="stat-val" id="stCol">0</div></div>
-      </div>
-      <div class="card">
-        <div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Backup Database</div></div>
-        <div class="grid-2" style="padding:20px;gap:12px;">
-          <button onclick="JOY.Storage.export()" class="btn-accent" style="padding:12px;font-size:14px;">Export JSON</button>
-          <input type="file" id="importFile" accept=".json" style="display:none;" onchange="JOY.Storage.import(event)"/>
-          <button onclick="document.getElementById('importFile').click()" class="btn" style="padding:12px;font-size:14px;">Import JSON</button>
-        </div>
-        <div style="padding:20px;border-top:1px solid #222222;">
-          <button onclick="JOY.Optimize.run()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;">🧹 Jalankan Optimasi Manual (Aman)</button>
-          <div style="font-size:11px;color:#7a7a7a;margin-top:8px;">Hanya membersihkan log lama & mengompres data. Data inti 100% aman.</div>
-        </div>
-      </div>
-    </section>
-    <section id="profile" class="section">
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Identitas</div></div>
-          <div style="padding:20px;">
-            <div style="width:80px;height:80px;border-radius:8px;background:#1a1a1a;border:1px solid #2c2c2c;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;color:#c9a27a;">J</div>
-            <div style="margin-top:16px;font-size:18px;font-weight:600;color:#ededed;">JOY CORPORATION</div>
-            <div style="font-size:12px;color:#7a7a7a;">Micro-SaaS · Global Market</div>
-            <div class="divider"></div>
-            <div style="font-size:11px;color:#7a7a7a;letter-spacing:1px;">FOUNDER & OWNER</div>
-            <div style="font-size:14px;color:#ededed;margin-top:4px;">Ade Kurnia Sandy</div>
-            <div style="font-size:11px;color:#7a7a7a;letter-spacing:1px;margin-top:12px;">CHIEF AI OFFICER</div>
-            <div style="font-size:14px;color:#ededed;margin-top:4px;">Tequila</div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-h"><div style="font-size:14px;font-weight:500;color:#ededed;">Visi · Misi · Filosofi</div></div>
-          <div style="padding:20px;font-size:14px;color:#d4d4d4;line-height:1.6;">
-            <div style="margin-bottom:16px;"><div style="font-size:11px;color:#c9a27a;letter-spacing:1px;margin-bottom:4px;">VISI</div><p style="margin:0;">Menjadi rumah bagi produk digital kelas dunia yang lahir dari riset pasar global, diproduksi oleh agen AI otonom, dan menghasilkan arus kas pasif berkelanjutan.</p></div>
-            <div style="margin-bottom:16px;"><div style="font-size:11px;color:#c9a27a;letter-spacing:1px;margin-bottom:4px;">MISI</div><ul style="margin:0;padding-left:20px;"><li>Terbitkan minimal 5 produk digital per hari untuk pasar US & EU.</li><li>Otomasi seluruh rantai nilai: riset → validasi → produksi → QC → penjualan.</li><li>Keamanan finansial: Transfer hanya ke rekening Owner, wajib PIN.</li></ul></div>
-            <div><div style="font-size:11px;color:#c9a27a;letter-spacing:1px;margin-bottom:4px;">FILOSOFI</div><p style="margin:0;">"Uang tidak bekerja untuk kita — sistem yang kita bangun yang bekerja. Kita hanya merancang, mengawasi, dan memperbaiki."</p></div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-</main>
-<div id="modal">
-  <div class="card" style="max-width:640px;margin:0 auto;">
-    <div class="card-h" style="display:flex;align-items:center;justify-content:space-between;">
-      <div id="modalTitle" style="font-size:14px;font-weight:500;color:#ededed;">Modal</div>
-      <button onclick="JOY.App.closeModal()" style="background:none;border:none;color:#7a7a7a;font-size:18px;padding:4px 8px;">✕</button>
-    </div>
-    <div id="modalBody" style="padding:20px;"></div>
-  </div>
+  </main>
 </div>
-<div id="toast"></div>
+
 <script>
-window.addEventListener('load', function() {
-  document.getElementById('modal').classList.remove('show');
-  document.getElementById('overlay').classList.remove('show');
-  document.getElementById('sidebar').classList.add('closed');
-});
+const CONFIG_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU';
+let sb=null;
 
-const JOY = {
-  DB: null,
-  LS_KEY: 'joy_corp_v61_db',
+function saveConfig(){
+  const url=document.getElementById('supabaseUrl').value.trim();
+  const key=document.getElementById('supabaseKey').value.trim();
+  if(!url||!key){alert('Enter both Supabase URL and anon public key.');return;}
+  localStorage.setItem(CONFIG_KEY,JSON.stringify({url,key}));
+  initSupabase();
+}
 
-  init() {
-    const raw = localStorage.getItem(this.LS_KEY);
-    if (!raw) {
-      this.DB = {
-        transactions: [],
-        agents: [
-          {id:this.id(), name:'Tequila', role:'Manager / CAO', model:'gpt-4o', status:'active'},
-          {id:this.id(), name:'Scout', role:'Research', model:'llama-3.3-70b', status:'active'},
-          {id:this.id(), name:'Validator', role:'Validation', model:'gpt-4o-mini', status:'active'},
-          {id:this.id(), name:'Builder', role:'Production', model:'claude-3.5', status:'active'},
-          {id:this.id(), name:'Marketer', role:'Marketing Tech', model:'gpt-4o-mini', status:'active'},
-          {id:this.id(), name:'Closer', role:'Closing', model:'gpt-4o-mini', status:'active'},
-          {id:this.id(), name:'Della', role:'Market Observer', model:'llama-3.3-70b', status:'active'},
-          {id:this.id(), name:'Sarah', role:'Creator / Copy', model:'gpt-4o', status:'active'},
-          {id:this.id(), name:'Mario', role:'Tech / Script', model:'claude-3.5', status:'active'},
-          {id:this.id(), name:'Michelle', role:'QC & Publisher', model:'gpt-4o', status:'active'},
-          {id:this.id(), name:'Grace', role:'Sales Executive', model:'gpt-4o-mini', status:'active'},
-          {id:this.id(), name:'Elten', role:'Sales Executive', model:'gpt-4o-mini', status:'active'},
-          {id:this.id(), name:'Angela', role:'Business Development', model:'gpt-4o', status:'active'},
-          {id:this.id(), name:'Sanny', role:'Finance', model:'gpt-4o', status:'active'},
-          {id:this.id(), name:'Desi', role:'HRD', model:'gpt-4o-mini', status:'active'},
-          {id:this.id(), name:'Panda', role:'GA / Ops', model:'gpt-4o-mini', status:'active'},
-          {id:this.id(), name:'Dody', role:'Tech Support', model:'llama-3.3-70b', status:'active'},
-          {id:this.id(), name:'Yuliana', role:'AI Medis', model:'gpt-4o-mini', status:'active'},
-          {id:this.id(), name:'Yusi', role:'AI Medis', model:'gpt-4o-mini', status:'active'}
-        ],
-        assets: [], progress: [], requests: [],
-        providers: [
-          {id:this.id(), label:'Primary', vendor:'Groq', model:'llama-3.3-70b-versatile', role:'primary', status:'ok', latency:0, lastCheck:null},
-          {id:this.id(), label:'Backup-1', vendor:'Pollinations', model:'openai', role:'emergency', status:'ok', latency:0, lastCheck:null}
-        ],
-        chat: [], keys: [],
-        rules: [],
-        pin: '123456',
-        target: {daily:5, history:{}},
-        log: [],
-        health: {lastRun: null, status: 'ok', integrity: 100, storageUsed: 0},
-        optimize: {lastRun: null},
-        logo: null
-      };
-      this.DB.rules = this.Rules.defaults();
-      this.save();
-      this.Log.push('System', 'JOY Corporation v6.1 diinisialisasi. Groq AI siap.');
-    } else {
-      this.DB = this.normalize(JSON.parse(raw));
-    }
-    this.App.renderAll();
-    setInterval(() => this.Health.run(true), 6 * 60 * 60 * 1000);
-    setInterval(() => this.Optimize.run(true), 12 * 60 * 60 * 1000);
-    setTimeout(() => this.Health.run(true), 3000);
-  },
+function initSupabase(){
+  const saved=JSON.parse(localStorage.getItem(CONFIG_KEY)||'null');
+  if(!saved){document.getElementById('authStatus').textContent='Connect Supabase in Settings';return;}
+  sb=window.supabase.createClient(saved.url,saved.key);
+  document.getElementById('authStatus').textContent='Supabase connected';
+  loadCatalog();loadProduction();loadOrders();
+}
 
-  normalize: function(db) {
-    if (!db) db = {};
-    if (!db.transactions) db.transactions = [];
-    if (!db.agents) db.agents = [];
-    if (!db.assets) db.assets = [];
-    if (!db.progress) db.progress = [];
-    if (!db.requests) db.requests = [];
-    if (!db.providers) db.providers = [];
-    if (!db.chat) db.chat = [];
-    if (!db.keys) db.keys = [];
-    if (!db.rules || db.rules.length === 0) db.rules = JOY.Rules.defaults();
-    if (!db.pin) db.pin = '123456';
-    if (!db.target) db.target = {daily:5, history:{}};
-    if (!db.log) db.log = [];
-    if (!db.health) db.health = {lastRun: null, status: 'ok', integrity: 100, storageUsed: 0};
-    if (!db.optimize) db.optimize = {lastRun: null};
-    if (typeof db.logo === 'undefined') db.logo = null;
-    db.assets.forEach(function(a) {
-      if (typeof a.product_link === 'undefined') a.product_link = '';
-    });
-    return db;
-  },
+function setTab(tab){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  document.querySelector(`.menu[data-tab="${tab}"]`).classList.add('active');
+}
+document.querySelectorAll('.menu').forEach(m=>m.onclick=()=>setTab(m.dataset.tab));
 
-  id() { return Math.random().toString(36).slice(2,10); },
-  save() { localStorage.setItem(this.LS_KEY, JSON.stringify(this.DB)); },
-
-  // === GROQ AI INTEGRATION ===
-  AI: {
-    _fetchWithTimeout: async function(url, options, timeout = 15000) {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), timeout);
-      try {
-        const response = await fetch(url, { ...options, signal: controller.signal });
-        clearTimeout(id);
-        return response;
-      } catch (e) {
-        clearTimeout(id);
-        throw e;
-      }
-    },
-
-    _getGroqKey: function() {
-      for (var i = 0; i < JOY.DB.keys.length; i++) {
-        var k = JOY.DB.keys[i];
-        if (k.label.toLowerCase().indexOf('groq') !== -1) return k.val;
-      }
-      return null;
-    },
-
-    _getPollinationsKey: function() {
-      for (var i = 0; i < JOY.DB.keys.length; i++) {
-        var k = JOY.DB.keys[i];
-        if (k.label.toLowerCase().indexOf('pollinations') !== -1 || k.label.toLowerCase().indexOf('hugging') !== -1) return k.val;
-      }
-      return null;
-    },
-
-    _getSystemPrompt: function(persona) {
-      var activeAgents = JOY.DB.agents.filter(function(a){return a.status==='active';}).length;
-      var today = JOY.Utils.today();
-      var todayDone = JOY.DB.target.history[today] || 0;
-      var totalAssets = JOY.DB.assets.length;
-      var balance = JOY.Finance.getBalance();
-      var ownerName = 'Ade Kurnia Sandy';
-
-      var prompts = {
-        'Tequila': 'Kamu adalah Tequila, Chief AI Officer (CAO) JOY Corporation. Owner: '+ownerName+'. Jawab dengan profesional, ringkas, dan strategis. Data sistem: '+activeAgents+' agen aktif, '+totalAssets+' produk siap jual, target hari ini '+todayDone+'/5, saldo '+JOY.Utils.fmtRp(balance)+'.',
-        'Sanny': 'Kamu adalah Sanny, Finance JOY Corporation. Owner: '+ownerName+'. Fokus pada angka, margin, dan keamanan finansial. Data: saldo '+JOY.Utils.fmtRp(balance)+', '+JOY.DB.transactions.length+' transaksi tercatat. Jawab dengan akurat dan hati-hati.',
-        'Della': 'Kamu adalah Della, Market Observer JOY Corp. Fokus pada tren pasar US & EU. Bantu identifikasi peluang produk baru.',
-        'Scout': 'Kamu adalah Scout, Research JOY Corp. Fokus pada riset mendalam dan validasi ide sebelum produksi.',
-        'Michelle': 'Kamu adalah Michelle, QC & Publisher JOY Corp. Fokus pada kualitas produk. Ada '+totalAssets+' produk siap jual.',
-        'Grace': 'Kamu adalah Grace, Sales Executive JOY Corp. Fokus pada strategi penjualan dan konversi.',
-        'Elten': 'Kamu adalah Elten, Sales Executive JOY Corp. Fokus pada follow-up dan closing.',
-        'Angela': 'Kamu adalah Angela, Business Development JOY Corp. Fokus pada peluang B2B dan partnership.',
-        'Sarah': 'Kamu adalah Sarah, Creator & Copy JOY Corp. Fokus pada konten dan copywriting yang menarik.',
-        'Yuliana': 'Kamu adalah Yuliana, AI Medis JOY Corp. Fokus pada analisis data dan optimasi sistem.'
-      };
-      return prompts[persona] || prompts['Tequila'];
-    },
-
-    call: async function(message, persona) {
-      persona = persona || 'Tequila';
-      var sysPrompt = this._getSystemPrompt(persona);
-      var lastError = null;
-
-      // === Coba Groq dulu ===
-      var groqKey = this._getGroqKey();
-      if (groqKey) {
-        try {
-          var start = Date.now();
-          var res = await this._fetchWithTimeout('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': 'Bearer ' + groqKey,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              model: 'llama-3.3-70b-versatile',
-              messages: [
-                { role: 'system', content: sysPrompt },
-                { role: 'user', content: message }
-              ],
-              temperature: 0.7,
-              max_tokens: 1024
-            })
-          });
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          var data = await res.json();
-          var text = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : '';
-          return { text: text, provider: 'Groq (Llama 3.3)', latency: Date.now() - start };
-        } catch (e) {
-          lastError = e;
-          console.warn('Groq gagal:', e.message);
-        }
-      }
-
-      // === Fallback ke Pollinations (gratis, tanpa key) ===
-      try {
-        var start2 = Date.now();
-        var encodedPrompt = encodeURIComponent(sysPrompt + '\n\nUser: ' + message);
-        var res2 = await this._fetchWithTimeout('https://text.pollinations.ai/' + encodedPrompt, { method: 'GET' });
-        if (!res2.ok) throw new Error('HTTP ' + res2.status);
-        var text2 = await res2.text();
-        return { text: text2 || 'Pollinations tidak merespons.', provider: 'Pollinations (Fallback)', latency: Date.now() - start2 };
-      } catch (e2) {
-        lastError = e2;
-        console.warn('Pollinations gagal:', e2.message);
-      }
-
-      return { text: 'Maaf Owner, AI sedang tidak tersedia. Pastikan Groq API Key sudah ditambahkan di menu API Config. Error: ' + (lastError ? lastError.message : 'unknown'), provider: 'Offline', latency: 0 };
-    }
-  },
-
-  Utils: {
-    fmtRp: n => 'Rp ' + (n||0).toLocaleString('id-ID'),
-    fmtDate: d => new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}),
-    fmtTime: d => new Date(d).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}),
-    fmtDateTime: d => new Date(d).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}),
-    today: function() {
-      var d = new Date();
-      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-      return d.toISOString().slice(0,10);
-    },
-    esc: function(s) {
-      return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
-        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-      });
-    },
-    copy: function(text) {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => JOY.App.toast('Disalin ke clipboard','ok'));
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = text; document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); JOY.App.toast('Disalin','ok'); } catch(e){}
-        document.body.removeChild(ta);
-      }
-    },
-    toast: function(msg, type) {
-      type = type || 'info';
-      const t = document.createElement('div');
-      const colors = {ok:'#7a9a7a',warn:'#b8956a',danger:'#a86a6a',info:'#a3a3a3'};
-      const c = colors[type] || colors.info;
-      t.style.cssText = 'padding:12px 16px;background:#0f0f0f;border:1px solid '+c+';border-radius:6px;color:'+c+';font-size:14px;margin-bottom:8px;box-shadow:0 4px 12px rgba(0,0,0,0.5);';
-      t.textContent = msg;
-      document.getElementById('toast').appendChild(t);
-      setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){t.remove();},300); }, 2600);
-    }
-  },
-
-  App: {
-    openSidebar: function() {
-      document.getElementById('sidebar').classList.remove('closed');
-      document.getElementById('overlay').classList.add('show');
-    },
-    closeSidebar: function() {
-      document.getElementById('sidebar').classList.add('closed');
-      document.getElementById('overlay').classList.remove('show');
-    },
-    openModal: function(title, html) {
-      document.getElementById('modalTitle').textContent = title;
-      document.getElementById('modalBody').innerHTML = html;
-      document.getElementById('modal').classList.add('show');
-    },
-    closeModal: function() {
-      document.getElementById('modal').classList.remove('show');
-    },
-    toast: function(msg, type) { JOY.Utils.toast(msg, type); },
-    resetUI: function() {
-      document.getElementById('modal').classList.remove('show');
-      document.getElementById('overlay').classList.remove('show');
-      document.getElementById('sidebar').classList.add('closed');
-      JOY.App.toast('UI di-reset','ok');
-    },
-    nameVisible: true,
-    toggleName: function() {
-      JOY.App.nameVisible = !JOY.App.nameVisible;
-      var nameEl = document.getElementById('ownerName');
-      var eyeEl = document.getElementById('eyeIcon');
-      if (!nameEl || !eyeEl) return;
-      if (JOY.App.nameVisible) {
-        nameEl.style.visibility = 'visible'; nameEl.style.opacity = '1';
-        eyeEl.textContent = '◉'; eyeEl.style.opacity = '1';
-      } else {
-        nameEl.style.visibility = 'hidden'; nameEl.style.opacity = '0';
-        eyeEl.textContent = '◌'; eyeEl.style.opacity = '0.5';
-      }
-    },
-    changeLogo: function(ev) {
-      var file = ev.target.files && ev.target.files[0];
-      if (!file) return;
-      if (!file.type.startsWith('image/')) return JOY.App.toast('Pilih file gambar','warn');
-      if (file.size > 800000) return JOY.App.toast('Gambar terlalu besar (max ~800KB)','warn');
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        JOY.DB.logo = e.target.result;
-        JOY.save();
-        JOY.App.applyLogo();
-        JOY.App.toast('Logo disimpan','ok');
-      };
-      reader.readAsDataURL(file);
-      ev.target.value = '';
-    },
-    applyLogo: function() {
-      var el = document.getElementById('brandLogo');
-      if (!el) return;
-      if (JOY.DB.logo) {
-        el.style.backgroundImage = 'url('+JOY.DB.logo+')';
-        el.textContent = '';
-        el.style.backgroundSize = 'cover';
-        el.style.backgroundPosition = 'center';
-      } else {
-        el.style.backgroundImage = '';
-        el.textContent = 'J';
-      }
-    },
-    renderAll: function() {
-      JOY.Finance.render(); JOY.Agency.render(); JOY.Asset.render(); JOY.Progress.render();
-      JOY.Target.render(); JOY.Log.render(); JOY.Provider.render(); JOY.Chat.render();
-      JOY.Config.render(); JOY.Rules.render(); JOY.Storage.render(); JOY.Health.render();
-      JOY.App.applyLogo();
-    }
-  },
-
-  Finance: {
-    _pending: null,
-    getBalance: function() { return JOY.DB.transactions.reduce(function(acc, t) { return t.type==='in' ? acc + t.amt : acc - t.amt; }, 0); },
-    addExpense: function() {
-      var cat = document.getElementById('exCat').value.trim();
-      var amt = parseInt(document.getElementById('exAmt').value)||0;
-      var note = document.getElementById('exNote').value.trim();
-      if(!cat || amt<=0) return JOY.App.toast('Kategori dan jumlah wajib','warn');
-      JOY.DB.transactions.unshift({id:JOY.id(), type:'out', cat:cat, amt:amt, note:note, ts:Date.now(), by:'Sanny'});
-      JOY.save();
-      document.getElementById('exCat').value = ''; document.getElementById('exAmt').value = ''; document.getElementById('exNote').value = '';
-      JOY.App.toast('Sanny mencatat pengeluaran','ok');
-      JOY.Log.push('Sanny', 'Mencatat pengeluaran: '+cat+' — '+JOY.Utils.fmtRp(amt)+(note ? ' ('+note+')' : ''));
-      JOY.App.renderAll();
-    },
-    openApproveModal: function() {
-      var amt = parseInt(document.getElementById('payApproveAmt').value)||0;
-      var note = (document.getElementById('payApproveNote').value || '').trim() || 'Pembayaran Produk';
-      if(amt<=0) return JOY.App.toast('Masukkan nominal yang valid','warn');
-      JOY.Finance._pending = { amt: amt, note: note };
-      JOY.App.openModal('Verifikasi Sanny (PIN)', '<div><div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Sanny akan menyetujui pemasukan <b style="color:var(--ok)">'+JOY.Utils.fmtRp(amt)+'</b><br><span style="font-size:12px;">Dari: '+JOY.Utils.esc(note)+'</span><br><span style="font-size:12px;color:var(--text-dim);margin-top:6px;display:block;">Saldo naik · Target +1 · Produk dirilis</span></div><input id="tempPinApprove" type="password" maxlength="6" class="input" style="text-align:center;font-size:24px;letter-spacing:8px;font-family:JetBrains Mono,monospace;" placeholder="PIN"/><button onclick="JOY.Finance.confirmApprove()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;font-weight:500;margin-top:14px;">Sanny Approve & Release</button></div>');
-    },
-    confirmApprove: function() {
-      var p = JOY.Finance._pending;
-      if (!p) return JOY.App.toast('Tidak ada pembayaran tertunda','warn');
-      var pin = document.getElementById('tempPinApprove').value;
-      if(pin !== JOY.DB.pin) return JOY.App.toast('PIN salah — Sanny menolak','danger');
-      JOY.DB.transactions.unshift({id:JOY.id(), type:'in', cat:'Penjualan', amt:p.amt, note:p.note, ts:Date.now(), by:'Sanny'});
-      var today = JOY.Utils.today();
-      JOY.DB.target.history[today] = (JOY.DB.target.history[today]||0) + 1;
-      JOY.Finance._pending = null;
-      JOY.save();
-      JOY.App.closeModal();
-      JOY.App.toast('Sanny menyetujui pembayaran · Produk dirilis','ok');
-      JOY.Log.push('Sanny', 'Menyetujui pemasukan: '+JOY.Utils.fmtRp(p.amt)+' dari '+p.note);
-      JOY.Log.push('Michelle', 'Link download produk dikirim ke customer.');
-      JOY.Log.push('Grace', 'Order dari "'+p.note+'" telah diproses.');
-      document.getElementById('payApproveAmt').value=''; document.getElementById('payApproveNote').value='';
-      JOY.App.renderAll();
-    },
-    clearLog: function() { if(confirm('Hapus log keuangan?')) { JOY.DB.transactions=[]; JOY.save(); JOY.App.renderAll(); } },
-    render: function() {
-      var now = new Date(), m = now.getMonth(), y = now.getFullYear();
-      var inc=0, exp=0, ic=0, ec=0;
-      JOY.DB.transactions.forEach(function(t) {
-        var d = new Date(t.ts);
-        if(d.getMonth()===m && d.getFullYear()===y) { if(t.type==='in'){inc+=t.amt; ic++;} else {exp+=t.amt; ec++;} }
-      });
-      document.getElementById('sIncome').textContent = JOY.Utils.fmtRp(inc);
-      document.getElementById('sExpense').textContent = JOY.Utils.fmtRp(exp);
-      document.getElementById('sMargin').textContent = JOY.Utils.fmtRp(inc - exp);
-      document.getElementById('sIncomeCount').textContent = ic + ' transaksi';
-      document.getElementById('sExpenseCount').textContent = ec + ' transaksi';
-      var tb = document.getElementById('trTable');
-      if(JOY.DB.transactions.length===0) { tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:#7a7a7a;padding:24px;">Belum ada mutasi</td></tr>'; return; }
-      var html = '';
-      JOY.DB.transactions.slice(0,50).forEach(function(t) {
-        html += '<tr><td data-label="Waktu" style="color:#7a7a7a;font-size:12px;">'+JOY.Utils.fmtDate(t.ts)+'<br>'+JOY.Utils.fmtTime(t.ts)+'</td><td data-label="Tipe"><span class="badge '+(t.type==='in'?'ok':'danger')+'">'+(t.type==='in'?'Masuk':'Keluar')+'</span></td><td data-label="Kategori" style="color:#ededed;">'+JOY.Utils.esc(t.cat)+(t.note?'<div style="font-size:11px;color:#7a7a7a;">'+JOY.Utils.esc(t.note)+'</div>':'')+'</td><td data-label="Jumlah" style="color:'+(t.type==='in'?'#7a9a7a':'#a86a6a')+';font-weight:500;">'+(t.type==='in'?'+':'-')+' '+JOY.Utils.fmtRp(t.amt)+'</td><td data-label=""></td></tr>';
-      });
-      tb.innerHTML = html;
-    }
-  },
-
-  Agency: {
-    add: function() {
-      var name = document.getElementById('agName').value.trim();
-      if(!name) return JOY.App.toast('Nama wajib','warn');
-      var role = document.getElementById('agRole').value;
-      var model = document.getElementById('agModel').value.trim()||'gpt-4o';
-      JOY.DB.agents.push({id:JOY.id(), name:name, role:role, model:model, status:'active'});
-      JOY.save(); document.getElementById('agName').value=''; document.getElementById('agModel').value='';
-      JOY.App.toast('Agen ditambahkan','ok');
-      JOY.Log.push('Tequila', 'Agen baru "'+name+'" ditambahkan ke tim ('+role+').');
-      JOY.Agency.render();
-    },
-    toggle: function(id) {
-      var a = JOY.DB.agents.find(function(x){return x.id===id;});
-      if (!a) return;
-      a.status = a.status==='active'?'idle':'active';
-      JOY.save();
-      JOY.Log.push('Tequila', 'Status agen "'+a.name+'" diubah menjadi '+a.status+'.');
-      JOY.Agency.render();
-    },
-    render: function() {
-      var el = document.getElementById('agentList');
-      var html = '';
-      JOY.DB.agents.forEach(function(a) {
-        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#0f0f0f;border:1px solid #222222;border-radius:8px;margin-bottom:8px;"><div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1;"><span class="dot '+(a.status==='active'?'ok':'idle')+'"></span><div style="min-width:0;flex:1;"><div style="font-size:14px;color:#ededed;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+JOY.Utils.esc(a.name)+'</div><div style="font-size:11px;color:#7a7a7a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+JOY.Utils.esc(a.role)+' · '+JOY.Utils.esc(a.model)+'</div></div></div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><span class="badge '+(a.status==='active'?'ok':'info')+'">'+a.status+'</span><button onclick="JOY.Agency.toggle(\''+a.id+'\')" style="background:none;border:none;color:#7a7a7a;font-size:11px;">toggle</button></div></div>';
-      });
-      el.innerHTML = html || '<div style="color:#7a7a7a;text-align:center;padding:24px;">Belum ada agen.</div>';
-    }
-  },
-
-  Asset: {
-    openAdd: function() {
-      JOY.App.openModal('Tambah Asset Manual', '<div><input id="asName" class="input" placeholder="Nama produk" style="margin-bottom:12px;"/><input id="asPrice" type="number" class="input" placeholder="Harga (Rp)" style="margin-bottom:12px;"/><input id="asLink" class="input" placeholder="Link Produk (Gumroad/Drive/dll)" style="margin-bottom:12px;"/><textarea id="asDesc" class="input" rows="3" placeholder="Deskripsi" style="margin-bottom:12px;"></textarea><button onclick="JOY.Asset.save()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;">Simpan</button></div>');
-    },
-    save: function() {
-      var name = document.getElementById('asName').value.trim();
-      if(!name) return JOY.App.toast('Nama wajib','warn');
-      JOY.DB.assets.unshift({id:JOY.id(), name:name, price:parseInt(document.getElementById('asPrice').value)||0, product_link:document.getElementById('asLink').value.trim(), desc:document.getElementById('asDesc').value.trim(), ts:Date.now(), status:'ready'});
-      JOY.save(); JOY.App.closeModal(); JOY.App.toast('Asset ditambahkan','ok');
-      JOY.Log.push('Michelle', 'Asset produk "'+name+'" ditambahkan manual ke gudang.');
-      JOY.Asset.render();
-    },
-    delete: function(id) {
-      if(!confirm('Hapus asset ini?')) return;
-      var a = JOY.DB.assets.find(function(x){return x.id===id;});
-      JOY.DB.assets = JOY.DB.assets.filter(function(x){return x.id!==id;});
-      JOY.save();
-      if(a) JOY.Log.push('Michelle', 'Asset "'+a.name+'" dihapus dari gudang.');
-      JOY.Asset.render();
-    },
-    render: function() {
-      var el = document.getElementById('assetGrid');
-      if(JOY.DB.assets.length===0) { el.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#7a7a7a;padding:24px;">Belum ada asset. Produk yang lolos QC Michelle akan muncul di sini.</div>'; return; }
-      var html = '';
-      JOY.DB.assets.forEach(function(a) {
-        var linkHtml = a.product_link ? '<a href="'+JOY.Utils.esc(a.product_link)+'" target="_blank" style="font-size:11px;color:#c9a27a;text-decoration:none;word-break:break-all;display:block;margin-top:6px;">🔗 '+JOY.Utils.esc(a.product_link)+'</a>' : '<div style="font-size:11px;color:#7a7a7a;margin-top:6px;">Belum ada link produk</div>';
-        html += '<div style="padding:16px;background:#0f0f0f;border:1px solid #222222;border-radius:8px;position:relative;"><div style="display:flex;align-items:flex-start;justify-content:space-between;"><div style="min-width:0;flex:1;"><div style="font-size:14px;font-weight:500;color:#ededed;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+JOY.Utils.esc(a.name)+'</div><div style="font-size:11px;color:#7a7a7a;margin-top:4px;">'+JOY.Utils.fmtRp(a.price)+'</div>'+linkHtml+'</div><span class="badge ok">ready</span></div><div style="font-size:12px;color:#7a7a7a;margin-top:8px;">'+(a.desc?JOY.Utils.esc(a.desc):'-')+'</div><button onclick="JOY.Asset.delete(\''+a.id+'\')" style="position:absolute;top:8px;right:8px;background:none;border:none;color:#a86a6a;font-size:12px;padding:4px 8px;">✕</button></div>';
-      });
-      el.innerHTML = html;
-    }
-  },
-
-  Progress: {
-    openRequest: function() {
-      JOY.App.openModal('Request Produk Baru', '<div><input id="rqTitle" class="input" placeholder="Judul / ide produk" style="margin-bottom:12px;"/><input id="rqMarket" class="input" placeholder="Target pasar (US, EU, Global)" style="margin-bottom:12px;"/><button onclick="JOY.Progress.saveReq()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;">Ajukan ke Desi</button></div>');
-    },
-    saveReq: function() {
-      var title = document.getElementById('rqTitle').value.trim();
-      if(!title) return JOY.App.toast('Judul wajib','warn');
-      var market = document.getElementById('rqMarket').value.trim()||'Global';
-      JOY.DB.requests.unshift({id:JOY.id(), title:title, market:market, status:'assigned', ts:Date.now()});
-      JOY.DB.progress.unshift({id: JOY.id(), name: title, stage: 'Riset (Della + Scout)', pct: 5, ts: Date.now(), fromRequest: true, released: false});
-      JOY.save();
-      JOY.App.closeModal();
-      JOY.App.toast('Request diterima Desi → tiket progress dibuat','ok');
-      JOY.Log.push('Desi', 'Menerima request "'+title+'" ('+market+'). Tiket kerja dibuat.');
-      JOY.Log.push('Della', 'Mulai riset pasar untuk "'+title+'".');
-      JOY.Progress.render();
-      JOY.App.renderAll();
-    },
-    openAdd: function() {
-      JOY.App.openModal('Tambah Progress', '<div><input id="prName" class="input" placeholder="Nama produk" style="margin-bottom:12px;"/><select id="prStage" class="input" style="margin-bottom:12px;"><option>Riset (Della)</option><option>Produksi (Sarah/Mario)</option><option>QC (Michelle)</option><option>Selesai</option></select><input id="prPct" type="number" min="0" max="100" class="input" placeholder="Progress %" style="margin-bottom:12px;"/><button onclick="JOY.Progress.savePr()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;">Simpan</button></div>');
-    },
-    savePr: function() {
-      var name = document.getElementById('prName').value.trim();
-      if(!name) return JOY.App.toast('Nama wajib','warn');
-      var pct = Math.min(100, Math.max(0, parseInt(document.getElementById('prPct').value)||0));
-      JOY.DB.progress.unshift({id:JOY.id(), name:name, stage:document.getElementById('prStage').value, pct:pct, ts:Date.now(), released: pct>=100});
-      JOY.save(); JOY.App.closeModal(); JOY.App.toast('Progress ditambahkan','ok');
-      JOY.Log.push('Builder', 'Produk baru "'+name+'" ditambahkan ke pipeline ('+pct+'%).');
-      JOY.Progress.render();
-    },
-    upd: function(id, pct) {
-      var p = JOY.DB.progress.find(function(x){return x.id===id;});
-      if(!p) return;
-      var oldPct = p.pct;
-      p.pct = Math.min(100, Math.max(0, parseInt(pct)||0));
-
-      if (p.pct < 25) p.stage = 'Riset (Della + Scout)';
-      else if (p.pct < 55) {
-        p.stage = 'Produksi (Builder + Sarah + Mario)';
-        if (oldPct < 25 && p.pct >= 25) {
-          JOY.Log.push('Builder', 'Mulai kerangka produk "'+p.name+'".');
-          JOY.Log.push('Sarah', 'Menyiapkan copy & aset visual untuk "'+p.name+'".');
-        }
-      } else if (p.pct < 85) {
-        p.stage = 'QC (Michelle)';
-        if (oldPct < 55 && p.pct >= 55) JOY.Log.push('Michelle', 'Menerima draft "'+p.name+'" untuk QC.');
-      } else if (p.pct < 100) p.stage = 'Final Check (Michelle)';
-
-      if (p.pct >= 100 && !p.released) {
-        p.released = true;
-        p.stage = 'Selesai · Uploaded by Michelle';
-        JOY.DB.assets.unshift({id: JOY.id(), name: p.name, price: 0, product_link: '', desc: 'Auto-uploaded by Michelle after QC Passed', ts: Date.now(), status: 'ready'});
-        JOY.Log.push('Michelle', 'QC Lolos. Produk "'+p.name+'" berhasil di-upload ke Asset Produk.');
-        JOY.Log.push('Grace', 'Produk "'+p.name+'" siap dijual. Menyiapkan materi sales.');
-        JOY.Log.push('Sanny', 'Menghitung harga & margin optimal untuk "'+p.name+'".');
-        var today = JOY.Utils.today();
-        JOY.DB.target.history[today] = (JOY.DB.target.history[today] || 0) + 1;
-        var req = JOY.DB.requests.find(function(r){ return r.title === p.name; });
-        if (req) req.status = 'done';
-      } else if (p.pct < 100) p.released = false;
-
-      JOY.save();
-      JOY.Progress.render();
-      JOY.App.renderAll();
-    },
-    render: function() {
-      var rtb = document.getElementById('reqTable');
-      if(JOY.DB.requests.length===0) rtb.innerHTML='<tr><td colspan="4" style="text-align:center;color:#7a7a7a;padding:24px;">Belum ada request</td></tr>';
-      else {
-        var html = '';
-        JOY.DB.requests.forEach(function(r) {
-          var stClass = r.status==='done' ? 'ok' : (r.status==='assigned' ? 'info' : 'warn');
-          html += '<tr><td data-label="Judul" style="color:#ededed;">'+JOY.Utils.esc(r.title)+'</td><td data-label="Pasar" style="color:#d4d4d4;">'+JOY.Utils.esc(r.market)+'</td><td data-label="Status"><span class="badge '+stClass+'">'+r.status+'</span></td><td data-label=""></td></tr>';
-        });
-        rtb.innerHTML = html;
-      }
-      var pl = document.getElementById('progressList');
-      if(JOY.DB.progress.length===0) pl.innerHTML='<div style="text-align:center;color:#7a7a7a;padding:24px;">Belum ada produk dalam pengerjaan.</div>';
-      else {
-        var html = '';
-        JOY.DB.progress.forEach(function(p) {
-          html += '<div style="padding:16px;background:#0f0f0f;border:1px solid #222222;border-radius:8px;margin-bottom:12px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap;"><div style="min-width:0;flex:1;"><div style="font-size:14px;font-weight:500;color:#ededed;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+JOY.Utils.esc(p.name)+'</div><div style="font-size:11px;color:#7a7a7a;">Tahap: <span style="color:#c9a27a;">'+JOY.Utils.esc(p.stage)+'</span></div></div><span class="badge '+(p.pct>=100?'ok':'info')+'">'+p.pct+'%</span></div><div style="width:100%;height:8px;background:#1a1a1a;border-radius:4px;overflow:hidden;"><div style="height:100%;background:#c9a27a;width:'+p.pct+'%;"></div></div><input type="range" min="0" max="100" value="'+p.pct+'" onchange="JOY.Progress.upd(\''+p.id+'\', this.value)" style="width:100%;margin-top:8px;accent-color:#c9a27a;"/></div>';
-        });
-        pl.innerHTML = html;
-      }
-    }
-  },
-
-  Target: {
-    render: function() {
-      var today = JOY.Utils.today();
-      var done = JOY.DB.target.history[today] || 0;
-      document.getElementById('tgToday').textContent = done;
-      var streak = 0, d = new Date();
-      while(true) {
-        var k = d.toISOString().slice(0,10);
-        if((JOY.DB.target.history[k]||0) >= JOY.DB.target.daily) { streak++; d.setDate(d.getDate()-1); }
-        else break;
-      }
-      document.getElementById('tgStreak').textContent = streak;
-      var barsHtml = '', rowsHtml = '';
-      for(var i=13; i>=0; i--) {
-        var dd = new Date(); dd.setDate(dd.getDate()-i);
-        var k = dd.toISOString().slice(0,10);
-        var v = JOY.DB.target.history[k] || 0;
-        var pct = Math.min(100, (v/JOY.DB.target.daily)*100);
-        var color = v>=JOY.DB.target.daily?'#7a9a7a':v>0?'#c9a27a':'#2c2c2c';
-        barsHtml += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:10px;color:#7a7a7a;">'+v+'</div><div style="width:100%;background:'+color+';border-radius:4px 4px 0 0;height:'+Math.max(4,pct*1.2)+'px;"></div><div style="font-size:9px;color:#7a7a7a;">'+dd.getDate()+'/'+(dd.getMonth()+1)+'</div></div>';
-        rowsHtml += '<tr><td data-label="Tanggal" style="color:#7a7a7a;font-size:12px;">'+JOY.Utils.fmtDate(dd)+'</td><td data-label="Produk" style="color:#ededed;">'+v+'</td><td data-label="Target" style="color:#7a7a7a;">'+JOY.DB.target.daily+'</td><td data-label="Status"><span class="badge '+(v>=JOY.DB.target.daily?'ok':'danger')+'">'+(v>=JOY.DB.target.daily?'tercapai':'belum')+'</span></td></tr>';
-      }
-      document.getElementById('tgBars').innerHTML = barsHtml;
-      document.getElementById('tgTable').innerHTML = rowsHtml;
-    }
-  },
-
-  Log: {
-    push: function(ag, act) {
-      JOY.DB.log.unshift({ag:ag, act:act, ts:Date.now()});
-      if(JOY.DB.log.length>200) JOY.DB.log = JOY.DB.log.slice(0,200);
-      JOY.save(); JOY.Log.render();
-    },
-    clear: function() {
-      if(confirm('Bersihkan semua log?')) {
-        JOY.DB.log=[];
-        JOY.save();
-        JOY.Log.render();
-        JOY.App.toast('Log dibersihkan','ok');
-      }
-    },
-    render: function() {
-      var el = document.getElementById('liveLog');
-      if(JOY.DB.log.length===0) { el.innerHTML='<div style="text-align:center;color:#7a7a7a;padding:24px;">Belum ada aktivitas. Log hanya mencatat aksi nyata.</div>'; return; }
-      var html = '';
-      JOY.DB.log.slice(0,80).forEach(function(l) {
-        html += '<div class="log-line"><span class="ts">['+JOY.Utils.fmtTime(l.ts)+']</span> <span class="ag">'+JOY.Utils.esc(l.ag)+'</span> <span class="act">'+JOY.Utils.esc(l.act)+'</span></div>';
-      });
-      el.innerHTML = html;
-    }
-  },
-
-  Provider: {
-    openAdd: function() {
-      JOY.App.openModal('Tambah Provider', '<div><input id="pvLabel" class="input" placeholder="Label (Primary/Backup/Emergency)" style="margin-bottom:12px;"/><input id="pvVendor" class="input" placeholder="Vendor (Groq, Pollinations, dll)" style="margin-bottom:12px;"/><input id="pvModel" class="input" placeholder="Model" style="margin-bottom:12px;"/><select id="pvRole" class="input" style="margin-bottom:12px;"><option value="primary">Primary</option><option value="backup">Backup</option><option value="emergency">Emergency</option></select><button onclick="JOY.Provider.save()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;">Simpan</button></div>');
-    },
-    save: function() {
-      var label = document.getElementById('pvLabel').value.trim();
-      if(!label) return JOY.App.toast('Label wajib','warn');
-      var vendor = document.getElementById('pvVendor').value.trim();
-      JOY.DB.providers.push({id:JOY.id(), label:label, vendor:vendor, model:document.getElementById('pvModel').value.trim(), role:document.getElementById('pvRole').value, status:'ok', latency:0, lastCheck:null});
-      JOY.save(); JOY.App.closeModal(); JOY.App.toast('Provider ditambahkan','ok');
-      JOY.Log.push('Yuliana', 'Provider baru "'+label+'" ('+vendor+') ditambahkan ke rantai fallback.');
-      JOY.Provider.render();
-    },
-    render: function() {
-      var tb = document.getElementById('provTable');
-      if(JOY.DB.providers.length===0) { tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#7a7a7a;padding:24px;">Belum ada provider</td></tr>'; return; }
-      var sorted = JOY.DB.providers.slice().sort(function(a,b) {
-        var order = {primary:1, backup:2, emergency:3};
-        return (order[a.role]||9) - (order[b.role]||9);
-      });
-      var html = '';
-      sorted.forEach(function(p, idx) {
-        var st = p.status==='ok'?'ok':p.status==='warn'?'warn':'danger';
-        html += '<tr><td data-label="Urutan" style="color:#7a7a7a;font-family:JetBrains Mono,monospace;">#'+(idx+1)+'</td><td data-label="Label" style="color:#ededed;">'+JOY.Utils.esc(p.label)+'</td><td data-label="Vendor" style="color:#d4d4d4;">'+JOY.Utils.esc(p.vendor)+'</td><td data-label="Model" style="font-family:JetBrains Mono,monospace;font-size:11px;color:#d4d4d4;">'+JOY.Utils.esc(p.model)+'</td><td data-label="Status"><span class="badge '+st+'"><span class="dot '+st+'"></span>'+p.status+'</span></td><td data-label=""></td></tr>';
-      });
-      tb.innerHTML = html;
-      var chain = sorted.map(function(p){return p.label+' ('+p.vendor+')';}).join(' → ');
-      document.getElementById('fallbackChain').innerHTML = '<div style="font-size:12px;color:#7a7a7a;margin-bottom:8px;">Urutan percobaan saat Primary gagal:</div><div style="font-family:JetBrains Mono,monospace;font-size:13px;color:#c9a27a;">'+chain+'</div>';
-    }
-  },
-
-  Chat: {
-    send: async function() {
-      var inp = document.getElementById('chatInput');
-      var msg = inp.value.trim();
-      if(!msg) return;
-      var persona = document.getElementById('chatPersona').value;
-
-      // Tambah pesan user
-      JOY.DB.chat.push({role:'user', content:JOY.Utils.esc(msg), ts:Date.now(), persona: persona});
-      inp.value='';
-      JOY.save();
-
-      // Tambah pesan loading AI
-      var tempId = 'temp_' + Date.now();
-      JOY.DB.chat.push({role:'ai', content:'<span class="pulse-dot">●</span> AI sedang berpikir...', ts:Date.now(), id:tempId, persona: persona});
-      JOY.Chat.render();
-
-      // Update status
-      var statusEl = document.getElementById('chatAiStatus');
-      if (statusEl) {
-        statusEl.innerHTML = '<span class="dot warn pulse-dot"></span> AI Bekerja';
-        statusEl.className = 'badge warn';
-      }
-
-      try {
-        var result = await JOY.AI.call(msg, persona);
-        // Hapus pesan loading
-        JOY.DB.chat = JOY.DB.chat.filter(function(c){return c.id!==tempId;});
-        // Tambah respons AI (FIX: hanya 1 nama persona)
-        JOY.DB.chat.push({
-          role:'ai',
-          content:'<div style="white-space:pre-wrap;">'+JOY.Utils.esc(result.text)+'</div><div style="font-size:10px;color:#7a7a7a;margin-top:6px;">via '+result.provider+' · '+result.latency+'ms</div>',
-          ts:Date.now(),
-          persona: persona
-        });
-        if (statusEl) {
-          statusEl.innerHTML = '<span class="dot ok pulse-dot"></span> AI Siap';
-          statusEl.className = 'badge ok';
-        }
-        JOY.Log.push(persona, 'Merespons chat Owner via '+result.provider+'.');
-      } catch (e) {
-        JOY.DB.chat = JOY.DB.chat.filter(function(c){return c.id!==tempId;});
-        JOY.DB.chat.push({role:'ai', content:'Maaf, terjadi kesalahan: '+JOY.Utils.esc(e.message), ts:Date.now(), persona: persona});
-        if (statusEl) {
-          statusEl.innerHTML = '<span class="dot danger pulse-dot"></span> AI Error';
-          statusEl.className = 'badge danger';
-        }
-      }
-
-      JOY.save();
-      JOY.Chat.render();
-    },
-    clear: function() { if(confirm('Bersihkan chat?')) { JOY.DB.chat=[]; JOY.save(); JOY.Chat.render(); } },
-    render: function() {
-      var box = document.getElementById('chatBox');
-      if(JOY.DB.chat.length===0) {
-        box.innerHTML = '<div style="text-align:center;color:#7a7a7a;padding:40px;"><div style="font-size:32px;margin-bottom:8px;">◈</div><div style="font-size:14px;">Mulai percakapan dengan tim AI JOY CORP.</div><div style="font-size:12px;margin-top:8px;">AI akan berpikir sungguhan via Groq/Pollinations.</div></div>';
-        return;
-      }
-      var html = '';
-      JOY.DB.chat.forEach(function(m) {
-        var pName = m.persona || 'Tequila';
-        // FIX: hanya tampilkan nama persona 1x di header pesan AI
-        var headerHtml = m.role==='ai' ? '<div style="font-size:10px;color:#c9a27a;margin-bottom:4px;letter-spacing:1px;">'+JOY.Utils.esc(pName).toUpperCase()+'</div>' : '';
-        html += '<div style="display:flex;'+(m.role==='user'?'justify-content:flex-end':'justify-content:flex-start')+';margin-bottom:8px;"><div class="chat-msg '+(m.role==='user'?'chat-user':'chat-ai')+'">'+headerHtml+'<div>'+m.content+'</div><div style="font-size:10px;color:#7a7a7a;margin-top:4px;">'+JOY.Utils.fmtTime(m.ts)+'</div></div></div>';
-      });
-      box.innerHTML = html;
-      box.scrollTop = box.scrollHeight;
-    }
-  },
-
-  Health: {
-    run: function(silent) {
-      if (!silent) JOY.App.toast('Memulai health check...','info');
-      var issues = [];
-      if (!JOY.DB.agents || JOY.DB.agents.length === 0) issues.push('Agen kosong');
-      if (!JOY.DB.providers || JOY.DB.providers.length === 0) issues.push('Provider kosong');
-      if (!JOY.DB.pin || JOY.DB.pin.length !== 6) issues.push('PIN tidak valid');
-      var groqKey = JOY.AI._getGroqKey();
-      if (!groqKey) issues.push('Groq Key belum ditambahkan');
-      var integrity = 100 - (issues.length * 15);
-      if (integrity < 0) integrity = 0;
-      var raw = localStorage.getItem(JOY.LS_KEY) || '';
-      var bytes = new Blob([raw]).size;
-      var storageUsed = bytes < 1024 ? bytes+' B' : (bytes/1024).toFixed(1)+' KB';
-      var sysStatus = 'ok', sysLabel = 'Optimal', sysColor = 'ok';
-      if (integrity < 60) { sysStatus = 'danger'; sysLabel = 'Kendala'; sysColor = 'danger'; }
-      else if (integrity < 80) { sysStatus = 'warn'; sysLabel = 'Perhatian'; sysColor = 'warn'; }
-      JOY.DB.health = {lastRun: Date.now(), status: sysStatus, integrity: integrity, storageUsed: storageUsed, issues: issues};
-      JOY.save();
-      var indicator = document.getElementById('sysIndicator');
-      if (indicator) indicator.innerHTML = '<span class="dot '+sysColor+' pulse-dot"></span><span id="sysLabel" style="font-size:11px;color:'+sysColor+';">'+sysLabel+'</span>';
-      if (!silent) JOY.App.toast('Health check selesai. Integritas: '+integrity+'%','ok');
-      JOY.Health.render();
-      if (issues.length > 0 && !silent) JOY.Log.push('Yuliana', 'Health check: ditemukan '+issues.length+' masalah ('+issues.join(', ')+').');
-    },
-    render: function() {
-      var h = JOY.DB.health;
-      var hStatusEl = document.getElementById('hStatus');
-      if (!hStatusEl) return;
-      hStatusEl.textContent = h.status === 'ok' ? 'Optimal' : h.status === 'warn' ? 'Perhatian' : 'Kendala';
-      hStatusEl.style.color = h.status === 'ok' ? '#7a9a7a' : h.status === 'warn' ? '#b8956a' : '#a86a6a';
-      document.getElementById('hStatusSub').textContent = h.lastRun ? 'Terakhir cek: '+JOY.Utils.fmtDateTime(h.lastRun) : 'Belum pernah dicek';
-      document.getElementById('hIntegrity').textContent = h.integrity + '%';
-      document.getElementById('hStorage').textContent = h.storageUsed || '—';
-      var tb = document.getElementById('healthTable');
-      if (!tb) return;
-      var html = '';
-      html += '<tr><td data-label="Komponen" style="color:#ededed;">Database LocalStorage</td><td data-label="Status"><span class="badge ok"><span class="dot ok"></span>OK</span></td><td data-label="Detail" style="color:#7a7a7a;font-size:12px;">'+(h.storageUsed||'—')+'</td></tr>';
-      html += '<tr><td data-label="Komponen" style="color:#ededed;">Agen AI</td><td data-label="Status"><span class="badge '+(JOY.DB.agents.length>0?'ok':'danger')+'"><span class="dot '+(JOY.DB.agents.length>0?'ok':'danger')+'"></span>'+(JOY.DB.agents.length>0?'OK':'Kosong')+'</span></td><td data-label="Detail" style="color:#7a7a7a;font-size:12px;">'+JOY.DB.agents.length+' agen</td></tr>';
-      html += '<tr><td data-label="Komponen" style="color:#ededed;">Provider AI</td><td data-label="Status"><span class="badge '+(JOY.DB.providers.length>0?'ok':'danger')+'"><span class="dot '+(JOY.DB.providers.length>0?'ok':'danger')+'"></span>'+(JOY.DB.providers.length>0?'OK':'Kosong')+'</span></td><td data-label="Detail" style="color:#7a7a7a;font-size:12px;">'+JOY.DB.providers.length+' provider</td></tr>';
-      var groqKey = JOY.AI._getGroqKey();
-      html += '<tr><td data-label="Komponen" style="color:#ededed;">Groq AI</td><td data-label="Status"><span class="badge '+(groqKey?'ok':'warn')+'"><span class="dot '+(groqKey?'ok':'warn')+'"></span>'+(groqKey?'Aktif':'Belum ada Key')+'</span></td><td data-label="Detail" style="color:#7a7a7a;font-size:12px;">'+(groqKey?'Terhubung':'Tambahkan di API Config')+'</td></tr>';
-      html += '<tr><td data-label="Komponen" style="color:#ededed;">PIN Keamanan</td><td data-label="Status"><span class="badge '+(JOY.DB.pin&&JOY.DB.pin.length===6?'ok':'danger')+'"><span class="dot '+(JOY.DB.pin&&JOY.DB.pin.length===6?'ok':'danger')+'"></span>'+(JOY.DB.pin&&JOY.DB.pin.length===6?'OK':'Invalid')+'</span></td><td data-label="Detail" style="color:#7a7a7a;font-size:12px;">6 digit</td></tr>';
-      html += '<tr><td data-label="Komponen" style="color:#ededed;">Integritas Data</td><td data-label="Status"><span class="badge '+(h.integrity>=80?'ok':h.integrity>=60?'warn':'danger')+'"><span class="dot '+(h.integrity>=80?'ok':h.integrity>=60?'warn':'danger')+'"></span>'+(h.integrity>=80?'OK':'Issue')+'</span></td><td data-label="Detail" style="color:#7a7a7a;font-size:12px;">'+h.integrity+'%'+(h.issues&&h.issues.length>0?' ('+h.issues.join(', ')+')':'')+'</td></tr>';
-      tb.innerHTML = html;
-    }
-  },
-
-  Optimize: {
-    run: function(silent) {
-      if (!silent) JOY.App.toast('Memulai optimasi sistem...','info');
-      var thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-      var logBefore = JOY.DB.log.length;
-      JOY.DB.log = JOY.DB.log.filter(function(l){return l.ts > thirtyDaysAgo;});
-      var logRemoved = logBefore - JOY.DB.log.length;
-      var fourteenDaysAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
-      var chatBefore = JOY.DB.chat.length;
-      JOY.DB.chat = JOY.DB.chat.filter(function(c){return c.ts > fourteenDaysAgo;});
-      var chatRemoved = chatBefore - JOY.DB.chat.length;
-      JOY.DB.optimize = {lastRun: Date.now(), logRemoved:logRemoved, chatRemoved:chatRemoved};
-      JOY.save();
-      if (!silent) JOY.App.toast('Optimasi selesai. Log lama: '+logRemoved+', Chat lama: '+chatRemoved+' dihapus.','ok');
-      JOY.Log.push('Panda', 'Optimasi sistem: '+logRemoved+' log lama & '+chatRemoved+' chat lama dibersihkan. Data inti 100% aman.');
-    }
-  },
-
-  Config: {
-    unlocked: false,
-    unlock: function() {
-      var pin = document.getElementById('apiUnlockPin').value;
-      if (pin !== JOY.DB.pin) {
-        JOY.App.toast('PIN salah','danger');
-        return;
-      }
-      JOY.Config.unlocked = true;
-      document.getElementById('apiLockScreen').style.display = 'none';
-      document.getElementById('apiContent').style.display = 'block';
-      document.getElementById('apiUnlockPin').value = '';
-      JOY.Config.render();
-      JOY.App.toast('API Config terbuka','ok');
-      JOY.Log.push('Tequila', 'Akses API Config dibuka dengan PIN.');
-    },
-    lock: function() {
-      JOY.Config.unlocked = false;
-      document.getElementById('apiLockScreen').style.display = 'block';
-      document.getElementById('apiContent').style.display = 'none';
-      JOY.App.toast('API Config dikunci kembali','info');
-    },
-    openAdd: function() {
-      if (!JOY.Config.unlocked) return JOY.App.toast('Buka kunci dulu','warn');
-      JOY.App.openModal('Tambah API Key', '<div><div style="font-size:12px;color:#c9a27a;margin-bottom:12px;padding:10px;background:rgba(212,165,116,0.08);border-radius:6px;">💡 Untuk mengaktifkan AI sungguhan, tambahkan key dengan label <b>Groq</b>. Key bisa didapat gratis di console.groq.com</div><input id="kLabel" class="input" placeholder="Label (Groq / Pollinations / dll)" style="margin-bottom:12px;"/><select id="kType" class="input" style="margin-bottom:12px;"><option>API Key</option><option>Secret</option><option>Token</option></select><input id="kVal" class="input" placeholder="sk-... / token" style="margin-bottom:12px;font-family:JetBrains Mono,monospace;"/><input id="kExp" type="date" class="input" style="margin-bottom:12px;"/><button onclick="JOY.Config.save()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;">Simpan</button></div>');
-    },
-    save: function() {
-      var label = document.getElementById('kLabel').value.trim();
-      var val = document.getElementById('kVal').value.trim();
-      if(!label||!val) return JOY.App.toast('Label & Value wajib','warn');
-      JOY.DB.keys.push({id:JOY.id(), label:label, type:document.getElementById('kType').value, val:val, exp:document.getElementById('kExp').value||null, ts:Date.now()});
-      JOY.save(); JOY.App.closeModal(); JOY.App.toast('Kunci disimpan','ok'); JOY.Config.render();
-      JOY.Log.push('Tequila', 'API Key baru ditambahkan: '+label);
-    },
-    delete: function(id) {
-      if (confirm('Yakin ingin menghapus API Key ini?')) {
-        JOY.DB.keys = JOY.DB.keys.filter(function(k) { return k.id !== id; });
-        JOY.save();
-        JOY.Config.render();
-        JOY.App.toast('API Key berhasil dihapus','ok');
-        JOY.Log.push('Tequila', 'Menghapus salah satu API Key dari sistem.');
-      }
-    },
-    copyKey: function(id) {
-      var k = JOY.DB.keys.find(function(x) { return x.id === id; });
-      if (k) JOY.Utils.copy(k.val);
-    },
-    render: function() {
-      var tb = document.getElementById('keyTable');
-      if (!tb) return;
-      if(JOY.DB.keys.length===0) {
-        tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#7a7a7a;padding:24px;">Belum ada kunci. Tambahkan Groq API Key untuk mengaktifkan AI sungguhan.</td></tr>';
-        return;
-      }
-      var html = '';
-      JOY.DB.keys.forEach(function(k) {
-        var mask = k.val.length < 12 ? '••••••••' : k.val.slice(0, 6) + '••••••' + k.val.slice(-4);
-        var isExp = k.exp && new Date(k.exp).getTime() < Date.now();
-        html += '<tr>';
-        html += '<td data-label="Label" style="color:#ededed;">'+JOY.Utils.esc(k.label)+'</td>';
-        html += '<td data-label="Tipe"><span class="badge info">'+JOY.Utils.esc(k.type)+'</span></td>';
-        html += '<td data-label="Key" style="font-family:JetBrains Mono,monospace;font-size:11px;color:#7a7a7a; word-break:break-all;">'+mask+'</td>';
-        html += '<td data-label="Valid" style="color:#7a7a7a;font-size:12px;">'+(k.exp?JOY.Utils.fmtDate(k.exp):'—')+'</td>';
-        html += '<td data-label="Status"><span class="badge '+(isExp?'danger':'ok')+'"><span class="dot '+(isExp?'danger':'ok')+'"></span>'+(isExp?'Kadaluarsa':'Valid')+'</span></td>';
-        html += '<td data-label="Aksi" style="justify-content:flex-end;gap:8px;margin-top:10px;">';
-        html += '<button onclick="JOY.Config.copyKey(\''+k.id+'\')" class="btn" style="padding:5px 10px;font-size:11px;">Salin</button>';
-        html += '<button onclick="JOY.Config.delete(\''+k.id+'\')" class="btn-danger" style="padding:5px 10px;font-size:11px;">Hapus</button>';
-        html += '</td>';
-        html += '</tr>';
-      });
-      tb.innerHTML = html;
-    }
-  },
-
-  Rules: {
-    defaults: function() {
-      return [
-        {id:JOY.id(), title:'Keamanan Finansial', body:'1. Transfer keluar hanya ke rekening Owner (Ade Kurnia Sandy).\n2. Approve uang masuk wajib PIN (Sanny).\n3. Pengeluaran operasional dicatat Sanny tanpa PIN, tapi semua tercatat di log.\n4. Tidak ada transfer ke rekening pihak ketiga tanpa izin tertulis Owner.', ts:Date.now()},
-        {id:JOY.id(), title:'Target Produksi Harian', body:'Minimum 5 produk digital siap jual per hari untuk pasar US & EU.\nSetiap produk yang lolos QC (Michelle) otomatis masuk Asset dan dihitung ke target harian.', ts:Date.now()},
-        {id:JOY.id(), title:'Alur Kerja Agency', body:'1. Request produk → Desi buat tiket.\n2. Riset → Della + Scout.\n3. Produksi → Builder + Sarah + Mario.\n4. QC & Upload → Michelle.\n5. Sales → Grace, Elten, Closer, Angela.\n6. Finance → Sanny.', ts:Date.now()},
-        {id:JOY.id(), title:'Akses API & Keamanan Data', body:'1. API Config terkunci PIN.\n2. Key hanya boleh ditambah/dilihat setelah buka kunci.\n3. Key tidak boleh dibagikan ke luar sistem.\n4. Backup database dilakukan rutin oleh Panda.', ts:Date.now()},
-        {id:JOY.id(), title:'Komunikasi & Chat AI', body:'Chat Manager memakai Groq AI (Primary) dengan fallback Pollinations.\nPrimary gagal → otomatis pindah ke fallback.\nSemua interaksi agen tercatat di Log Real-time.', ts:Date.now()},
-        {id:JOY.id(), title:'Kepemilikan & Keputusan', body:'Pemegang Kendali Utama: Ade Kurnia Sandy.\nKeputusan strategis final ada di Owner.\nTequila sebagai CAO mengawasi operasional harian.', ts:Date.now()}
-      ];
-    },
-    seedIfEmpty: function() {
-      if (!JOY.DB.rules || JOY.DB.rules.length === 0) {
-        JOY.DB.rules = JOY.Rules.defaults();
-        JOY.save();
-      }
-    },
-    openAdd: function() {
-      JOY.App.openModal('Tambah Peraturan', '<div><input id="rlTitle" class="input" placeholder="Judul" style="margin-bottom:12px;"/><textarea id="rlBody" class="input" rows="4" placeholder="Isi peraturan" style="margin-bottom:12px;"></textarea><button onclick="JOY.Rules.save()" class="btn-accent" style="width:100%;padding:12px;font-size:14px;">Simpan</button></div>');
-    },
-    save: function() {
-      var title = document.getElementById('rlTitle').value.trim();
-      if(!title) return JOY.App.toast('Judul wajib','warn');
-      JOY.DB.rules.unshift({id:JOY.id(), title:title, body:document.getElementById('rlBody').value.trim(), ts:Date.now()});
-      JOY.save(); JOY.App.closeModal(); JOY.App.toast('Peraturan ditambahkan','ok'); JOY.Rules.render();
-    },
-    render: function() {
-      JOY.Rules.seedIfEmpty();
-      var el = document.getElementById('ruleList');
-      if (!el) return;
-      if(JOY.DB.rules.length===0) { el.innerHTML='<div style="text-align:center;color:#7a7a7a;padding:24px;">Belum ada peraturan.</div>'; return; }
-      var html = '';
-      JOY.DB.rules.forEach(function(r) {
-        html += '<details style="margin-bottom:8px;"><summary style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="min-width:0;flex:1;"><div style="font-size:14px;color:#ededed;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+JOY.Utils.esc(r.title)+'</div><div style="font-size:11px;color:#7a7a7a;">'+JOY.Utils.fmtDate(r.ts)+'</div></div></summary><div class="body" style="font-size:14px;color:#d4d4d4;white-space:pre-wrap;">'+(r.body?JOY.Utils.esc(r.body):'(kosong)')+'</div></details>';
-      });
-      el.innerHTML = html;
-    }
-  },
-
-  System: {
-    changePin: function() {
-      var o = document.getElementById('pinOld').value;
-      var n = document.getElementById('pinNew').value;
-      var c = document.getElementById('pinConf').value;
-      var msg = document.getElementById('pinMsg');
-      if(o !== JOY.DB.pin) { msg.textContent='PIN lama salah'; msg.style.color='#a86a6a'; return; }
-      if(n.length!==6 || !/^\d+$/.test(n)) { msg.textContent='PIN baru harus 6 digit angka'; msg.style.color='#a86a6a'; return; }
-      if(n!==c) { msg.textContent='Konfirmasi tidak cocok'; msg.style.color='#a86a6a'; return; }
-      JOY.DB.pin = n; JOY.save();
-      msg.textContent='PIN berhasil diperbarui.'; msg.style.color='#7a9a7a';
-      document.getElementById('pinOld').value=''; document.getElementById('pinNew').value=''; document.getElementById('pinConf').value='';
-      JOY.App.toast('PIN diperbarui','ok');
-      JOY.Log.push('Tequila', 'PIN operator diperbarui oleh Owner.');
-    }
-  },
-
-  Storage: {
-    render: function() {
-      var raw = localStorage.getItem(JOY.LS_KEY) || '';
-      var bytes = new Blob([raw]).size;
-      document.getElementById('stUsed').textContent = bytes<1024 ? bytes+' B' : (bytes/1024).toFixed(1)+' KB';
-      var totalRec = 0, cols = 0;
-      Object.keys(JOY.DB).forEach(function(k) {
-        cols++;
-        var v = JOY.DB[k];
-        totalRec += Array.isArray(v) ? v.length : (typeof v === 'object' && v !== null ? Object.keys(v).length : 1);
-      });
-      document.getElementById('stRec').textContent = totalRec;
-      document.getElementById('stCol').textContent = cols;
-    },
-    export: function() {
-      var blob = new Blob([JSON.stringify(JOY.DB,null,2)], {type:'application/json'});
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a'); a.href = url; a.download = 'joy_corp_backup_'+JOY.Utils.today()+'.json';
-      a.click(); URL.revokeObjectURL(url);
-      JOY.App.toast('Database diekspor','ok');
-      JOY.Log.push('Panda', 'Backup database diekspor ke JSON.');
-    },
-    import: function(ev) {
-      var f = ev.target.files[0]; if(!f) return;
-      var r = new FileReader();
-      r.onload = function(e) {
-        try {
-          var data = JSON.parse(e.target.result);
-          if(!confirm('Timpa database saat ini?')) return;
-          JOY.DB = JOY.normalize(data);
-          JOY.save(); JOY.App.renderAll(); JOY.App.toast('Database diimpor','ok');
-          JOY.Log.push('Panda', 'Database diimpor dari backup JSON.');
-        } catch(err) { JOY.App.toast('File tidak valid','danger'); }
-      };
-      r.readAsText(f);
-    }
-  }
-};
-
-document.querySelectorAll('.nav-item').forEach(function(el) {
-  el.addEventListener('click', function() {
-    var t = el.getAttribute('data-target');
-    document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
-    el.classList.add('active');
-    document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
-    document.getElementById(t).classList.add('active');
-    var titles = {
-      saldo:['Saldo & Keuangan','Pencatatan arus kas & mutasi'],
-      agency:['Agency Network','Hybrid Task Force · 19 Agen AI'],
-      asset:['Asset Produk','Gudang produk digital jadi'],
-      progress:['Progress & Request','Tiket kerja & pengerjaan'],
-      target:['Target Harian','Minimum 5 produk per hari'],
-      log:['Log Real-time','Hanya aktivitas nyata'],
-      aiprovider:['AI Provider','Rantai fallback 2 lapis'],
-      chat:['Chat Manager','Konsultasi AI sungguhan (Groq)'],
-      apiconfig:['API Config','Manajemen kunci akses'],
-      health:['Health Check','Status sistem & integritas'],
-      rules:['Peraturan','Tata tertib internal'],
-      pin:['Ganti PIN','Keamanan operator'],
-      payment:['Pembayaran','Info rekening & approve'],
-      storage:['Penyimpanan','Backup & restore database'],
-      profile:['Profil','Visi, misi, dan founder']
-    };
-    document.getElementById('pageTitle').textContent = titles[t][0];
-    document.getElementById('pageSub').textContent = titles[t][1];
-    JOY.App.closeSidebar();
-    JOY.App.renderAll();
+async function loadCatalog(){
+  const grid=document.getElementById('catalogGrid');grid.textContent='';
+  if(!sb){grid.textContent='Connect Supabase first.';return;}
+  const {data,error}=await sb.from('products').select('*').eq('status','published').order('created_at',{ascending:false});
+  if(error){grid.textContent='Unable to load products: '+error.message;return;}
+  if(!data.length){grid.textContent='No published products yet.';return;}
+  data.forEach(p=>{
+    const card=document.createElement('div');card.className='product';
+    const title=document.createElement('h3');title.textContent=p.title;
+    const desc=document.createElement('p');desc.style.cssText='font-size:.8rem;color:var(--muted)';desc.textContent=p.description;
+    const price=document.createElement('div');price.className='price';price.textContent='$'+Number(p.price_usd).toFixed(2);
+    const btn=document.createElement('button');btn.className='btn btn-gold';btn.textContent='Buy now';
+    btn.onclick=()=>startCheckout(p);
+    card.append(title,desc,price,btn);grid.appendChild(card);
   });
-});
-document.querySelector('.nav-item').classList.add('active');
-document.getElementById('modal').addEventListener('click', function(e) { if(e.target.id==='modal') JOY.App.closeModal(); });
-document.getElementById('chatInput').addEventListener('keydown', function(e) { if(e.key==='Enter') JOY.Chat.send(); });
-document.getElementById('apiUnlockPin') && document.getElementById('apiUnlockPin').addEventListener('keydown', function(e) { if(e.key==='Enter') JOY.Config.unlock(); });
+}
 
-JOY.init();
+async function startCheckout(product){
+  if(!sb){alert('Connect Supabase first.');return;}
+  const email=prompt('Enter your email to receive the product:');
+  if(!email)return;
+  const {error}=await sb.from('orders').insert({product_id:product.id,customer_email:email,amount:product.price_usd,currency:'USD',payment_provider:'pending',payment_status:'pending'});
+  if(error){alert('Could not create order: '+error.message);return;}
+  alert('Order created. Connect PayPal/Doku checkout in the next build step.');
+}
+
+async function loadProduction(){
+  const body=document.getElementById('productionBody');body.textContent='';
+  if(!sb)return;
+  const {data,error}=await sb.from('production_items').select('*').order('created_at',{ascending:false});
+  if(error){body.textContent='Error: '+error.message;return;}
+  data.forEach(item=>{
+    const tr=document.createElement('tr');
+    [item.title,item.product_type,item.status].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td);});
+    const td=document.createElement('td');
+    const btn=document.createElement('button');btn.className='btn';btn.textContent='Advance';
+    btn.onclick=()=>advanceStatus(item);
+    td.appendChild(btn);tr.appendChild(td);body.appendChild(tr);
+  });
+}
+
+async function advanceStatus(item){
+  const flow=['idea','drafting','owner_review','qc','ready','published'];
+  const next=flow[Math.min(flow.indexOf(item.status)+1,flow.length-1)];
+  if(item.status==='qc'&&next==='ready'&&!confirm('Have you completed the full QC checklist?'))return;
+  const {error}=await sb.from('production_items').update({status:next}).eq('id',item.id);
+  if(error){alert(error.message);return;}
+  loadProduction();
+}
+
+async function createProductionItem(){
+  if(!sb){alert('Connect Supabase first.');return;}
+  const title=document.getElementById('pTitle').value.trim();
+  const type=document.getElementById('pType').value;
+  const idea=document.getElementById('pIdea').value.trim();
+  if(!title||!idea){alert('Enter a title and idea.');return;}
+  const {error}=await sb.from('production_items').insert({title,product_type:type,idea,status:'idea'});
+  if(error){alert(error.message);return;}
+  document.getElementById('pTitle').value='';document.getElementById('pIdea').value='';
+  loadProduction();
+}
+
+async function loadOrders(){
+  const body=document.getElementById('ordersBody');body.textContent='';
+  if(!sb)return;
+  const {data,error}=await sb.from('orders').select('*, products(title)').order('created_at',{ascending:false}).limit(50);
+  if(error){body.textContent='Error: '+error.message;return;}
+  data.forEach(o=>{
+    const tr=document.createElement('tr');
+    const date=new Date(o.created_at).toLocaleString();
+    [date,o.products?.title||'Product','$'+Number(o.amount).toFixed(2),o.payment_provider,o.payment_status].forEach(v=>{
+      const td=document.createElement('td');td.textContent=v;tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+}
+
+window.addEventListener('DOMContentLoaded',initSupabase);
 </script>
 </body>
 </html>
