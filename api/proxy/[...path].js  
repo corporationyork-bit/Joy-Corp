@@ -1,51 +1,48 @@
-const SUPABASE_URL = 'https://nszdjbnoikdvqquhxrhe.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU';
+// api/proxy/[...path].js
 
 export default async function handler(req, res) {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'apikey, Authorization, Content-Type');
-    return res.status(200).end();
+  // Ambil path setelah /api/proxy/
+  const path = req.query.path ? req.query.path.join('/') : '';
+  
+  // Ambil query string asli
+  const queryString = req.url.includes('?') 
+    ? req.url.split('?')[1] 
+    : '';
+
+  // URL lengkap ke Supabase
+  const supabaseUrl = process.env.SUPABASE_URL; // contoh: https://xxxxx.supabase.co
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(500).json({ error: 'Missing SUPABASE_URL or SUPABASE_KEY' });
   }
 
-  const { path } = req.query;
-  const pathString = Array.isArray(path) ? path.join('/') : path;
-  
-  // Bangun URL Supabase
-  const targetUrl = `${SUPABASE_URL}/${pathString}`;
-  
-  // Header wajib Supabase
-  const headers = {
-    'apikey': ANON_KEY,
-    'Authorization': `Bearer ${ANON_KEY}`,
-    'Content-Type': 'application/json',
-    'Prefer': 'return=representation',
-  };
-  
-  const options = {
-    method: req.method,
-    headers,
-  };
-  
-  // Body untuk POST/PUT/PATCH
-  if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
-    options.body = JSON.stringify(req.body);
-  }
-  
+  const targetUrl = `\( {supabaseUrl}/ \){path}${queryString ? '?' + queryString : ''}`;
+
   try {
-    const response = await fetch(targetUrl, options);
+    // Forward request ke Supabase
+    const response = await fetch(targetUrl, {
+      method: req.method,
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': req.headers.prefer || '',
+      },
+      body: ['POST', 'PATCH', 'PUT'].includes(req.method) 
+        ? JSON.stringify(req.body) 
+        : undefined,
+    });
+
     const data = await response.text();
     
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'apikey, Authorization, Content-Type');
-    res.setHeader('Content-Type', 'application/json');
+    // Set status & header yang sama
+    res.status(response.status);
+    res.setHeader('Content-Type', response.headers.get('content-type') || 'application/json');
     
-    res.status(response.status).send(data);
+    return res.send(data);
   } catch (error) {
     console.error('Proxy error:', error);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
