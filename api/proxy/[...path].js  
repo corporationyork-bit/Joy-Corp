@@ -2,15 +2,26 @@ const SUPABASE_URL = 'https://nszdjbnoikdvqquhxrhe.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU';
 
 export default async function handler(req, res) {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'apikey, Authorization, Content-Type');
+    return res.status(200).end();
+  }
+
   const { path } = req.query;
   const pathString = Array.isArray(path) ? path.join('/') : path;
   
+  // Bangun URL Supabase
   const targetUrl = `${SUPABASE_URL}/${pathString}`;
   
+  // Header wajib Supabase
   const headers = {
     'apikey': ANON_KEY,
     'Authorization': `Bearer ${ANON_KEY}`,
     'Content-Type': 'application/json',
+    'Prefer': 'return=representation',
   };
   
   const options = {
@@ -18,20 +29,23 @@ export default async function handler(req, res) {
     headers,
   };
   
-  if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
+  // Body untuk POST/PUT/PATCH
+  if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
     options.body = JSON.stringify(req.body);
   }
   
   try {
     const response = await fetch(targetUrl, options);
-    const data = await response.json();
+    const data = await response.text();
     
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'apikey, Authorization, Content-Type');
+    res.setHeader('Content-Type', 'application/json');
     
-    res.status(response.status).json(data);
+    res.status(response.status).send(data);
   } catch (error) {
+    console.error('Proxy error:', error);
     res.status(500).json({ error: error.message });
   }
 }
