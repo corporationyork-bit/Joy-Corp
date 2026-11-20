@@ -1,184 +1,32 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>PERUSAHAAN JOY - Control Center</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{--bg:#0d0f12;--panel:#14171d;--card:#1a1e26;--border:#2a303c;--text:#e0e0e0;--muted:#8b92a0;--gold:#c5a059;--green:#4caf50;--red:#ef4444}
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
-body{background:var(--bg);color:var(--text);min-height:100vh}
-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--panel);border-bottom:1px solid var(--border)}
-.brand{font-weight:800;letter-spacing:1px}
-.brand span{color:var(--gold)}
-.badge{font-size:.72rem;color:var(--muted)}
-.container{display:flex;min-height:calc(100vh - 61px)}
-.sidebar{width:230px;background:var(--panel);border-right:1px solid var(--border);padding:12px 0}
-.menu{padding:12px 18px;color:var(--muted);cursor:pointer;border-left:3px solid transparent}
-.menu:hover,.menu.active{background:var(--card);color:var(--gold);border-left-color:var(--gold)}
-.content{flex:1;padding:22px;overflow:auto}
-.section{display:none}
-.section.active{display:block}
-h2{color:var(--gold);margin-bottom:16px;font-size:1.15rem}
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
-.btn{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:.8rem}
-.btn-gold{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
-input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:#fff;padding:10px;border-radius:6px;margin:6px 0 12px}
-label{font-size:.78rem;color:var(--muted)}
-table{width:100%;border-collapse:collapse;font-size:.82rem}
-th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
-.status{padding:3px 8px;border-radius:4px;font-size:.7rem;font-weight:700}
-.published{background:rgba(76,175,80,.2);color:var(--green)}
-.idea,.drafting,.owner_review,.qc,.ready{background:rgba(197,160,89,.2);color:var(--gold)}
-.catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
-.product{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
-.product h3{color:#fff;font-size:.95rem;margin-bottom:6px}
-.price{color:var(--gold);font-weight:800;margin:8px 0}
-.notice{background:rgba(197,160,89,.12);border:1px solid var(--gold);padding:12px;border-radius:8px;font-size:.8rem;color:var(--muted);margin-bottom:16px}
-@media(max-width:768px){
-  .container{flex-direction:column}
-  .sidebar{width:100%;display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--border)}
-  .menu{white-space:nowrap;border-left:0;border-bottom:3px solid transparent}
-  .menu.active{border-bottom-color:var(--gold)}
-  .content{padding:14px}
-}
-</style>
-</head>
-<body>
-<header>
-  <div>
-    <div class="brand">PERUSAHAAN <span>JOY</span></div>
-    <div class="badge">Studio Produk AI · Pasar Global</div>
-  </div>
-  <div class="badge" id="authStatus">Memeriksa koneksi…</div>
-</header>
-
-<div class="container">
-  <nav class="sidebar">
-    <div class="menu active" data-tab="catalog">Katalog Publik</div>
-    <div class="menu" data-tab="production">Produksi</div>
-    <div class="menu" data-tab="orders">Pesanan</div>
-    <div class="menu" data-tab="agency">Agen</div>
-    <div class="menu" data-tab="settings">Pengaturan</div>
-  </nav>
-
-  <main class="content">
-    <!-- KATALOG -->
-    <section id="catalog" class="section active">
-      <h2>Katalog Publik</h2>
-      <div class="notice">Halaman ini ditujukan untuk pelanggan. Produk hanya akan terlihat setelah mendapat persetujuan pemilik dan melalui proses kontrol kualitas (QC).</div>
-      <div class="catalog-grid" id="catalogGrid"></div>
-    </section>
-
-    <!-- PRODUKSI -->
-    <section id="production" class="section">
-      <h2>Pipeline Produksi</h2>
-      <div class="card">
-        <label>Judul Produk</label>
-        <input id="pTitle" placeholder="AI Toolkit for Creators & Small Businesses">
-        <label>Tipe Produk</label>
-        <select id="pType">
-          <option value="toolkit">toolkit</option>
-          <option value="ebook">ebook</option>
-          <option value="prompt-pack">prompt-pack</option>
-          <option value="template">template</option>
-        </select>
-        <label>Ide Produk</label>
-        <textarea id="pIdea" rows="3" placeholder="Jelaskan hasil yang didapat customer dan isi produknya"></textarea>
-        <button class="btn btn-gold" onclick="createProductionItem()">Buat Item Produksi</button>
-      </div>
-      <div class="card">
-        <table>
-          <thead>
-            <tr><th>Judul</th><th>Tipe</th><th>Status</th><th>Aksi</th></tr>
-          </thead>
-          <tbody id="productionBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- PESANAN -->
-    <section id="orders" class="section">
-      <h2>Pesanan</h2>
-      <div class="card">
-        <table>
-          <thead>
-            <tr><th>Tanggal</th><th>Produk</th><th>Jumlah</th><th>Provider</th><th>Status</th></tr>
-          </thead>
-          <tbody id="ordersBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- AGEN -->
-    <section id="agency" class="section">
-      <h2>Alur Kerja Agen</h2>
-      <div class="card">
-        <p style="font-size:.85rem;color:var(--muted)">
-          Aperol riset permintaan → Walker membuat draf → Hendrick’s siapkan aset → Absolut jalankan QC → Kamu setujui → Martini publikasikan.
-        </p>
-      </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>Agen</th><th>Tanggung Jawab</th></tr></thead>
-          <tbody>
-            <tr><td>Aperol</td><td>Riset pasar dan validasi ide produk</td></tr>
-            <tr><td>Walker</td><td>Membuat outline, draf, dan sales copy</td></tr>
-            <tr><td>Hendrick’s</td><td>Menyiapkan template dan file downloadable</td></tr>
-            <tr><td>Absolut</td><td>Menjalankan checklist QC; tidak bisa publish tanpa persetujuan</td></tr>
-            <tr><td>Martini</td><td>Mempublikasikan produk yang sudah disetujui</td></tr>
-            <tr><td>Hennessy</td><td>Laporan revenue, refund, dan margin</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- PENGATURAN -->
-    <section id="settings" class="section">
-      <h2>Pengaturan</h2>
-      <div class="card">
-        <label>Supabase URL</label>
-        <input id="supabaseUrl" placeholder="https://nszdjbnoikdvqquhxrhe.supabase.co">
-        <label>Supabase Anon Key</label>
-        <input id="supabaseKey" placeholder="Paste anon public key">
-        <button class="btn btn-gold" onclick="saveConfig()">Simpan Koneksi</button>
-        <p class="notice" style="margin-top:12px">
-          Jangan pernah taruh service-role key, secret PayPal, Doku, atau API key AI di sini. Simpan di Environment Variables Vercel.
-        </p>
-      </div>
-    </section>
-  </main>
-</div>
-
 <script>
+  // ====== KONFIGURASI LANGSUNG (anon key = publik, aman) ======
+  const SUPABASE_URL = 'https://nszdjbnoikdvqquhxrhe.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU';
+  // ============================================================
+
   const STORAGE_KEY = 'joy_supabase_config';
   let sb = null;
 
   function saveConfig() {
     const url = document.getElementById('supabaseUrl').value.trim();
     const key = document.getElementById('supabaseKey').value.trim();
-    if (!url || !key) {
-      alert('Isi URL dan Anon Key dulu.');
-      return;
-    }
+    if (!url || !key) { alert('Isi URL dan Anon Key dulu.'); return; }
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ url, key }));
     initSupabase();
-    alert('Koneksi berhasil disimpan!');
+    alert('Koneksi override tersimpan!');
   }
 
   function initSupabase() {
+    // override opsional dari tab Pengaturan; default pakai konstanta
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-    if (!saved) {
-      document.getElementById('authStatus').textContent = 'Hubungkan Supabase di Pengaturan';
-      return;
-    }
+    const url = (saved && saved.url) || SUPABASE_URL;
+    const key = (saved && saved.key) || SUPABASE_ANON_KEY;
 
-    document.getElementById('supabaseUrl').value = saved.url || '';
-    document.getElementById('supabaseKey').value = saved.key || '';
+    document.getElementById('supabaseUrl').value = url;
+    document.getElementById('supabaseKey').value = key;
 
     try {
-      sb = window.supabase.createClient(saved.url, saved.key);
+      sb = window.supabase.createClient(url, key);
       document.getElementById('authStatus').textContent = 'Supabase terhubung';
       loadCatalog();
       loadProduction();
@@ -200,33 +48,25 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   async function loadCatalog() {
     const grid = document.getElementById('catalogGrid');
     grid.innerHTML = '';
-    if (!sb) {
-      grid.innerHTML = '<p style="color:var(--muted)">Hubungkan Supabase terlebih dahulu.</p>';
-      return;
-    }
-
+    if (!sb) { grid.innerHTML = '<p style="color:var(--muted)">Belum terhubung.</p>'; return; }
     try {
       const { data, error } = await sb
-        .from('products')
-        .select('*')
+        .from('products').select('*')
         .eq('status', 'published')
         .order('created_at', { ascending: false });
-
       if (error) throw error;
-
       if (!data || data.length === 0) {
         grid.innerHTML = '<p style="color:var(--muted)">Belum ada produk yang dipublikasikan.</p>';
         return;
       }
-
       data.forEach(p => {
         const card = document.createElement('div');
         card.className = 'product';
         card.innerHTML = `
           <h3>${p.title || 'Tanpa Judul'}</h3>
           <p style="font-size:.8rem;color:var(--muted)">${p.description || ''}</p>
-          <div class="price">\[ {Number(p.price_usd || 0).toFixed(2)}</div>
-          <button class="btn btn-gold" onclick='startCheckout(${JSON.stringify(p).replace(/'/g, "\\'")})'>Beli Sekarang</button>
+          <div class="price">$${Number(p.price_usd || 0).toFixed(2)}</div>
+          <button class="btn btn-gold" onclick='startCheckout(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Beli Sekarang</button>
         `;
         grid.appendChild(card);
       });
@@ -240,49 +80,38 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     if (!sb) return alert('Hubungkan Supabase dulu.');
     const email = prompt('Masukkan email untuk menerima produk:');
     if (!email) return;
-
     try {
       const { error } = await sb.from('orders').insert({
-        product_id: product.id,
-        customer_email: email,
-        amount: product.price_usd,
-        currency: 'USD',
-        payment_provider: 'pending',
-        payment_status: 'pending'
+        product_id: product.id, customer_email: email,
+        amount: product.price_usd, currency: 'USD',
+        payment_provider: 'pending', payment_status: 'pending'
       });
       if (error) throw error;
-      alert('Pesanan berhasil dibuat. Pembayaran otomatis akan ditambahkan nanti.');
+      alert('Pesanan dibuat. Pembayaran otomatis menyusul (Tahap 9).');
       loadOrders();
-    } catch (err) {
-      alert('Gagal membuat pesanan: ' + err.message);
-    }
+    } catch (err) { alert('Gagal: ' + err.message); }
   }
 
   async function loadProduction() {
     const body = document.getElementById('productionBody');
     body.innerHTML = '';
     if (!sb) return;
-
     try {
       const { data, error } = await sb
-        .from('production_items')
-        .select('*')
+        .from('production_items').select('*')
         .order('created_at', { ascending: false });
-
       if (error) throw error;
-
       if (!data || data.length === 0) {
         body.innerHTML = '<tr><td colspan="4" style="color:var(--muted)">Belum ada item produksi.</td></tr>';
         return;
       }
-
       data.forEach(item => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${item.title}</td>
           <td>${item.product_type || '-'}</td>
-          <td><span class="status \( {item.status}"> \){item.status}</span></td>
-          <td><button class="btn" onclick='advanceStatus(${JSON.stringify(item).replace(/'/g, "\\'")})'>Majukan</button></td>
+          <td><span class="status ${item.status}">${item.status}</span></td>
+          <td><button class="btn" onclick='advanceStatus(${JSON.stringify(item).replace(/'/g, "&#39;")})'>Majukan</button></td>
         `;
         body.appendChild(tr);
       });
@@ -296,72 +125,48 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     const title = document.getElementById('pTitle').value.trim();
     const type = document.getElementById('pType').value;
     const idea = document.getElementById('pIdea').value.trim();
-
     if (!title || !idea) return alert('Isi judul dan ide produk dulu.');
-
     try {
       const { error } = await sb.from('production_items').insert({
-        title,
-        product_type: type,
-        idea,
-        status: 'idea'
+        title, product_type: type, idea, status: 'idea'
       });
       if (error) throw error;
-
       document.getElementById('pTitle').value = '';
       document.getElementById('pIdea').value = '';
       loadProduction();
-    } catch (err) {
-      alert('Gagal membuat item: ' + err.message);
-    }
+    } catch (err) { alert('Gagal: ' + err.message); }
   }
 
   async function advanceStatus(item) {
-    const flow = ['idea', 'drafting', 'owner_review', 'qc', 'ready', 'published'];
-    const currentIndex = flow.indexOf(item.status);
-    const next = flow[Math.min(currentIndex + 1, flow.length - 1)];
-
-    if (item.status === 'qc' && next === 'ready') {
-      if (!confirm('Sudah selesai checklist QC?')) return;
-    }
-
+    const flow = ['idea','drafting','owner_review','qc','ready','published'];
+    const next = flow[Math.min(flow.indexOf(item.status) + 1, flow.length - 1)];
+    if (item.status === 'qc' && next === 'ready' && !confirm('Sudah selesai checklist QC?')) return;
     try {
-      const { error } = await sb
-        .from('production_items')
-        .update({ status: next })
-        .eq('id', item.id);
+      const { error } = await sb.from('production_items').update({ status: next }).eq('id', item.id);
       if (error) throw error;
       loadProduction();
-    } catch (err) {
-      alert(err.message);
-    }
+    } catch (err) { alert(err.message); }
   }
 
   async function loadOrders() {
     const body = document.getElementById('ordersBody');
     body.innerHTML = '';
     if (!sb) return;
-
     try {
       const { data, error } = await sb
-        .from('orders')
-        .select('*, products(title)')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
+        .from('orders').select('*, products(title)')
+        .order('created_at', { ascending: false }).limit(50);
       if (error) throw error;
-
       if (!data || data.length === 0) {
         body.innerHTML = '<tr><td colspan="5" style="color:var(--muted)">Belum ada pesanan.</td></tr>';
         return;
       }
-
       data.forEach(o => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${new Date(o.created_at).toLocaleString('id-ID')}</td>
           <td>${o.products?.title || 'Produk'}</td>
-          <td> \]{Number(o.amount).toFixed(2)}</td>
+          <td>$${Number(o.amount).toFixed(2)}</td>
           <td>${o.payment_provider}</td>
           <td>${o.payment_status}</td>
         `;
@@ -373,6 +178,4 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   }
 
   window.addEventListener('DOMContentLoaded', initSupabase);
-</script>
-</body>
-</html>
+               </script>
