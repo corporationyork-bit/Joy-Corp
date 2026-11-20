@@ -51,7 +51,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     <div class="brand">PERUSAHAAN <span>JOY</span></div>
     <div class="badge">Studio Produk AI · Pasar Global</div>
   </div>
-  <div class="badge" id="authStatus">Memeriksa koneksi…</div>
+  <div class="badge" id="authStatus">Memeriksa koneksi… (v2)</div>
 </header>
 
 <div class="container">
@@ -64,14 +64,12 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   </nav>
 
   <main class="content">
-    <!-- KATALOG -->
     <section id="catalog" class="section active">
       <h2>Katalog Publik</h2>
       <div class="notice">Halaman ini ditujukan untuk pelanggan. Produk hanya akan terlihat setelah mendapat persetujuan pemilik dan melalui proses kontrol kualitas (QC).</div>
       <div class="catalog-grid" id="catalogGrid"></div>
     </section>
 
-    <!-- PRODUKSI -->
     <section id="production" class="section">
       <h2>Pipeline Produksi</h2>
       <div class="card">
@@ -90,34 +88,26 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
       </div>
       <div class="card">
         <table>
-          <thead>
-            <tr><th>Judul</th><th>Tipe</th><th>Status</th><th>Aksi</th></tr>
-          </thead>
+          <thead><tr><th>Judul</th><th>Tipe</th><th>Status</th><th>Aksi</th></tr></thead>
           <tbody id="productionBody"></tbody>
         </table>
       </div>
     </section>
 
-    <!-- PESANAN -->
     <section id="orders" class="section">
       <h2>Pesanan</h2>
       <div class="card">
         <table>
-          <thead>
-            <tr><th>Tanggal</th><th>Produk</th><th>Jumlah</th><th>Provider</th><th>Status</th></tr>
-          </thead>
+          <thead><tr><th>Tanggal</th><th>Produk</th><th>Jumlah</th><th>Provider</th><th>Status</th></tr></thead>
           <tbody id="ordersBody"></tbody>
         </table>
       </div>
     </section>
 
-    <!-- AGEN -->
     <section id="agency" class="section">
       <h2>Alur Kerja Agen</h2>
       <div class="card">
-        <p style="font-size:.85rem;color:var(--muted)">
-          Aperol riset permintaan → Walker membuat draf → Hendrick's siapkan aset → Absolut jalankan QC → Kamu setujui → Martini publikasikan.
-        </p>
+        <p style="font-size:.85rem;color:var(--muted)">Aperol riset → Walker draf → Hendrick's aset → Absolut QC → Kamu setujui → Martini publikasi.</p>
       </div>
       <div class="card">
         <table>
@@ -134,7 +124,6 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
       </div>
     </section>
 
-    <!-- PENGATURAN -->
     <section id="settings" class="section">
       <h2>Pengaturan</h2>
       <div class="card">
@@ -143,6 +132,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
         <label>Supabase Anon Key</label>
         <input id="supabaseKey" placeholder="Paste anon public key">
         <button class="btn btn-gold" onclick="saveConfig()">Simpan Koneksi</button>
+        <button class="btn" onclick="resetSupabaseConfig()">Reset ke Default</button>
         <p class="notice" style="margin-top:12px">
           Jangan pernah taruh service-role key, secret PayPal, Doku, atau API key AI di sini. Simpan di Environment Variables Vercel.
         </p>
@@ -152,182 +142,137 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
 </div>
 
 <script>
-  // ====== KONFIGURASI LANGSUNG (anon key = publik, aman) ======
   const SUPABASE_URL = 'https://nszdjbnoikdvqquhxrhe.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU';
-  // ============================================================
-
   const STORAGE_KEY = 'joy_supabase_config';
   let sb = null;
 
-  function saveConfig() {
+  function isValidUrl(u){ return /^https:\/\/[a-z0-9][a-z0-9-]*\.supabase\.co$/i.test(u); }
+
+  function saveConfig(){
     const url = document.getElementById('supabaseUrl').value.trim();
     const key = document.getElementById('supabaseKey').value.trim();
-    if (!url || !key) { alert('Isi URL dan Anon Key dulu.'); return; }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ url, key }));
+    if(!isValidUrl(url)){ alert('URL tidak valid. Format: https://xxxx.supabase.co'); return; }
+    if(!key || key.length < 20){ alert('Anon Key tidak valid.'); return; }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({url, key}));
     initSupabase();
-    alert('Koneksi override tersimpan!');
+    alert('Koneksi tersimpan & tersambung.');
   }
 
-  function initSupabase() {
-    // override opsional dari tab Pengaturan; default pakai konstanta
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-    const url = (saved && saved.url) || SUPABASE_URL;
-    const key = (saved && saved.key) || SUPABASE_ANON_KEY;
+  function resetSupabaseConfig(){
+    localStorage.removeItem(STORAGE_KEY);
+    initSupabase();
+    alert('Sudah di-reset ke default. Reload halaman bila perlu.');
+  }
 
+  function initSupabase(){
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    let url = SUPABASE_URL, key = SUPABASE_ANON_KEY;
+    if(saved && isValidUrl(saved.url) && saved.key && saved.key.length > 20){ url = saved.url; key = saved.key; }
     document.getElementById('supabaseUrl').value = url;
     document.getElementById('supabaseKey').value = key;
-
-    try {
+    try{
       sb = window.supabase.createClient(url, key);
-      document.getElementById('authStatus').textContent = 'Supabase terhubung';
-      loadCatalog();
-      loadProduction();
-      loadOrders();
-    } catch (err) {
-      document.getElementById('authStatus').textContent = 'Gagal terhubung';
+      const prefix = url.replace(/^https:\/\//,'').replace(/\.supabase\.co$/,'');
+      document.getElementById('authStatus').textContent = 'Terhubung · ' + prefix + ' (v2)';
+      loadCatalog(); loadProduction(); loadOrders();
+    }catch(err){
+      document.getElementById('authStatus').textContent = 'Gagal terhubung (v2)';
       console.error(err);
     }
   }
 
-  function setTab(tab) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
+  function setTab(tab){
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
     document.getElementById(tab).classList.add('active');
-    document.querySelector(`.menu[data-tab="${tab}"]`).classList.add('active');
+    document.querySelector('.menu[data-tab="'+tab+'"]').classList.add('active');
   }
-  document.querySelectorAll('.menu').forEach(m => m.onclick = () => setTab(m.dataset.tab));
+  document.querySelectorAll('.menu').forEach(m=>m.onclick=()=>setTab(m.dataset.tab));
 
-  async function loadCatalog() {
-    const grid = document.getElementById('catalogGrid');
-    grid.innerHTML = '';
-    if (!sb) { grid.innerHTML = '<p style="color:var(--muted)">Belum terhubung.</p>'; return; }
-    try {
-      const { data, error } = await sb
-        .from('products').select('*')
-        .eq('status', 'published')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      if (!data || data.length === 0) {
-        grid.innerHTML = '<p style="color:var(--muted)">Belum ada produk yang dipublikasikan.</p>';
-        return;
-      }
-      data.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'product';
-        card.innerHTML = `
-          <h3>${p.title || 'Tanpa Judul'}</h3>
-          <p style="font-size:.8rem;color:var(--muted)">${p.description || ''}</p>
-          <div class="price">$${Number(p.price_usd || 0).toFixed(2)}</div>
-          <button class="btn btn-gold" onclick='startCheckout(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Beli Sekarang</button>
-        `;
-        grid.appendChild(card);
+  async function loadCatalog(){
+    const grid = document.getElementById('catalogGrid'); grid.innerHTML='';
+    if(!sb){ grid.innerHTML='<p style="color:var(--muted)">Belum terhubung.</p>'; return; }
+    try{
+      const { data, error } = await sb.from('products').select('*').eq('status','published').order('created_at',{ascending:false});
+      if(error) throw error;
+      if(!data || data.length===0){ grid.innerHTML='<p style="color:var(--muted)">Belum ada produk yang dipublikasikan.</p>'; return; }
+      data.forEach(p=>{
+        const card=document.createElement('div'); card.className='product';
+        const h3=document.createElement('h3'); h3.textContent=p.title||'Tanpa Judul';
+        const pd=document.createElement('p'); pd.style.fontSize='.8rem'; pd.style.color='var(--muted)'; pd.textContent=p.description||'';
+        const price=document.createElement('div'); price.className='price'; price.textContent='$'+Number(p.price_usd||0).toFixed(2);
+        const btn=document.createElement('button'); btn.className='btn btn-gold'; btn.textContent='Beli Sekarang';
+        btn.addEventListener('click',()=>startCheckout(p));
+        card.append(h3,pd,price,btn); grid.appendChild(card);
       });
-    } catch (err) {
-      grid.innerHTML = `<p style="color:var(--red)">Kesalahan: ${err.message}</p>`;
-      console.error(err);
-    }
+    }catch(err){ grid.innerHTML='<p style="color:var(--red)">Kesalahan: '+err.message+'</p>'; console.error(err); }
   }
 
-  async function startCheckout(product) {
-    if (!sb) return alert('Hubungkan Supabase dulu.');
-    const email = prompt('Masukkan email untuk menerima produk:');
-    if (!email) return;
-    try {
-      const { error } = await sb.from('orders').insert({
-        product_id: product.id, customer_email: email,
-        amount: product.price_usd, currency: 'USD',
-        payment_provider: 'pending', payment_status: 'pending'
+  async function startCheckout(product){
+    if(!sb) return alert('Hubungkan Supabase dulu.');
+    const email = prompt('Masukkan email untuk menerima produk:'); if(!email) return;
+    try{
+      const { error } = await sb.from('orders').insert({ product_id:product.id, customer_email:email, amount:product.price_usd, currency:'USD', payment_provider:'pending', payment_status:'pending' });
+      if(error) throw error;
+      alert('Pesanan dibuat. Pembayaran otomatis menyusul (Tahap 9).'); loadOrders();
+    }catch(err){ alert('Gagal: '+err.message); }
+  }
+
+  async function loadProduction(){
+    const body=document.getElementById('productionBody'); body.innerHTML='';
+    if(!sb) return;
+    try{
+      const { data, error } = await sb.from('production_items').select('*').order('created_at',{ascending:false});
+      if(error) throw error;
+      if(!data || data.length===0){ body.innerHTML='<tr><td colspan="4" style="color:var(--muted)">Belum ada item produksi.</td></tr>'; return; }
+      data.forEach(item=>{
+        const tr=document.createElement('tr');
+        const c1=document.createElement('td'); c1.textContent=item.title;
+        const c2=document.createElement('td'); c2.textContent=item.product_type||'-';
+        const c3=document.createElement('td'); const sp=document.createElement('span'); sp.className='status '+item.status; sp.textContent=item.status; c3.appendChild(sp);
+        const c4=document.createElement('td'); const btn=document.createElement('button'); btn.className='btn'; btn.textContent='Majukan'; btn.addEventListener('click',()=>advanceStatus(item)); c4.appendChild(btn);
+        tr.append(c1,c2,c3,c4); body.appendChild(tr);
       });
-      if (error) throw error;
-      alert('Pesanan dibuat. Pembayaran otomatis menyusul (Tahap 9).');
-      loadOrders();
-    } catch (err) { alert('Gagal: ' + err.message); }
+    }catch(err){ body.innerHTML='<tr><td colspan="4" style="color:var(--red)">Error: '+err.message+'</td></tr>'; }
   }
 
-  async function loadProduction() {
-    const body = document.getElementById('productionBody');
-    body.innerHTML = '';
-    if (!sb) return;
-    try {
-      const { data, error } = await sb
-        .from('production_items').select('*')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      if (!data || data.length === 0) {
-        body.innerHTML = '<tr><td colspan="4" style="color:var(--muted)">Belum ada item produksi.</td></tr>';
-        return;
-      }
-      data.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${item.title}</td>
-          <td>${item.product_type || '-'}</td>
-          <td><span class="status ${item.status}">${item.status}</span></td>
-          <td><button class="btn" onclick='advanceStatus(${JSON.stringify(item).replace(/'/g, "&#39;")})'>Majukan</button></td>
-        `;
+  async function createProductionItem(){
+    if(!sb) return alert('Hubungkan Supabase dulu.');
+    const title=document.getElementById('pTitle').value.trim();
+    const type=document.getElementById('pType').value;
+    const idea=document.getElementById('pIdea').value.trim();
+    if(!title||!idea) return alert('Isi judul dan ide produk dulu.');
+    try{
+      const { error } = await sb.from('production_items').insert({ title, product_type:type, idea, status:'idea' });
+      if(error) throw error;
+      document.getElementById('pTitle').value=''; document.getElementById('pIdea').value=''; loadProduction();
+    }catch(err){ alert('Gagal: '+err.message); }
+  }
+
+  async function advanceStatus(item){
+    const flow=['idea','drafting','owner_review','qc','ready','published'];
+    const next=flow[Math.min(flow.indexOf(item.status)+1, flow.length-1)];
+    if(item.status==='qc' && next==='ready' && !confirm('Sudah selesai checklist QC?')) return;
+    try{
+      const { error } = await sb.from('production_items').update({ status:next }).eq('id',item.id);
+      if(error) throw error; loadProduction();
+    }catch(err){ alert(err.message); }
+  }
+
+  async function loadOrders(){
+    const body=document.getElementById('ordersBody'); body.innerHTML='';
+    if(!sb) return;
+    try{
+      const { data, error } = await sb.from('orders').select('*, products(title)').order('created_at',{ascending:false}).limit(50);
+      if(error) throw error;
+      if(!data || data.length===0){ body.innerHTML='<tr><td colspan="5" style="color:var(--muted)">Belum ada pesanan.</td></tr>'; return; }
+      data.forEach(o=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML='<td>'+new Date(o.created_at).toLocaleString('id-ID')+'</td><td>'+(o.products&&o.products.title||'Produk')+'</td><td>$'+Number(o.amount).toFixed(2)+'</td><td>'+o.payment_provider+'</td><td>'+o.payment_status+'</td>';
         body.appendChild(tr);
       });
-    } catch (err) {
-      body.innerHTML = `<tr><td colspan="4" style="color:var(--red)">Error: ${err.message}</td></tr>`;
-    }
-  }
-
-  async function createProductionItem() {
-    if (!sb) return alert('Hubungkan Supabase dulu.');
-    const title = document.getElementById('pTitle').value.trim();
-    const type = document.getElementById('pType').value;
-    const idea = document.getElementById('pIdea').value.trim();
-    if (!title || !idea) return alert('Isi judul dan ide produk dulu.');
-    try {
-      const { error } = await sb.from('production_items').insert({
-        title, product_type: type, idea, status: 'idea'
-      });
-      if (error) throw error;
-      document.getElementById('pTitle').value = '';
-      document.getElementById('pIdea').value = '';
-      loadProduction();
-    } catch (err) { alert('Gagal: ' + err.message); }
-  }
-
-  async function advanceStatus(item) {
-    const flow = ['idea','drafting','owner_review','qc','ready','published'];
-    const next = flow[Math.min(flow.indexOf(item.status) + 1, flow.length - 1)];
-    if (item.status === 'qc' && next === 'ready' && !confirm('Sudah selesai checklist QC?')) return;
-    try {
-      const { error } = await sb.from('production_items').update({ status: next }).eq('id', item.id);
-      if (error) throw error;
-      loadProduction();
-    } catch (err) { alert(err.message); }
-  }
-
-  async function loadOrders() {
-    const body = document.getElementById('ordersBody');
-    body.innerHTML = '';
-    if (!sb) return;
-    try {
-      const { data, error } = await sb
-        .from('orders').select('*, products(title)')
-        .order('created_at', { ascending: false }).limit(50);
-      if (error) throw error;
-      if (!data || data.length === 0) {
-        body.innerHTML = '<tr><td colspan="5" style="color:var(--muted)">Belum ada pesanan.</td></tr>';
-        return;
-      }
-      data.forEach(o => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${new Date(o.created_at).toLocaleString('id-ID')}</td>
-          <td>${o.products?.title || 'Produk'}</td>
-          <td>$${Number(o.amount).toFixed(2)}</td>
-          <td>${o.payment_provider}</td>
-          <td>${o.payment_status}</td>
-        `;
-        body.appendChild(tr);
-      });
-    } catch (err) {
-      body.innerHTML = `<tr><td colspan="5" style="color:var(--red)">Error: ${err.message}</td></tr>`;
-    }
+    }catch(err){ body.innerHTML='<tr><td colspan="5" style="color:var(--red)">Error: '+err.message+'</td></tr>'; }
   }
 
   window.addEventListener('DOMContentLoaded', initSupabase);
