@@ -44,7 +44,10 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
 </head>
 <body>
 <header>
-  <div><div class="brand">JOY <span>CORPORATION</span></div><div class="badge">AI Product Studio · Global Market</div></div>
+  <div>
+    <div class="brand">JOY <span>CORPORATION</span></div>
+    <div class="badge">AI Product Studio · Global Market</div>
+  </div>
   <div class="badge" id="authStatus">Checking session…</div>
 </header>
 
@@ -58,162 +61,298 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   </nav>
 
   <main class="content">
+    <!-- CATALOG -->
     <section id="catalog" class="section active">
       <h2>Public Catalog</h2>
       <div class="notice">This page is for customers. Products become visible only after owner approval and QC.</div>
       <div class="catalog-grid" id="catalogGrid"></div>
     </section>
 
+    <!-- PRODUCTION -->
     <section id="production" class="section">
       <h2>Production Pipeline</h2>
       <div class="card">
-        <label>Product title</label><input id="pTitle" placeholder="AI Toolkit for Creators & Small Businesses">
+        <label>Product title</label>
+        <input id="pTitle" placeholder="AI Toolkit for Creators & Small Businesses">
         <label>Product type</label>
-        <select id="pType"><option>toolkit</option><option>ebook</option><option>prompt-pack</option><option>template</option></select>
-        <label>Product idea</label><textarea id="pIdea" rows="3" placeholder="Describe the customer outcome and contents"></textarea>
+        <select id="pType">
+          <option value="toolkit">toolkit</option>
+          <option value="ebook">ebook</option>
+          <option value="prompt-pack">prompt-pack</option>
+          <option value="template">template</option>
+        </select>
+        <label>Product idea</label>
+        <textarea id="pIdea" rows="3" placeholder="Describe the customer outcome and contents"></textarea>
         <button class="btn btn-gold" onclick="createProductionItem()">Create production item</button>
       </div>
-      <div class="card"><table><thead><tr><th>Title</th><th>Type</th><th>Status</th><th>Action</th></tr></thead><tbody id="productionBody"></tbody></table></div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th>Title</th><th>Type</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody id="productionBody"></tbody>
+        </table>
+      </div>
     </section>
 
+    <!-- ORDERS -->
     <section id="orders" class="section">
       <h2>Orders</h2>
-      <div class="card"><table><thead><tr><th>Date</th><th>Product</th><th>Amount</th><th>Provider</th><th>Status</th></tr></thead><tbody id="ordersBody"></tbody></table></div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Product</th><th>Amount</th><th>Provider</th><th>Status</th></tr>
+          </thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+      </div>
     </section>
 
+    <!-- AGENCY -->
     <section id="agency" class="section">
       <h2>Agency Workflow</h2>
       <div class="card">
-        <p style="font-size:.85rem;color:var(--muted)">Aperol researches demand → Walker drafts → Hendrick’s prepares assets → Absolut runs QC checklist → You approve → Martini publishes.</p>
+        <p style="font-size:.85rem;color:var(--muted)">
+          Aperol researches demand → Walker drafts → Hendrick’s prepares assets → Absolut runs QC checklist → You approve → Martini publishes.
+        </p>
       </div>
-      <div class="card"><table><thead><tr><th>Agent</th><th>Real responsibility</th></tr></thead><tbody>
-        <tr><td>Aperol</td><td>Market research and product idea validation</td></tr>
-        <tr><td>Walker</td><td>Creates outlines, drafts, and sales copy</td></tr>
-        <tr><td>Hendrick’s</td><td>Prepares templates and final downloadable assets</td></tr>
-        <tr><td>Absolut</td><td>Runs the QC checklist; cannot publish without owner approval</td></tr>
-        <tr><td>Martini</td><td>Publishes approved products and tracks conversion</td></tr>
-        <tr><td>Hennessy</td><td>Reports revenue, refunds, and margins</td></tr>
-      </tbody></table></div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Agent</th><th>Real responsibility</th></tr></thead>
+          <tbody>
+            <tr><td>Aperol</td><td>Market research and product idea validation</td></tr>
+            <tr><td>Walker</td><td>Creates outlines, drafts, and sales copy</td></tr>
+            <tr><td>Hendrick’s</td><td>Prepares templates and final downloadable assets</td></tr>
+            <tr><td>Absolut</td><td>Runs the QC checklist; cannot publish without owner approval</td></tr>
+            <tr><td>Martini</td><td>Publishes approved products and tracks conversion</td></tr>
+            <tr><td>Hennessy</td><td>Reports revenue, refunds, and margins</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
+    <!-- SETTINGS -->
     <section id="settings" class="section">
       <h2>Settings</h2>
       <div class="card">
-        <label>Supabase URL</label><input id="supabaseUrl" placeholder="https://nszdjbnoikdvqquhxrhe.supabase.co">
-        <label>Supabase anon public key</label><input id="supabaseKey" placeholder="Paste anon public key only">
+        <label>Supabase URL</label>
+        <input id="supabaseUrl" placeholder="https://nszdjbnoikdvqquhxrhe.supabase.co">
+        <label>Supabase anon public key</label>
+        <input id="supabaseKey" placeholder="Paste anon public key only">
         <button class="btn btn-gold" onclick="saveConfig()">Save connection</button>
-        <p class="notice" style="margin-top:12px">Never place service-role keys, PayPal secrets, Doku secrets, or AI provider keys in this browser app. Keep them in Vercel environment variables and Supabase Edge Function secrets.</p>
+        <p class="notice" style="margin-top:12px">
+          Never place service-role keys, PayPal secrets, Doku secrets, or AI provider keys in this browser app. Keep them in Vercel environment variables and Supabase Edge Function secrets.
+        </p>
       </div>
     </section>
   </main>
 </div>
 
 <script>
-const CONFIG_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU';
-let sb=null;
+  // ====================== CONFIG ======================
+  const STORAGE_KEY = 'joy_supabase_config';
+  let sb = null;
 
-function saveConfig(){
-  const url=document.getElementById('supabaseUrl').value.trim();
-  const key=document.getElementById('supabaseKey').value.trim();
-  if(!url||!key){alert('Enter both Supabase URL and anon public key.');return;}
-  localStorage.setItem(CONFIG_KEY,JSON.stringify({url,key}));
-  initSupabase();
-}
+  // ====================== INIT ======================
+  function saveConfig() {
+    const url = document.getElementById('supabaseUrl').value.trim();
+    const key = document.getElementById('supabaseKey').value.trim();
+    if (!url || !key) {
+      alert('Masukkan Supabase URL dan anon key.');
+      return;
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ url, key }));
+    initSupabase();
+    alert('Koneksi berhasil disimpan!');
+  }
 
-function initSupabase(){
-  const saved=JSON.parse(localStorage.getItem(CONFIG_KEY)||'null');
-  if(!saved){document.getElementById('authStatus').textContent='Connect Supabase in Settings';return;}
-  sb=window.supabase.createClient(saved.url,saved.key);
-  document.getElementById('authStatus').textContent='Supabase connected';
-  loadCatalog();loadProduction();loadOrders();
-}
+  function initSupabase() {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    if (!saved) {
+      document.getElementById('authStatus').textContent = 'Connect Supabase di Settings';
+      return;
+    }
 
-function setTab(tab){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
-  document.getElementById(tab).classList.add('active');
-  document.querySelector(`.menu[data-tab="${tab}"]`).classList.add('active');
-}
-document.querySelectorAll('.menu').forEach(m=>m.onclick=()=>setTab(m.dataset.tab));
+    // Isi form Settings otomatis
+    document.getElementById('supabaseUrl').value = saved.url || '';
+    document.getElementById('supabaseKey').value = saved.key || '';
 
-async function loadCatalog(){
-  const grid=document.getElementById('catalogGrid');grid.textContent='';
-  if(!sb){grid.textContent='Connect Supabase first.';return;}
-  const {data,error}=await sb.from('products').select('*').eq('status','published').order('created_at',{ascending:false});
-  if(error){grid.textContent='Unable to load products: '+error.message;return;}
-  if(!data.length){grid.textContent='No published products yet.';return;}
-  data.forEach(p=>{
-    const card=document.createElement('div');card.className='product';
-    const title=document.createElement('h3');title.textContent=p.title;
-    const desc=document.createElement('p');desc.style.cssText='font-size:.8rem;color:var(--muted)';desc.textContent=p.description;
-    const price=document.createElement('div');price.className='price';price.textContent='$'+Number(p.price_usd).toFixed(2);
-    const btn=document.createElement('button');btn.className='btn btn-gold';btn.textContent='Buy now';
-    btn.onclick=()=>startCheckout(p);
-    card.append(title,desc,price,btn);grid.appendChild(card);
-  });
-}
+    sb = window.supabase.createClient(saved.url, saved.key);
+    document.getElementById('authStatus').textContent = 'Supabase connected';
+    
+    loadCatalog();
+    loadProduction();
+    loadOrders();
+  }
 
-async function startCheckout(product){
-  if(!sb){alert('Connect Supabase first.');return;}
-  const email=prompt('Enter your email to receive the product:');
-  if(!email)return;
-  const {error}=await sb.from('orders').insert({product_id:product.id,customer_email:email,amount:product.price_usd,currency:'USD',payment_provider:'pending',payment_status:'pending'});
-  if(error){alert('Could not create order: '+error.message);return;}
-  alert('Order created. Connect PayPal/Doku checkout in the next build step.');
-}
+  // ====================== TABS ======================
+  function setTab(tab) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    document.querySelector(`.menu[data-tab="${tab}"]`).classList.add('active');
+  }
+  document.querySelectorAll('.menu').forEach(m => m.onclick = () => setTab(m.dataset.tab));
 
-async function loadProduction(){
-  const body=document.getElementById('productionBody');body.textContent='';
-  if(!sb)return;
-  const {data,error}=await sb.from('production_items').select('*').order('created_at',{ascending:false});
-  if(error){body.textContent='Error: '+error.message;return;}
-  data.forEach(item=>{
-    const tr=document.createElement('tr');
-    [item.title,item.product_type,item.status].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td);});
-    const td=document.createElement('td');
-    const btn=document.createElement('button');btn.className='btn';btn.textContent='Advance';
-    btn.onclick=()=>advanceStatus(item);
-    td.appendChild(btn);tr.appendChild(td);body.appendChild(tr);
-  });
-}
+  // ====================== CATALOG ======================
+  async function loadCatalog() {
+    const grid = document.getElementById('catalogGrid');
+    grid.innerHTML = '';
+    if (!sb) {
+      grid.textContent = 'Connect Supabase first.';
+      return;
+    }
 
-async function advanceStatus(item){
-  const flow=['idea','drafting','owner_review','qc','ready','published'];
-  const next=flow[Math.min(flow.indexOf(item.status)+1,flow.length-1)];
-  if(item.status==='qc'&&next==='ready'&&!confirm('Have you completed the full QC checklist?'))return;
-  const {error}=await sb.from('production_items').update({status:next}).eq('id',item.id);
-  if(error){alert(error.message);return;}
-  loadProduction();
-}
+    const { data, error } = await sb
+      .from('products')
+      .select('*')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false });
 
-async function createProductionItem(){
-  if(!sb){alert('Connect Supabase first.');return;}
-  const title=document.getElementById('pTitle').value.trim();
-  const type=document.getElementById('pType').value;
-  const idea=document.getElementById('pIdea').value.trim();
-  if(!title||!idea){alert('Enter a title and idea.');return;}
-  const {error}=await sb.from('production_items').insert({title,product_type:type,idea,status:'idea'});
-  if(error){alert(error.message);return;}
-  document.getElementById('pTitle').value='';document.getElementById('pIdea').value='';
-  loadProduction();
-}
+    if (error) {
+      grid.textContent = 'Error: ' + error.message;
+      return;
+    }
+    if (!data || data.length === 0) {
+      grid.textContent = 'Belum ada produk yang published.';
+      return;
+    }
 
-async function loadOrders(){
-  const body=document.getElementById('ordersBody');body.textContent='';
-  if(!sb)return;
-  const {data,error}=await sb.from('orders').select('*, products(title)').order('created_at',{ascending:false}).limit(50);
-  if(error){body.textContent='Error: '+error.message;return;}
-  data.forEach(o=>{
-    const tr=document.createElement('tr');
-    const date=new Date(o.created_at).toLocaleString();
-    [date,o.products?.title||'Product','$'+Number(o.amount).toFixed(2),o.payment_provider,o.payment_status].forEach(v=>{
-      const td=document.createElement('td');td.textContent=v;tr.appendChild(td);
+    data.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'product';
+      card.innerHTML = `
+        <h3>${p.title}</h3>
+        <p style="font-size:.8rem;color:var(--muted)">${p.description || ''}</p>
+        <div class="price">\[ {Number(p.price_usd).toFixed(2)}</div>
+        <button class="btn btn-gold" onclick='startCheckout(${JSON.stringify(p)})'>Buy now</button>
+      `;
+      grid.appendChild(card);
     });
-    body.appendChild(tr);
-  });
-}
+  }
 
-window.addEventListener('DOMContentLoaded',initSupabase);
+  async function startCheckout(product) {
+    if (!sb) return alert('Connect Supabase first.');
+    const email = prompt('Masukkan email untuk menerima produk:');
+    if (!email) return;
+
+    const { error } = await sb.from('orders').insert({
+      product_id: product.id,
+      customer_email: email,
+      amount: product.price_usd,
+      currency: 'USD',
+      payment_provider: 'pending',
+      payment_status: 'pending'
+    });
+
+    if (error) {
+      alert('Gagal membuat order: ' + error.message);
+      return;
+    }
+    alert('Order berhasil dibuat. Pembayaran otomatis akan ditambahkan di tahap berikutnya.');
+    loadOrders();
+  }
+
+  // ====================== PRODUCTION ======================
+  async function loadProduction() {
+    const body = document.getElementById('productionBody');
+    body.innerHTML = '';
+    if (!sb) return;
+
+    const { data, error } = await sb
+      .from('production_items')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      body.innerHTML = `<tr><td colspan="4">Error: ${error.message}</td></tr>`;
+      return;
+    }
+
+    data.forEach(item => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item.title}</td>
+        <td>${item.product_type || '-'}</td>
+        <td><span class="status \( {item.status}"> \){item.status}</span></td>
+        <td><button class="btn" onclick='advanceStatus(${JSON.stringify(item)})'>Advance</button></td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  async function createProductionItem() {
+    if (!sb) return alert('Connect Supabase first.');
+    const title = document.getElementById('pTitle').value.trim();
+    const type = document.getElementById('pType').value;
+    const idea = document.getElementById('pIdea').value.trim();
+
+    if (!title || !idea) return alert('Isi title dan idea dulu.');
+
+    const { error } = await sb.from('production_items').insert({
+      title,
+      product_type: type,
+      idea,
+      status: 'idea'
+    });
+
+    if (error) return alert(error.message);
+
+    document.getElementById('pTitle').value = '';
+    document.getElementById('pIdea').value = '';
+    loadProduction();
+  }
+
+  async function advanceStatus(item) {
+    const flow = ['idea', 'drafting', 'owner_review', 'qc', 'ready', 'published'];
+    const currentIndex = flow.indexOf(item.status);
+    const next = flow[Math.min(currentIndex + 1, flow.length - 1)];
+
+    if (item.status === 'qc' && next === 'ready') {
+      if (!confirm('Sudah selesai QC checklist?')) return;
+    }
+
+    const { error } = await sb
+      .from('production_items')
+      .update({ status: next })
+      .eq('id', item.id);
+
+    if (error) return alert(error.message);
+    loadProduction();
+  }
+
+  // ====================== ORDERS ======================
+  async function loadOrders() {
+    const body = document.getElementById('ordersBody');
+    body.innerHTML = '';
+    if (!sb) return;
+
+    const { data, error } = await sb
+      .from('orders')
+      .select('*, products(title)')
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error) {
+      body.innerHTML = `<tr><td colspan="5">Error: ${error.message}</td></tr>`;
+      return;
+    }
+
+    data.forEach(o => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${new Date(o.created_at).toLocaleString()}</td>
+        <td>${o.products?.title || 'Product'}</td>
+        <td> \]{Number(o.amount).toFixed(2)}</td>
+        <td>${o.payment_provider}</td>
+        <td>${o.payment_status}</td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  // ====================== START ======================
+  window.addEventListener('DOMContentLoaded', initSupabase);
 </script>
 </body>
 </html>
