@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>PERUSAHAAN JOY - Control Center</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#0d0f12;--panel:#14171d;--card:#1a1e26;--border:#2a303c;--text:#e0e0e0;--muted:#8b92a0;--gold:#c5a059;--green:#4caf50;--red:#ef4444}
 *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
@@ -51,7 +50,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     <div class="brand">PERUSAHAAN <span>JOY</span></div>
     <div class="badge">Studio Produk AI · Pasar Global</div>
   </div>
-  <div class="badge" id="authStatus">Memeriksa koneksi… (v3)</div>
+  <div class="badge" id="authStatus">Memeriksa koneksi… (v4)</div>
 </header>
 
 <div class="container">
@@ -134,22 +133,32 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
 </div>
 
 <script>
-  // URL proxy Vercel (pasti bisa diakses dari mana saja)
-  const PROXY_URL = '/api/proxy';
-  let sb = null;
+  const PROXY_BASE = '/api/proxy';
+  let connected = false;
 
-  function initSupabase() {
-    try {
-      // Buat Supabase client dengan URL proxy
-      sb = window.supabase.createClient(PROXY_URL, 'proxy-key');
-      document.getElementById('authStatus').textContent = 'Terhubung via Proxy (v3)';
-      loadCatalog();
-      loadProduction();
-      loadOrders();
-    } catch (err) {
-      document.getElementById('authStatus').textContent = 'Gagal terhubung (v3)';
-      console.error(err);
+  // Helper: fetch ke proxy
+  async function apiFetch(path, options = {}) {
+    const url = `${PROXY_BASE}/${path}`;
+    const res = await fetch(url, {
+      method: options.method || 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: options.body ? JSON.stringify(options.body) : undefined,
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`HTTP ${res.status}: ${err}`);
     }
+    return res.json();
+  }
+
+  function initApp() {
+    connected = true;
+    document.getElementById('authStatus').textContent = 'Terhubung via Proxy (v4)';
+    loadCatalog();
+    loadProduction();
+    loadOrders();
   }
 
   function setTab(tab) {
@@ -163,18 +172,13 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   async function loadCatalog() {
     const grid = document.getElementById('catalogGrid');
     grid.innerHTML = '';
-    if (!sb) {
+    if (!connected) {
       grid.innerHTML = '<p style="color:var(--muted)">Belum terhubung.</p>';
       return;
     }
     try {
-      const { data, error } = await sb
-        .from('products')
-        .select('*')
-        .eq('status', 'published')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
+      // GET /rest/v1/products?select=*&status=eq.published&order=created_at.desc
+      const data = await apiFetch('rest/v1/products?select=*&status=eq.published&order=created_at.desc');
       
       if (!data || data.length === 0) {
         grid.innerHTML = '<p style="color:var(--muted)">Belum ada produk yang dipublikasikan.</p>';
@@ -212,21 +216,22 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   }
 
   async function startCheckout(product) {
-    if (!sb) return alert('Belum terhubung.');
+    if (!connected) return alert('Belum terhubung.');
     const email = prompt('Masukkan email untuk menerima produk:');
     if (!email) return;
     
     try {
-      const { error } = await sb.from('orders').insert({
-        product_id: product.id,
-        customer_email: email,
-        amount: product.price_usd,
-        currency: 'USD',
-        payment_provider: 'pending',
-        payment_status: 'pending'
+      await apiFetch('rest/v1/orders', {
+        method: 'POST',
+        body: {
+          product_id: product.id,
+          customer_email: email,
+          amount: product.price_usd,
+          currency: 'USD',
+          payment_provider: 'pending',
+          payment_status: 'pending'
+        }
       });
-      
-      if (error) throw error;
       alert('Pesanan dibuat. Pembayaran otomatis menyusul (Tahap 9).');
       loadOrders();
     } catch (err) {
@@ -237,15 +242,10 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   async function loadProduction() {
     const body = document.getElementById('productionBody');
     body.innerHTML = '';
-    if (!sb) return;
+    if (!connected) return;
     
     try {
-      const { data, error } = await sb
-        .from('production_items')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
+      const data = await apiFetch('rest/v1/production_items?select=*&order=created_at.desc');
       
       if (!data || data.length === 0) {
         body.innerHTML = '<tr><td colspan="4" style="color:var(--muted)">Belum ada item produksi.</td></tr>';
@@ -283,7 +283,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   }
 
   async function createProductionItem() {
-    if (!sb) return alert('Belum terhubung.');
+    if (!connected) return alert('Belum terhubung.');
     
     const title = document.getElementById('pTitle').value.trim();
     const type = document.getElementById('pType').value;
@@ -292,14 +292,15 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     if (!title || !idea) return alert('Isi judul dan ide produk dulu.');
     
     try {
-      const { error } = await sb.from('production_items').insert({
-        title,
-        product_type: type,
-        idea,
-        status: 'idea'
+      await apiFetch('rest/v1/production_items', {
+        method: 'POST',
+        body: {
+          title,
+          product_type: type,
+          idea,
+          status: 'idea'
+        }
       });
-      
-      if (error) throw error;
       
       document.getElementById('pTitle').value = '';
       document.getElementById('pIdea').value = '';
@@ -316,12 +317,10 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     if (item.status === 'qc' && next === 'ready' && !confirm('Sudah selesai checklist QC?')) return;
     
     try {
-      const { error } = await sb
-        .from('production_items')
-        .update({ status: next })
-        .eq('id', item.id);
-      
-      if (error) throw error;
+      await apiFetch(`rest/v1/production_items?id=eq.${item.id}`, {
+        method: 'PATCH',
+        body: { status: next }
+      });
       loadProduction();
     } catch (err) {
       alert(err.message);
@@ -331,16 +330,10 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   async function loadOrders() {
     const body = document.getElementById('ordersBody');
     body.innerHTML = '';
-    if (!sb) return;
+    if (!connected) return;
     
     try {
-      const { data, error } = await sb
-        .from('orders')
-        .select('*, products(title)')
-        .order('created_at', { ascending: false })
-        .limit(50);
-      
-      if (error) throw error;
+      const data = await apiFetch('rest/v1/orders?select=*,products(title)&order=created_at.desc&limit=50');
       
       if (!data || data.length === 0) {
         body.innerHTML = '<tr><td colspan="5" style="color:var(--muted)">Belum ada pesanan.</td></tr>';
@@ -361,7 +354,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     }
   }
 
-  window.addEventListener('DOMContentLoaded', initSupabase);
+  window.addEventListener('DOMContentLoaded', initApp);
 </script>
 </body>
 </html>
