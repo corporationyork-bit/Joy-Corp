@@ -23,13 +23,14 @@ h2{color:var(--gold);margin-bottom:16px;font-size:1.15rem}
 .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
 .btn{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:.8rem}
 .btn-gold{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
+.btn-green{background:transparent;border-color:var(--green);color:var(--green)}
 input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:#fff;padding:10px;border-radius:6px;margin:6px 0 12px}
 label{font-size:.78rem;color:var(--muted)}
 table{width:100%;border-collapse:collapse;font-size:.82rem}
 th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
 .status{padding:3px 8px;border-radius:4px;font-size:.7rem;font-weight:700}
-.published{background:rgba(76,175,80,.2);color:var(--green)}
-.idea,.drafting,.owner_review,.qc,.ready{background:rgba(197,160,89,.2);color:var(--gold)}
+.published,.paid{background:rgba(76,175,80,.2);color:var(--green)}
+.idea,.drafting,.owner_review,.qc,.ready,.pending{background:rgba(197,160,89,.2);color:var(--gold)}
 .catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
 .product{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
 .product h3{color:#fff;font-size:.95rem;margin-bottom:6px}
@@ -50,7 +51,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     <div class="brand">PERUSAHAAN <span>JOY</span></div>
     <div class="badge">Studio Produk AI · Pasar Global</div>
   </div>
-  <div class="badge" id="authStatus">Memeriksa koneksi… (v4)</div>
+  <div class="badge" id="authStatus">Memeriksa Supabase… (v4)</div>
 </header>
 
 <div class="container">
@@ -97,7 +98,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
       <h2>Pesanan</h2>
       <div class="card">
         <table>
-          <thead><tr><th>Tanggal</th><th>Produk</th><th>Jumlah</th><th>Provider</th><th>Status</th></tr></thead>
+          <thead><tr><th>Tanggal</th><th>Produk</th><th>Jumlah</th><th>Provider</th><th>Status</th><th>Aksi</th></tr></thead>
           <tbody id="ordersBody"></tbody>
         </table>
       </div>
@@ -126,7 +127,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     <section id="settings" class="section">
       <h2>Pengaturan</h2>
       <div class="card">
-        <p style="color:var(--muted);font-size:.85rem">✅ Menggunakan Vercel API Proxy — tidak perlu konfigurasi tambahan.</p>
+        <p style="color:var(--muted);font-size:.85rem">✅ Terhubung ke Supabase melalui endpoint proxy <code>/api/proxy</code>.</p>
+        <button class="btn" style="margin-top:10px" onclick="initApp()">Cek Ulang Koneksi Supabase</button>
       </div>
     </section>
   </main>
@@ -136,29 +138,52 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   const PROXY_BASE = '/api/proxy';
   let connected = false;
 
-  // Helper: fetch ke proxy
   async function apiFetch(path, options = {}) {
-    const url = `${PROXY_BASE}/${path}`;
+    const cleanPath = path.replace(/^\/+/, '');
+    const url = `${PROXY_BASE}/${cleanPath}`;
+    const headers = {
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...(options.headers || {})
+    };
+
     const res = await fetch(url, {
       method: options.method || 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: options.body ? JSON.stringify(options.body) : undefined,
     });
+
     if (!res.ok) {
       const err = await res.text();
       throw new Error(`HTTP ${res.status}: ${err}`);
     }
-    return res.json();
+
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
   }
 
-  function initApp() {
-    connected = true;
-    document.getElementById('authStatus').textContent = 'Terhubung via Proxy (v4)';
-    loadCatalog();
-    loadProduction();
-    loadOrders();
+  function setAuthStatus(text, color) {
+    const el = document.getElementById('authStatus');
+    el.textContent = text;
+    el.style.color = color || 'var(--muted)';
+  }
+
+  async function initApp() {
+    connected = false;
+    setAuthStatus('Memeriksa Supabase… (v4)', 'var(--muted)');
+
+    try {
+      await apiFetch('rest/v1/products?select=id&limit=1');
+      connected = true;
+      setAuthStatus('Supabase Terhubung (v4)', 'var(--green)');
+      await Promise.all([loadCatalog(), loadProduction(), loadOrders()]);
+    } catch (err) {
+      connected = false;
+      setAuthStatus(`Supabase Gagal (${err.message.split(':')[0]})`, 'var(--red)');
+      document.getElementById('catalogGrid').innerHTML =
+        '<p style="color:var(--red)">Koneksi Supabase via /api/proxy bermasalah: ' + escapeHtml(err.message) + '</p>';
+      console.error('Supabase connection error:', err);
+    }
   }
 
   function setTab(tab) {
@@ -173,66 +198,67 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     const grid = document.getElementById('catalogGrid');
     grid.innerHTML = '';
     if (!connected) {
-      grid.innerHTML = '<p style="color:var(--muted)">Belum terhubung.</p>';
+      grid.innerHTML = '<p style="color:var(--muted)">Supabase belum terhubung.</p>';
       return;
     }
+
     try {
-      // GET /rest/v1/products?select=*&status=eq.published&order=created_at.desc
       const data = await apiFetch('rest/v1/products?select=*&status=eq.published&order=created_at.desc');
-      
+
       if (!data || data.length === 0) {
         grid.innerHTML = '<p style="color:var(--muted)">Belum ada produk yang dipublikasikan.</p>';
         return;
       }
-      
+
       data.forEach(p => {
         const card = document.createElement('div');
         card.className = 'product';
-        
+
         const h3 = document.createElement('h3');
         h3.textContent = p.title || 'Tanpa Judul';
-        
+
         const pd = document.createElement('p');
         pd.style.fontSize = '.8rem';
         pd.style.color = 'var(--muted)';
         pd.textContent = p.description || '';
-        
+
         const price = document.createElement('div');
         price.className = 'price';
         price.textContent = '$' + Number(p.price_usd || 0).toFixed(2);
-        
+
         const btn = document.createElement('button');
         btn.className = 'btn btn-gold';
         btn.textContent = 'Beli Sekarang';
         btn.addEventListener('click', () => startCheckout(p));
-        
+
         card.append(h3, pd, price, btn);
         grid.appendChild(card);
       });
     } catch (err) {
-      grid.innerHTML = '<p style="color:var(--red)">Kesalahan: ' + err.message + '</p>';
+      grid.innerHTML = '<p style="color:var(--red)">Kesalahan: ' + escapeHtml(err.message) + '</p>';
       console.error(err);
     }
   }
 
   async function startCheckout(product) {
-    if (!connected) return alert('Belum terhubung.');
+    if (!connected) return alert('Supabase belum terhubung.');
     const email = prompt('Masukkan email untuk menerima produk:');
     if (!email) return;
-    
+
     try {
-      await apiFetch('rest/v1/orders', {
+      const created = await apiFetch('rest/v1/orders', {
         method: 'POST',
         body: {
           product_id: product.id,
-          customer_email: email,
+          customer_email: email.trim(),
           amount: product.price_usd,
           currency: 'USD',
           payment_provider: 'pending',
           payment_status: 'pending'
         }
       });
-      alert('Pesanan dibuat. Pembayaran otomatis menyusul (Tahap 9).');
+      const orderId = Array.isArray(created) && created[0] ? created[0].id : '';
+      alert('Pesanan dibuat.' + (orderId ? ' Link unduhan: download.html?order=' + encodeURIComponent(orderId) : ''));
       loadOrders();
     } catch (err) {
       alert('Gagal: ' + err.message);
@@ -243,54 +269,58 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     const body = document.getElementById('productionBody');
     body.innerHTML = '';
     if (!connected) return;
-    
+
     try {
       const data = await apiFetch('rest/v1/production_items?select=*&order=created_at.desc');
-      
+
       if (!data || data.length === 0) {
         body.innerHTML = '<tr><td colspan="4" style="color:var(--muted)">Belum ada item produksi.</td></tr>';
         return;
       }
-      
+
       data.forEach(item => {
         const tr = document.createElement('tr');
-        
+
         const c1 = document.createElement('td');
         c1.textContent = item.title;
-        
+
         const c2 = document.createElement('td');
         c2.textContent = item.product_type || '-';
-        
+
         const c3 = document.createElement('td');
         const sp = document.createElement('span');
         sp.className = 'status ' + item.status;
         sp.textContent = item.status;
         c3.appendChild(sp);
-        
+
         const c4 = document.createElement('td');
-        const btn = document.createElement('button');
-        btn.className = 'btn';
-        btn.textContent = 'Majukan';
-        btn.addEventListener('click', () => advanceStatus(item));
-        c4.appendChild(btn);
-        
+        if (item.status !== 'published') {
+          const btn = document.createElement('button');
+          btn.className = 'btn';
+          btn.textContent = item.status === 'ready' ? 'Publikasikan' : 'Majukan';
+          btn.addEventListener('click', () => advanceStatus(item));
+          c4.appendChild(btn);
+        } else {
+          c4.innerHTML = '<span style="font-size:.75rem;color:var(--green)">Tayang</span>';
+        }
+
         tr.append(c1, c2, c3, c4);
         body.appendChild(tr);
       });
     } catch (err) {
-      body.innerHTML = '<tr><td colspan="4" style="color:var(--red)">Error: ' + err.message + '</td></tr>';
+      body.innerHTML = '<tr><td colspan="4" style="color:var(--red)">Error: ' + escapeHtml(err.message) + '</td></tr>';
     }
   }
 
   async function createProductionItem() {
-    if (!connected) return alert('Belum terhubung.');
-    
+    if (!connected) return alert('Supabase belum terhubung.');
+
     const title = document.getElementById('pTitle').value.trim();
     const type = document.getElementById('pType').value;
     const idea = document.getElementById('pIdea').value.trim();
-    
+
     if (!title || !idea) return alert('Isi judul dan ide produk dulu.');
-    
+
     try {
       await apiFetch('rest/v1/production_items', {
         method: 'POST',
@@ -301,7 +331,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
           status: 'idea'
         }
       });
-      
+
       document.getElementById('pTitle').value = '';
       document.getElementById('pIdea').value = '';
       loadProduction();
@@ -313,14 +343,36 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   async function advanceStatus(item) {
     const flow = ['idea', 'drafting', 'owner_review', 'qc', 'ready', 'published'];
     const next = flow[Math.min(flow.indexOf(item.status) + 1, flow.length - 1)];
-    
+
     if (item.status === 'qc' && next === 'ready' && !confirm('Sudah selesai checklist QC?')) return;
-    
+
+    let priceUsd = null;
+    if (next === 'published') {
+      const rawPrice = prompt('Setujui & masukkan harga jual produk (USD):', '29.00');
+      if (rawPrice === null) return;
+      priceUsd = parseFloat(rawPrice);
+      if (isNaN(priceUsd) || priceUsd <= 0) return alert('Harga USD tidak valid.');
+    }
+
     try {
-      await apiFetch(`rest/v1/production_items?id=eq.${item.id}`, {
+      await apiFetch(`rest/v1/production_items?id=eq.${encodeURIComponent(item.id)}`, {
         method: 'PATCH',
         body: { status: next }
       });
+
+      if (next === 'published') {
+        await apiFetch('rest/v1/products', {
+          method: 'POST',
+          body: {
+            title: item.title,
+            description: item.idea || '',
+            price_usd: priceUsd,
+            status: 'published'
+          }
+        });
+        loadCatalog();
+      }
+
       loadProduction();
     } catch (err) {
       alert(err.message);
@@ -331,27 +383,38 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     const body = document.getElementById('ordersBody');
     body.innerHTML = '';
     if (!connected) return;
-    
+
     try {
       const data = await apiFetch('rest/v1/orders?select=*,products(title)&order=created_at.desc&limit=50');
-      
+
       if (!data || data.length === 0) {
-        body.innerHTML = '<tr><td colspan="5" style="color:var(--muted)">Belum ada pesanan.</td></tr>';
+        body.innerHTML = '<tr><td colspan="6" style="color:var(--muted)">Belum ada pesanan.</td></tr>';
         return;
       }
-      
+
       data.forEach(o => {
         const tr = document.createElement('tr');
-        tr.innerHTML = '<td>' + new Date(o.created_at).toLocaleString('id-ID') + '</td>' +
-          '<td>' + (o.products && o.products.title || 'Produk') + '</td>' +
+        const prodTitle = (o.products && o.products.title) || 'Produk';
+        const dlUrl = `download.html?order=${encodeURIComponent(o.id)}`;
+
+        tr.innerHTML =
+          '<td>' + escapeHtml(new Date(o.created_at).toLocaleString('id-ID')) + '</td>' +
+          '<td>' + escapeHtml(prodTitle) + '</td>' +
           '<td>$' + Number(o.amount).toFixed(2) + '</td>' +
-          '<td>' + o.payment_provider + '</td>' +
-          '<td>' + o.payment_status + '</td>';
+          '<td>' + escapeHtml(o.payment_provider) + '</td>' +
+          '<td><span class="status ' + escapeHtml(o.payment_status) + '">' + escapeHtml(o.payment_status) + '</span></td>' +
+          '<td><a class="btn" href="' + dlUrl + '" target="_blank" rel="noopener">Unduh</a></td>';
         body.appendChild(tr);
       });
     } catch (err) {
-      body.innerHTML = '<tr><td colspan="5" style="color:var(--red)">Error: ' + err.message + '</td></tr>';
+      body.innerHTML = '<tr><td colspan="6" style="color:var(--red)">Error: ' + escapeHtml(err.message) + '</td></tr>';
     }
+  }
+
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, m => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[m]));
   }
 
   window.addEventListener('DOMContentLoaded', initApp);
