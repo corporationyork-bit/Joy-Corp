@@ -55,7 +55,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     <div class="brand">JOY <span>CORPORATION</span></div>
     <div class="tagline">"Kami ada karena kamu Ade"</div>
   </div>
-  <div class="badge" id="authStatus">Memeriksa Supabase… (v5)</div>
+  <div class="badge" id="authStatus">Memeriksa Supabase…</div>
 </header>
 
 <div class="container">
@@ -129,15 +129,18 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     </section>
 
     <section id="settings" class="section">
-      <h2>Pengaturan Koneksi Backend</h2>
+      <h2>Pengaturan Koneksi Supabase</h2>
       <div class="card">
-        <label>URL Server Proxy (Vercel / Render)</label>
-        <input id="backendUrlInput" placeholder="https://nama-project-kamu.vercel.app">
+        <label>Supabase Project URL</label>
+        <input id="supabaseUrlInput" placeholder="https://nszdjbnoikdvqquhxrhe.supabase.co">
+        <label>Supabase Anon Key</label>
+        <input id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
         <div class="hint">
-          Wajib diisi jika kamu membuka aplikasi dari <b>GitHub Pages (github.io)</b>, karena GitHub Pages tidak menjalankan folder <code>/api/proxy</code>. Kosongkan jika kamu membuka langsung dari domain Vercel/Render kamu.
+          Sudah tertanam otomatis ke proyek Supabase JOY CORPORATION. Kosongkan lalu simpan jika ingin mengembalikan ke konfigurasi bawaan.
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-gold" onclick="saveBackendUrl()">Simpan & Hubungkan</button>
+          <button class="btn btn-gold" onclick="saveSupabaseConfig()">Simpan & Hubungkan</button>
+          <button class="btn" onclick="resetSupabaseConfig()">Reset Bawaan</button>
           <button class="btn" onclick="initApp()">Cek Ulang Koneksi</button>
         </div>
         <p id="activeEndpointInfo" style="margin-top:12px;font-size:.76rem;color:var(--muted)"></p>
@@ -146,66 +149,55 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   </main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const BACKEND_STORAGE_KEY = 'joy_corp_backend_url';
+  const DEFAULT_SUPABASE_URL = 'https://nszdjbnoikdvqquhxrhe.supabase.co';
+  const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU';
+
+  const SUPABASE_URL_KEY = 'joy_supabase_url';
+  const SUPABASE_ANON_KEY = 'joy_supabase_anon_key';
+
+  let sb = null;
   let connected = false;
 
-  function getProxyBase() {
-    const saved = (localStorage.getItem(BACKEND_STORAGE_KEY) || '').trim().replace(/\/+$/, '');
-    if (saved) {
-      return saved.endsWith('/api/proxy') ? saved : `${saved}/api/proxy`;
-    }
-    return '/api/proxy';
+  function getSupabaseConfig() {
+    const customUrl = (localStorage.getItem(SUPABASE_URL_KEY) || '').trim().replace(/\/+$/, '');
+    const customKey = (localStorage.getItem(SUPABASE_ANON_KEY) || '').trim();
+    return {
+      url: customUrl || DEFAULT_SUPABASE_URL,
+      anonKey: customKey || DEFAULT_SUPABASE_ANON_KEY
+    };
   }
 
   function updateEndpointInfo() {
-    const base = getProxyBase();
-    const isGitHubPages = location.hostname.endsWith('github.io');
+    const { url } = getSupabaseConfig();
     const infoEl = document.getElementById('activeEndpointInfo');
     if (infoEl) {
-      infoEl.textContent = `Endpoint aktif saat ini: ${base}` +
-        (isGitHubPages && base === '/api/proxy'
-          ? ' (⚠️ Terdeteksi GitHub Pages: masukkan URL Vercel/Render di atas agar tidak 404)'
-          : '');
+      infoEl.textContent = 'Koneksi langsung Supabase aktif: ' + url;
     }
   }
 
-  function saveBackendUrl() {
-    const val = document.getElementById('backendUrlInput').value.trim().replace(/\/+$/, '');
-    if (val && !/^https?:\/\//i.test(val)) {
-      return alert('URL harus diawali dengan https:// (contoh: https://joy-corp.vercel.app)');
+  function saveSupabaseConfig() {
+    const urlVal = document.getElementById('supabaseUrlInput').value.trim().replace(/\/+$/, '');
+    const keyVal = document.getElementById('supabaseKeyInput').value.trim();
+
+    if (urlVal && !/^https?:\/\//i.test(urlVal)) {
+      return alert('URL Supabase harus diawali dengan https://');
     }
-    if (val) {
-      localStorage.setItem(BACKEND_STORAGE_KEY, val);
-    } else {
-      localStorage.removeItem(BACKEND_STORAGE_KEY);
-    }
-    updateEndpointInfo();
+
+    if (urlVal) localStorage.setItem(SUPABASE_URL_KEY, urlVal);
+    else localStorage.removeItem(SUPABASE_URL_KEY);
+
+    if (keyVal) localStorage.setItem(SUPABASE_ANON_KEY, keyVal);
+    else localStorage.removeItem(SUPABASE_ANON_KEY);
+
     initApp();
   }
 
-  async function apiFetch(path, options = {}) {
-    const cleanPath = path.replace(/^\/+/, '');
-    const url = `${getProxyBase()}/${cleanPath}`;
-    const headers = {
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation',
-      ...(options.headers || {})
-    };
-
-    const res = await fetch(url, {
-      method: options.method || 'GET',
-      headers,
-      body: options.body ? JSON.stringify(options.body) : undefined,
-    });
-
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(`HTTP ${res.status}: ${err}`);
-    }
-
-    const text = await res.text();
-    return text ? JSON.parse(text) : null;
+  function resetSupabaseConfig() {
+    localStorage.removeItem(SUPABASE_URL_KEY);
+    localStorage.removeItem(SUPABASE_ANON_KEY);
+    initApp();
   }
 
   function setAuthStatus(text, color) {
@@ -216,33 +208,33 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
 
   async function initApp() {
     connected = false;
-    document.getElementById('backendUrlInput').value = localStorage.getItem(BACKEND_STORAGE_KEY) || '';
+    const cfg = getSupabaseConfig();
+    document.getElementById('supabaseUrlInput').value = localStorage.getItem(SUPABASE_URL_KEY) || '';
+    document.getElementById('supabaseKeyInput').value = localStorage.getItem(SUPABASE_ANON_KEY) || '';
     updateEndpointInfo();
 
-    const isGitHubPages = location.hostname.endsWith('github.io');
-    const hasCustomBackend = Boolean((localStorage.getItem(BACKEND_STORAGE_KEY) || '').trim());
-
-    if (isGitHubPages && !hasCustomBackend) {
-      setAuthStatus('Perlu URL Backend (Pengaturan)', 'var(--gold)');
-      document.getElementById('catalogGrid').innerHTML =
-        '<div class="notice">Kamu membuka Joy Corp melalui <b>GitHub Pages</b>. Buka tab <b>Pengaturan</b> lalu masukkan URL deployment <b>Vercel / Render</b> kamu (tempat folder <code>/api/proxy</code> berjalan) agar terhubung ke Supabase.</div>';
-      return;
-    }
-
-    setAuthStatus('Memeriksa Supabase… (v5)', 'var(--muted)');
+    setAuthStatus('Memeriksa Supabase…', 'var(--muted)');
 
     try {
-      await apiFetch('rest/v1/products?select=id&limit=1');
+      if (!window.supabase || !window.supabase.createClient) {
+        throw new Error('SDK Supabase gagal dimuat');
+      }
+      sb = window.supabase.createClient(cfg.url, cfg.anonKey, {
+        auth: { persistSession: false, autoRefreshToken: false }
+      });
+
+      const { error } = await sb.from('products').select('id').limit(1);
+      if (error) throw new Error(error.message);
+
       connected = true;
-      setAuthStatus('Supabase Terhubung (v5)', 'var(--green)');
+      setAuthStatus('Supabase Terhubung', 'var(--green)');
       await Promise.all([loadCatalog(), loadProduction(), loadOrders()]);
     } catch (err) {
       connected = false;
-      const code = err.message.split(':')[0];
-      setAuthStatus(`Supabase Gagal (${code})`, 'var(--red)');
+      setAuthStatus('Supabase Gagal', 'var(--red)');
       document.getElementById('catalogGrid').innerHTML =
-        '<p style="color:var(--red);font-size:.85rem">Gagal terhubung ke Supabase lewat <code>' +
-        escapeHtml(getProxyBase()) + '</code>.<br>Detail: ' + escapeHtml(err.message.slice(0, 220)) + '</p>';
+        '<p style="color:var(--red);font-size:.85rem">Gagal terhubung langsung ke Supabase (' +
+        escapeHtml(cfg.url) + ').<br>Detail: ' + escapeHtml(err.message) + '</p>';
       console.error('Supabase connection error:', err);
     }
   }
@@ -258,13 +250,19 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   async function loadCatalog() {
     const grid = document.getElementById('catalogGrid');
     grid.innerHTML = '';
-    if (!connected) {
+    if (!connected || !sb) {
       grid.innerHTML = '<p style="color:var(--muted)">Supabase belum terhubung.</p>';
       return;
     }
 
     try {
-      const data = await apiFetch('rest/v1/products?select=*&status=eq.published&order=created_at.desc');
+      const { data, error } = await sb
+        .from('products')
+        .select('*')
+        .eq('status', 'published')
+        .order('created_at', { ascending: false });
+
+      if (error) throw new Error(error.message);
 
       if (!data || data.length === 0) {
         grid.innerHTML = '<p style="color:var(--muted)">Belum ada produk yang dipublikasikan.</p>';
@@ -301,23 +299,25 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   }
 
   async function startCheckout(product) {
-    if (!connected) return alert('Supabase belum terhubung.');
+    if (!connected || !sb) return alert('Supabase belum terhubung.');
     const email = prompt('Masukkan email untuk menerima produk:');
     if (!email) return;
 
     try {
-      const created = await apiFetch('rest/v1/orders', {
-        method: 'POST',
-        body: {
+      const { data, error } = await sb
+        .from('orders')
+        .insert([{
           product_id: product.id,
           customer_email: email.trim(),
           amount: product.price_usd,
           currency: 'USD',
           payment_provider: 'pending',
           payment_status: 'pending'
-        }
-      });
-      const orderId = Array.isArray(created) && created[0] ? created[0].id : '';
+        }])
+        .select();
+
+      if (error) throw new Error(error.message);
+      const orderId = Array.isArray(data) && data[0] ? data[0].id : '';
       alert('Pesanan dibuat.' + (orderId ? ' Link unduhan: download.html?order=' + encodeURIComponent(orderId) : ''));
       loadOrders();
     } catch (err) {
@@ -328,10 +328,15 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   async function loadProduction() {
     const body = document.getElementById('productionBody');
     body.innerHTML = '';
-    if (!connected) return;
+    if (!connected || !sb) return;
 
     try {
-      const data = await apiFetch('rest/v1/production_items?select=*&order=created_at.desc');
+      const { data, error } = await sb
+        .from('production_items')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw new Error(error.message);
 
       if (!data || data.length === 0) {
         body.innerHTML = '<tr><td colspan="4" style="color:var(--muted)">Belum ada item produksi.</td></tr>';
@@ -373,7 +378,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   }
 
   async function createProductionItem() {
-    if (!connected) return alert('Supabase belum terhubung.');
+    if (!connected || !sb) return alert('Supabase belum terhubung.');
 
     const title = document.getElementById('pTitle').value.trim();
     const type = document.getElementById('pType').value;
@@ -382,15 +387,16 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     if (!title || !idea) return alert('Isi judul dan ide produk dulu.');
 
     try {
-      await apiFetch('rest/v1/production_items', {
-        method: 'POST',
-        body: {
+      const { error } = await sb
+        .from('production_items')
+        .insert([{
           title,
           product_type: type,
           idea,
           status: 'idea'
-        }
-      });
+        }]);
+
+      if (error) throw new Error(error.message);
 
       document.getElementById('pTitle').value = '';
       document.getElementById('pIdea').value = '';
@@ -401,6 +407,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   }
 
   async function advanceStatus(item) {
+    if (!connected || !sb) return alert('Supabase belum terhubung.');
+
     const flow = ['idea', 'drafting', 'owner_review', 'qc', 'ready', 'published'];
     const next = flow[Math.min(flow.indexOf(item.status) + 1, flow.length - 1)];
 
@@ -415,21 +423,24 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     }
 
     try {
-      await apiFetch(`rest/v1/production_items?id=eq.${encodeURIComponent(item.id)}`, {
-        method: 'PATCH',
-        body: { status: next }
-      });
+      const { error } = await sb
+        .from('production_items')
+        .update({ status: next })
+        .eq('id', item.id);
+
+      if (error) throw new Error(error.message);
 
       if (next === 'published') {
-        await apiFetch('rest/v1/products', {
-          method: 'POST',
-          body: {
+        const { error: prodErr } = await sb
+          .from('products')
+          .insert([{
             title: item.title,
             description: item.idea || '',
             price_usd: priceUsd,
             status: 'published'
-          }
-        });
+          }]);
+
+        if (prodErr) throw new Error(prodErr.message);
         loadCatalog();
       }
 
@@ -442,10 +453,16 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   async function loadOrders() {
     const body = document.getElementById('ordersBody');
     body.innerHTML = '';
-    if (!connected) return;
+    if (!connected || !sb) return;
 
     try {
-      const data = await apiFetch('rest/v1/orders?select=*,products(title)&order=created_at.desc&limit=50');
+      const { data, error } = await sb
+        .from('orders')
+        .select('*,products(title)')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw new Error(error.message);
 
       if (!data || data.length === 0) {
         body.innerHTML = '<tr><td colspan="6" style="color:var(--muted)">Belum ada pesanan.</td></tr>';
