@@ -8,22 +8,26 @@ export default async function handler(req, res) {
   }
 
   const pathSegments = req.query.path || [];
-  const path = Array.isArray(pathSegments) ? pathSegments.join('/') : pathSegments;
+  const rawPath = Array.isArray(pathSegments) ? pathSegments.join('/') : String(pathSegments || '');
+  const cleanPath = rawPath.replace(/^\/+/, '');
 
-  const url = new URL(req.url, `https://${req.headers.host}`);
+  const host = req.headers.host || 'localhost';
+  const protocol = req.headers['x-forwarded-proto'] || 'https';
+  const url = new URL(req.url, `${protocol}://${host}`);
   const queryString = url.search;
 
-  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const rawSupabaseUrl = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
-  if (!SUPABASE_URL || !SUPABASE_KEY) {
+  if (!rawSupabaseUrl || !SUPABASE_KEY) {
     return res.status(500).json({
       error: 'Server misconfigured',
       message: 'SUPABASE_URL atau SUPABASE_KEY belum di-set di Environment Variables'
     });
   }
 
-  const targetUrl = `\( {SUPABASE_URL}/ \){path}${queryString}`;
+  const SUPABASE_URL = rawSupabaseUrl.replace(/\/+$/, '');
+  const targetUrl = `${SUPABASE_URL}/${cleanPath}${queryString}`;
 
   try {
     const headers = {
@@ -37,7 +41,7 @@ export default async function handler(req, res) {
     }
 
     let body = undefined;
-    if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
+    if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body !== undefined) {
       body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
     }
 
@@ -56,7 +60,6 @@ export default async function handler(req, res) {
     }
 
     return res.send(responseText);
-
   } catch (error) {
     console.error('[Proxy Error]', error.message);
     return res.status(500).json({
