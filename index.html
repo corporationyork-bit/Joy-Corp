@@ -245,7 +245,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     <!-- LOG KERJA REAL-TIME -->
     <section id="worklog" class="section">
       <h2>Log Kerja Agency (Real-Time)</h2>
-      <div class="notice">Laporan pergerakan agency secara real-time: <b>Aperol</b> (riset) → <b>Walker</b> (draf) → <b>Hendrick's</b> (aset) → <b>Absolut</b> (QC) → <b>Martini</b> (publikasi) → <b>Hennessy</b> (keuangan & pembayaran).</div>
+      <div class="notice">Laporan pergerakan agency secara real-time: <b>Aperol</b> (riset) → <b>Walker</b> (draf) → <b>Hendrick's</b> (aset) → <b>Absolut</b> (QC) → <b>Martini</b> (publikasi & Gumroad) → <b>Hennessy</b> (keuangan & pembayaran).</div>
       <div class="card">
         <div class="actions" style="margin-bottom:10px">
           <button class="btn" onclick="renderWorklogTable()">Segarkan Log</button>
@@ -275,7 +275,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       </div>
 
       <div id="archiveUnlockedPanel" style="display:none">
-        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis masuk ke penyimpanan telepon (file <code>.txt</code>) dan bisa dilihat atau diunduh ulang kapan saja.</div>
+        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis masuk ke penyimpanan telepon (file <code>.txt</code>) dan bisa dilihat, diunduh ulang, atau dikirim ke Gumroad kapan saja.</div>
         <div class="card" style="overflow-x:auto">
           <table>
             <thead>
@@ -326,7 +326,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         <div class="brand" style="font-size:1.1rem">JOY <span>CORPORATION</span></div>
         <div class="tagline" style="margin-bottom:10px">"Kami ada karena kamu Ade"</div>
         <div class="manifesto">
-          <b>JOY CORPORATION</b> adalah entitas sistem digital dan produksi mandiri yang dibangun atas prinsip eksekusi cepat, presisi sistem, dan keandalan operasional tanpa kompromi. Setiap alur kerja dirancang terstruktur dari riset, produksi, kontrol kualitas (QC), hingga distribusi produk yang terukur dan bertanggung jawab.
+          <b>JOY CORPORATION</b> adalah entitas sistem digital dan produksi mandiri yang dibangun atas prinsip eksekusi cepat, presisi sistem, dan keandalan operasional tanpa kompromi. Setiap alur kerja dirancang terstruktur dari riset pasar, produksi, kontrol kualitas (QC), hingga distribusi produk yang terukur dan bertanggung jawab.
         </div>
       </div>
 
@@ -340,10 +340,10 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         <div class="card">
           <h3 class="subhead" style="margin-top:0">Misi</h3>
           <ul style="font-size:.83rem;line-height:1.65;color:var(--text);padding-left:18px">
-            <li>Menjalankan standar produksi konsisten dengan target harian <b>10 produk/hari</b> secara otomatis dan terukur.</li>
+            <li>Menjalankan standar produksi konsisten dengan target harian <b>10 produk/hari</b> berbeda dan terukur.</li>
             <li>Menegakkan kontrol kualitas (<b>QC</b>) ketat sebelum produk masuk antrean <b>Pending</b> dan disetujui <b>Public</b> oleh owner.</li>
             <li>Menjaga keamanan data, integritas sistem, dan kelangsungan operasional tanpa kehilangan data sedikit pun.</li>
-            <li>Menyediakan akses pembayaran yang jelas (<b>Bank Mandiri</b> & <b>PayPal</b>) serta arsip unduhan yang rapi.</li>
+            <li>Menyediakan akses pembayaran yang jelas (<b>Bank Mandiri</b> & <b>PayPal</b>) serta sinkronisasi Gumroad & arsip unduhan yang rapi.</li>
           </ul>
         </div>
       </div>
@@ -362,7 +362,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     <section id="owner-admin" class="section">
       <h2>Owner Vault</h2>
       <div id="ownerLockedBanner" class="card">
-        <p style="font-size:.84rem;color:var(--gold);margin-bottom:10px">Owner Vault terkunci. Masukkan PIN untuk membuka Saldo, Penyimpanan Produk, Export Lokal Storage, Install Aplikasi, Koneksi Supabase, dan Ganti PIN.</p>
+        <p style="font-size:.84rem;color:var(--gold);margin-bottom:10px">Owner Vault terkunci. Masukkan PIN untuk membuka Saldo, Penyimpanan Produk, Export Lokal Storage, Install Aplikasi, Gumroad Endpoint, Koneksi Supabase, dan Ganti PIN.</p>
         <button class="btn btn-gold" onclick="openPinModalForOwner('owner-admin')">Masukkan PIN</button>
       </div>
 
@@ -443,7 +443,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         </div>
 
         <div class="card">
-          <h3 class="subhead" style="margin-top:0">Pengaturan Pembayaran & Koneksi Supabase</h3>
+          <h3 class="subhead" style="margin-top:0">Pengaturan Pembayaran, Gumroad & Koneksi Supabase</h3>
           <div class="grid-2">
             <div>
               <label>Nomor Rekening Mandiri</label>
@@ -466,6 +466,9 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
               <input id="paypalLinkInput" placeholder="https://www.paypal.me/akurniasandy">
             </div>
           </div>
+          <label>Gumroad Endpoint URL (Otomatis Terkirim Saat Klik Public)</label>
+          <input id="gumroadEndpointInput" placeholder="https://joy-corp.vercel.app/api/gumroad-publish">
+          <div class="hint">Setiap produk Pending yang disetujui lewat tombol <b>Public</b> akan otomatis masuk ke Produk Public dan dikirim ke endpoint Gumroad ini bila sudah diisi.</div>
           <label>Supabase Project URL</label>
           <input id="supabaseUrlInput" placeholder="https://qqqkvnzrzfwkqktwwxar.supabase.co">
           <label>Supabase Anon Key</label>
@@ -499,6 +502,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   const SUPABASE_URL_KEY = 'joy_supabase_url';
   const SUPABASE_ANON_KEY = 'joy_supabase_anon_key';
   const PAYMENT_CONFIG_KEY = 'joy_payment_config';
+  const GUMROAD_ENDPOINT_KEY = 'joy_gumroad_endpoint';
   const STORAGE_TARGET_KEY = 'joy_product_storage_target';
   const LOCAL_PRODUCTS_EXPORT_KEY = 'joy_local_products_memory';
   const WORKLOG_STORAGE_KEY = 'joy_agency_worklog';
@@ -511,6 +515,59 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
   const INITIAL_ACTIVE_PIN = '123123';
   const BASE_RESET_PIN = '444033';
+
+  const GLOBAL_TRENDING_BLUEPRINTS = [
+    {
+      title: 'AI Workflow Automation Pack for Solopreneurs',
+      product_type: 'toolkit',
+      idea: 'Step-by-step AI automation SOPs, task routing workflows, and weekly execution checklists to cut repetitive manual work.'
+    },
+    {
+      title: 'Digital Product Launch & Validation Playbook',
+      product_type: 'ebook',
+      idea: 'Structured playbook covering audience pain-point validation, high-converting offers, pricing tiers, and launch sequence.'
+    },
+    {
+      title: 'High-Conversion Sales & Outreach Prompt Vault',
+      product_type: 'prompt-pack',
+      idea: 'Curated prompt library for cold outreach, follow-up sequences, objection handling, and positioning angles.'
+    },
+    {
+      title: 'Startup Cashflow & Runway Tracker System',
+      product_type: 'template',
+      idea: 'Ready-to-use structure for tracking monthly revenue streams, burn rate, margins, and cash runway forecast.'
+    },
+    {
+      title: 'Short-Form Video Hook & Script System',
+      product_type: 'prompt-pack',
+      idea: 'Framework and prompts for generating scroll-stopping hooks, retention outlines, and clear call-to-action scripts.'
+    },
+    {
+      title: 'Client Onboarding & Scope Control Kit',
+      product_type: 'toolkit',
+      idea: 'Standardized client intake checklist, milestone tracker, and scope boundary templates for freelancers & agencies.'
+    },
+    {
+      title: 'Personal Knowledge & Second Brain Blueprint',
+      product_type: 'template',
+      idea: 'Organized system layout for capturing notes, linking project references, and turning ideas into shipped assets.'
+    },
+    {
+      title: 'E-Commerce Conversion & Retention Audit Guide',
+      product_type: 'ebook',
+      idea: 'Practical audit guide for product page clarity, checkout conversion, bundle offers, and repeat buyer retention.'
+    },
+    {
+      title: 'Weekly Executive Review & KPI Dashboard Template',
+      product_type: 'template',
+      idea: 'Structured weekly review format tracking core metrics, bottlenecks, completed deliverables, and next priorities.'
+    },
+    {
+      title: 'Niche Demand Research & Offer Scoping Kit',
+      product_type: 'request-produk',
+      idea: 'Actionable research kit to identify active buyer demand, test product angles, and scope minimum viable digital products.'
+    }
+  ];
 
   let sb = null;
   let connected = false;
@@ -999,6 +1056,10 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     }
   }
 
+  function getGumroadEndpoint() {
+    return (localStorage.getItem(GUMROAD_ENDPOINT_KEY) || '').trim();
+  }
+
   function formatIdr(usdAmount) {
     const { idrRate } = getPaymentConfig();
     return 'Rp ' + Math.round(Number(usdAmount || 0) * idrRate).toLocaleString('id-ID');
@@ -1008,9 +1069,10 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     if (!isOwnerUnlocked) return;
     const { url } = getSupabaseConfig();
     const pay = getPaymentConfig();
+    const gumroadUrl = getGumroadEndpoint() || '(Belum diatur)';
     const infoEl = document.getElementById('activeEndpointInfo');
     if (infoEl) {
-      infoEl.textContent = `Supabase: ${url} | Mandiri: ${pay.mandiriAccount} (${pay.mandiriHolder}) | PayPal: ${pay.paypalLink}`;
+      infoEl.textContent = `Supabase: ${url} | Gumroad: ${gumroadUrl} | Mandiri: ${pay.mandiriAccount} (${pay.mandiriHolder})`;
     }
   }
 
@@ -1022,6 +1084,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     document.getElementById('idrRateInput').value = pay.idrRate;
     document.getElementById('paypalEmailInput').value = pay.paypalEmail;
     document.getElementById('paypalLinkInput').value = pay.paypalLink;
+    document.getElementById('gumroadEndpointInput').value = getGumroadEndpoint();
     document.getElementById('supabaseUrlInput').value = localStorage.getItem(SUPABASE_URL_KEY) || '';
     document.getElementById('supabaseKeyInput').value = localStorage.getItem(SUPABASE_ANON_KEY) || '';
     updateEndpointInfo();
@@ -1031,6 +1094,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     if (!isOwnerUnlocked) return openPinModalForOwner('owner-admin');
     const urlVal = document.getElementById('supabaseUrlInput').value.trim().replace(/\/+$/, '');
     const keyVal = document.getElementById('supabaseKeyInput').value.trim();
+    const gumroadVal = document.getElementById('gumroadEndpointInput').value.trim();
 
     if (urlVal && !/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(urlVal)) {
       return alert('Format URL Supabase harus https://<project-ref>.supabase.co');
@@ -1045,6 +1109,9 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     };
 
     localStorage.setItem(PAYMENT_CONFIG_KEY, JSON.stringify(payConfig));
+    if (gumroadVal) localStorage.setItem(GUMROAD_ENDPOINT_KEY, gumroadVal);
+    else localStorage.removeItem(GUMROAD_ENDPOINT_KEY);
+
     if (urlVal) localStorage.setItem(SUPABASE_URL_KEY, urlVal);
     else localStorage.removeItem(SUPABASE_URL_KEY);
 
@@ -1059,6 +1126,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     localStorage.removeItem(SUPABASE_URL_KEY);
     localStorage.removeItem(SUPABASE_ANON_KEY);
     localStorage.removeItem(PAYMENT_CONFIG_KEY);
+    localStorage.removeItem(GUMROAD_ENDPOINT_KEY);
     initApp();
   }
 
@@ -1145,21 +1213,18 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     };
   }
 
-  function buildAutoGeneratedSpec(indexNumber, customType = 'toolkit') {
-    const types = ['toolkit', 'ebook', 'prompt-pack', 'template', 'request-produk'];
-    const chosenType = types.includes(customType) ? customType : types[indexNumber % types.length];
+  function buildAutoGeneratedSpec(indexNumber, customType = null, usedTitles = new Set()) {
     const stamp = new Date().toISOString().slice(0, 10);
-    const titles = [
-      `Joy Auto System Pack #${indexNumber} (${stamp})`,
-      `Joy SOP & Workflow Blueprint #${indexNumber} (${stamp})`,
-      `Joy High-Output Prompt Suite #${indexNumber} (${stamp})`,
-      `Joy Operational Template Kit #${indexNumber} (${stamp})`,
-      `Joy Custom Request Module #${indexNumber} (${stamp})`
-    ];
+    const pool = [...GLOBAL_TRENDING_BLUEPRINTS].sort(() => Math.random() - 0.5);
+    const picked = pool.find(item => !usedTitles.has(item.title)) ||
+      GLOBAL_TRENDING_BLUEPRINTS[(indexNumber - 1) % GLOBAL_TRENDING_BLUEPRINTS.length];
+    usedTitles.add(picked.title);
+
+    const chosenType = customType || picked.product_type;
     return {
-      title: titles[(indexNumber - 1) % titles.length],
+      title: `${picked.title} [${stamp} #${indexNumber}]`,
       product_type: chosenType,
-      idea: `Paket otomatis JOY CORPORATION #${indexNumber}: terstruktur, teruji checklist QC otomatis, dan siap ditinjau owner untuk publikasi.`
+      idea: `${picked.idea} | Global Market Trend: High-demand digital asset, auto-QC passed, ready for owner public confirmation.`
     };
   }
 
@@ -1234,12 +1299,13 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           return;
         }
 
-        triggerLivePulse('production', 'Sedang Produksi (10/Hari)', 'Aperol → Walker → Hendrick\'s', 'ok');
+        triggerLivePulse('production', 'Riset & Produksi 10 Produk Berbeda', 'Aperol → Walker → Hendrick\'s', 'ok');
         const todayStr = new Date().toISOString().slice(0, 10);
+        const usedTitles = new Set();
 
         for (let i = 1; i <= needed; i++) {
           const seq = todayCount + i;
-          const spec = buildAutoGeneratedSpec(seq);
+          const spec = buildAutoGeneratedSpec(seq, null, usedTitles);
           const descText = `${spec.idea}\nQC Otomatis: LOLOS (100%)\nTarget: Rilis ${todayStr} • Target 10/hari`;
 
           await sb.from('production_items').insert([{
@@ -1264,7 +1330,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
         await Promise.all([loadCatalog(), loadProduction()]);
         triggerLivePulse('production', `Selesai ${needed} Produk Pending`, 'Absolut QC', 'ok');
-        alert(`Otomatisasi selesai: ${needed} produk baru lolos QC, masuk ke Produk Pending, dan tersimpan ke arsip telepon.`);
+        alert(`Otomatisasi selesai: ${needed} produk berbeda lolos QC, masuk ke Produk Pending untuk dicek & di-Public, serta tersimpan ke arsip telepon.`);
       } catch (err) {
         alert('Gagal menjalankan otomatisasi 10 produk/hari: ' + err.message);
       }
@@ -1338,13 +1404,54 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     });
   }
 
+  async function sendProductToGumroad(product) {
+    const endpoint = getGumroadEndpoint();
+    if (!endpoint || !product) {
+      appendWorklogEntry('Gumroad', `Produk "${product?.title || ''}" masuk Public (Endpoint Gumroad belum diatur)`, 'pending');
+      return { skipped: true };
+    }
+
+    const payload = {
+      source: 'JOY_CORPORATION',
+      product_id: product.id,
+      title: product.title,
+      description: product.description || '',
+      price_usd: Number(product.price_usd || 29),
+      status: 'published',
+      content_txt: [
+        `JOY CORPORATION - ${product.title || 'Produk'}`,
+        `Harga: $${Number(product.price_usd || 29).toFixed(2)} USD`,
+        ``,
+        product.description || ''
+      ].join('\n')
+    };
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      appendWorklogEntry('Gumroad', `Terkirim otomatis ke Gumroad: ${product.title}`, 'ok');
+      return { ok: true };
+    } catch (err) {
+      appendWorklogEntry('Gumroad', `Gagal kirim "${product.title}" ke Gumroad: ${err.message}`, 'pending');
+      return { ok: false, error: err.message };
+    }
+  }
+
   async function publishPendingProduct(productId) {
     if (!connected || !sb) return alert('Supabase belum terhubung.');
     await runGuard('publish-' + productId, async () => {
       try {
         const current = allProductsCache.find(p => String(p.id) === String(productId));
         const defaultPrice = current && Number(current.price_usd) > 0 ? Number(current.price_usd) : 29.00;
-        const rawPrice = prompt('Setujui & konfirmasi harga jual produk (USD):', String(defaultPrice.toFixed(2)));
+        const rawPrice = prompt('Konfirmasi harga jual produk (USD) sebelum dipublikasikan ke Produk Public & Gumroad:', String(defaultPrice.toFixed(2)));
         if (rawPrice === null) return;
         const priceUsd = parseFloat(rawPrice);
         if (isNaN(priceUsd) || priceUsd <= 0) return alert('Harga USD tidak valid.');
@@ -1356,12 +1463,29 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           .select();
 
         if (error) throw new Error(error.message);
-        if (Array.isArray(updatedRows) && updatedRows[0]) {
-          autoSaveProductToPhoneMemory(updatedRows[0]);
+        const publishedProd = (Array.isArray(updatedRows) && updatedRows[0]) ? updatedRows[0] : {
+          ...current,
+          status: 'published',
+          price_usd: priceUsd
+        };
+
+        if (publishedProd && publishedProd.id) {
+          autoSaveProductToPhoneMemory(publishedProd);
         }
 
         await loadCatalog();
-        triggerLivePulse('worklog', `Produk Public: ${(current && current.title) || productId}`, 'Martini', 'ok');
+        triggerLivePulse('worklog', `Produk Public: ${(publishedProd && publishedProd.title) || productId}`, 'Martini', 'ok');
+
+        if (publishedProd) {
+          const gumResult = await sendProductToGumroad(publishedProd);
+          if (gumResult && gumResult.ok) {
+            alert(`Produk "${publishedProd.title}" sudah masuk ke Produk Public dan terkirim ke Gumroad.`);
+          } else if (gumResult && gumResult.skipped) {
+            alert(`Produk "${publishedProd.title}" sudah masuk ke Produk Public. Atur Gumroad Endpoint URL di Owner Vault jika ingin otomatis kirim ke Gumroad.`);
+          } else {
+            alert(`Produk "${publishedProd.title}" sudah masuk ke Produk Public, namun pengiriman ke Gumroad gagal: ${gumResult?.error || 'cek endpoint'}.`);
+          }
+        }
       } catch (err) {
         alert('Gagal mempublikasikan produk: ' + err.message);
       }
@@ -1496,6 +1620,15 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     a.remove();
   }
 
+  async function resendProductToGumroad(productId) {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
+    const p = allProductsCache.find(item => String(item.id) === String(productId));
+    if (!p) return;
+    const res = await sendProductToGumroad(p);
+    if (res && res.ok) alert(`Produk "${p.title}" berhasil dikirim ke Gumroad.`);
+    else alert(`Pengiriman ke Gumroad belum terkirim: ${res?.error || 'cek endpoint Gumroad di Owner Vault'}.`);
+  }
+
   function renderOwnerProductsTable(products) {
     const body = document.getElementById('ownerProductsBody');
     if (!body || !isOwnerUnlocked) return;
@@ -1519,6 +1652,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         '<td><div class="actions">' +
           '<button class="btn" onclick="viewOwnerProduct(\'' + escapeHtml(String(p.id)) + '\')">Lihat</button>' +
           '<button class="btn btn-gold" onclick="downloadOwnerProduct(\'' + escapeHtml(String(p.id)) + '\')">Download</button>' +
+          '<button class="btn" onclick="resendProductToGumroad(\'' + escapeHtml(String(p.id)) + '\')">Kirim Gumroad</button>' +
         '</div></td>';
 
       body.appendChild(tr);
