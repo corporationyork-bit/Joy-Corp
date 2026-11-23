@@ -1407,7 +1407,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   async function sendProductToGumroad(product) {
     const endpoint = getGumroadEndpoint();
     if (!endpoint || !product) {
-      appendWorklogEntry('Gumroad', `Produk "${product?.title || ''}" masuk Public (Endpoint Gumroad belum diatur)`, 'pending');
+      appendWorklogEntry('Martini', `Produk "${product?.title || ''}" masuk Public (Endpoint Gumroad belum diatur)`, 'pending');
       return { skipped: true };
     }
 
@@ -1417,6 +1417,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       title: product.title,
       description: product.description || '',
       price_usd: Number(product.price_usd || 29),
+      price_cents: Math.round(Number(product.price_usd || 29) * 100),
       status: 'published',
       content_txt: [
         `JOY CORPORATION - ${product.title || 'Produk'}`,
@@ -1433,14 +1434,24 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+      const rawText = await res.text();
+      let parsedData = null;
+      try {
+        parsedData = rawText ? JSON.parse(rawText) : null;
+      } catch (_) {
+        parsedData = null;
       }
 
-      appendWorklogEntry('Gumroad', `Terkirim otomatis ke Gumroad: ${product.title}`, 'ok');
-      return { ok: true };
+      const apiFailed = !res.ok || (parsedData && (parsedData.ok === false || parsedData.success === false));
+      if (apiFailed) {
+        const detail = (parsedData && (parsedData.error || parsedData.message)) || rawText || `HTTP ${res.status}`;
+        throw new Error(detail);
+      }
+
+      appendWorklogEntry('Martini', `Terkirim ke Gumroad: ${product.title}`, 'ok');
+      return { ok: true, data: parsedData };
     } catch (err) {
-      appendWorklogEntry('Gumroad', `Gagal kirim "${product.title}" ke Gumroad: ${err.message}`, 'pending');
+      appendWorklogEntry('Martini', `Gagal kirim "${product.title}" ke Gumroad: ${err.message}`, 'pending');
       return { ok: false, error: err.message };
     }
   }
