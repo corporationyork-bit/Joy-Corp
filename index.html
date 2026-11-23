@@ -3,18 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>JOY CORPORATION- "Kami ada karena kamu Ade"- Control Center</title>
+<title>JOY CORPORATION - Control Center</title>
 <style>
 :root{--bg:#0d0f12;--panel:#14171d;--card:#1a1e26;--border:#2a303c;--text:#e0e0e0;--muted:#8b92a0;--gold:#c5a059;--green:#4caf50;--red:#ef4444}
 *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
 body{background:var(--bg);color:var(--text);min-height:100vh}
-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--panel);border-bottom:1px solid var(--border)}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--panel);border-bottom:1px solid var(--border);gap:10px}
 .brand{font-weight:800;letter-spacing:1px}
 .brand span{color:var(--gold)}
-.badge{font-size:.72rem;color:var(--muted)}
-.container{display:flex;min-height:calc(100vh - 61px)}
-.sidebar{width:230px;background:var(--panel);border-right:1px solid var(--border);padding:12px 0}
-.menu{padding:12px 18px;color:var(--muted);cursor:pointer;border-left:3px solid transparent}
+.tagline{font-size:.74rem;color:var(--gold);font-style:italic;margin-top:2px}
+.badge{font-size:.72rem;color:var(--muted);text-align:right}
+.container{display:flex;min-height:calc(100vh - 67px)}
+.sidebar{width:230px;background:var(--panel);border-right:1px solid var(--border);padding:12px 0;flex-shrink:0}
+.menu{padding:12px 18px;color:var(--muted);cursor:pointer;border-left:3px solid transparent;font-size:.9rem}
 .menu:hover,.menu.active{background:var(--card);color:var(--gold);border-left-color:var(--gold)}
 .content{flex:1;padding:22px;overflow:auto}
 .section{display:none}
@@ -22,19 +23,23 @@ header{display:flex;justify-content:space-between;align-items:center;padding:14p
 h2{color:var(--gold);margin-bottom:16px;font-size:1.15rem}
 .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
 .btn{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:.8rem}
+.btn:hover{border-color:var(--gold);color:var(--gold)}
 .btn-gold{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
-input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:#fff;padding:10px;border-radius:6px;margin:6px 0 12px}
-label{font-size:.78rem;color:var(--muted)}
+.btn-gold:hover{opacity:.9;color:#000}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:#fff;padding:10px;border-radius:6px;margin:6px 0 12px;font-size:.85rem}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+label{font-size:.78rem;color:var(--muted);display:block}
 table{width:100%;border-collapse:collapse;font-size:.82rem}
 th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
-.status{padding:3px 8px;border-radius:4px;font-size:.7rem;font-weight:700}
+.status{padding:3px 8px;border-radius:4px;font-size:.7rem;font-weight:700;text-transform:uppercase}
 .published,.paid{background:rgba(76,175,80,.2);color:var(--green)}
 .idea,.drafting,.owner_review,.qc,.ready,.pending{background:rgba(197,160,89,.2);color:var(--gold)}
 .catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
 .product{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
 .product h3{color:#fff;font-size:.95rem;margin-bottom:6px}
 .price{color:var(--gold);font-weight:800;margin:8px 0}
-.notice{background:rgba(197,160,89,.12);border:1px solid var(--gold);padding:12px;border-radius:8px;font-size:.8rem;color:var(--muted);margin-bottom:16px}
+.notice{background:rgba(197,160,89,.12);border:1px solid var(--gold);padding:12px;border-radius:8px;font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.45}
+.hint{font-size:.76rem;color:var(--muted);margin-top:-6px;margin-bottom:12px;line-height:1.4}
 @media(max-width:768px){
   .container{flex-direction:column}
   .sidebar{width:100%;display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--border)}
@@ -47,10 +52,10 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
 <body>
 <header>
   <div>
-    <div class="brand">PERUSAHAAN <span>JOY</span></div>
-    <div class="badge">Studio Produk AI · Pasar Global</div>
+    <div class="brand">JOY <span>CORPORATION</span></div>
+    <div class="tagline">"Kami ada karena kamu Ade"</div>
   </div>
-  <div class="badge" id="authStatus">Memeriksa Supabase… (v4)</div>
+  <div class="badge" id="authStatus">Memeriksa Supabase… (v5)</div>
 </header>
 
 <div class="container">
@@ -85,7 +90,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
         <textarea id="pIdea" rows="3" placeholder="Jelaskan hasil yang didapat customer dan isi produknya"></textarea>
         <button class="btn btn-gold" onclick="createProductionItem()">Buat Item Produksi</button>
       </div>
-      <div class="card">
+      <div class="card" style="overflow-x:auto">
         <table>
           <thead><tr><th>Judul</th><th>Tipe</th><th>Status</th><th>Aksi</th></tr></thead>
           <tbody id="productionBody"></tbody>
@@ -95,7 +100,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
 
     <section id="orders" class="section">
       <h2>Pesanan</h2>
-      <div class="card">
+      <div class="card" style="overflow-x:auto">
         <table>
           <thead><tr><th>Tanggal</th><th>Produk</th><th>Jumlah</th><th>Provider</th><th>Status</th><th>Aksi</th></tr></thead>
           <tbody id="ordersBody"></tbody>
@@ -124,53 +129,64 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     </section>
 
     <section id="settings" class="section">
-      <h2>Pengaturan</h2>
+      <h2>Pengaturan Koneksi Backend</h2>
       <div class="card">
-        <label>URL Backend Proxy (otomatis dipakai saat dibuka dari GitHub Pages)</label>
-        <input id="proxyUrlInput" type="url" placeholder="https://nama-project-kamu.vercel.app/api/proxy">
+        <label>URL Server Proxy (Vercel / Render)</label>
+        <input id="backendUrlInput" placeholder="https://nama-project-kamu.vercel.app">
+        <div class="hint">
+          Wajib diisi jika kamu membuka aplikasi dari <b>GitHub Pages (github.io)</b>, karena GitHub Pages tidak menjalankan folder <code>/api/proxy</code>. Kosongkan jika kamu membuka langsung dari domain Vercel/Render kamu.
+        </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-gold" onclick="saveProxySettings()">Simpan & Hubungkan Supabase</button>
+          <button class="btn btn-gold" onclick="saveBackendUrl()">Simpan & Hubungkan</button>
           <button class="btn" onclick="initApp()">Cek Ulang Koneksi</button>
         </div>
-        <p id="activeProxyInfo" style="color:var(--muted);font-size:.78rem;margin-top:12px"></p>
+        <p id="activeEndpointInfo" style="margin-top:12px;font-size:.76rem;color:var(--muted)"></p>
       </div>
     </section>
   </main>
 </div>
 
 <script>
-  const PROXY_STORAGE_KEY = 'joy_corp_proxy_base_v1';
+  const BACKEND_STORAGE_KEY = 'joy_corp_backend_url';
   let connected = false;
 
-  function isGitHubPages() {
-    return window.location.hostname.endsWith('github.io');
-  }
-
   function getProxyBase() {
-    const saved = (localStorage.getItem(PROXY_STORAGE_KEY) || '').trim().replace(/\/+$/, '');
-    if (saved) return saved;
-    if (isGitHubPages()) return '';
+    const saved = (localStorage.getItem(BACKEND_STORAGE_KEY) || '').trim().replace(/\/+$/, '');
+    if (saved) {
+      return saved.endsWith('/api/proxy') ? saved : `${saved}/api/proxy`;
+    }
     return '/api/proxy';
   }
 
-  function saveProxySettings() {
-    const val = document.getElementById('proxyUrlInput').value.trim().replace(/\/+$/, '');
-    if (val) {
-      localStorage.setItem(PROXY_STORAGE_KEY, val);
-    } else {
-      localStorage.removeItem(PROXY_STORAGE_KEY);
+  function updateEndpointInfo() {
+    const base = getProxyBase();
+    const isGitHubPages = location.hostname.endsWith('github.io');
+    const infoEl = document.getElementById('activeEndpointInfo');
+    if (infoEl) {
+      infoEl.textContent = `Endpoint aktif saat ini: ${base}` +
+        (isGitHubPages && base === '/api/proxy'
+          ? ' (⚠️ Terdeteksi GitHub Pages: masukkan URL Vercel/Render di atas agar tidak 404)'
+          : '');
     }
+  }
+
+  function saveBackendUrl() {
+    const val = document.getElementById('backendUrlInput').value.trim().replace(/\/+$/, '');
+    if (val && !/^https?:\/\//i.test(val)) {
+      return alert('URL harus diawali dengan https:// (contoh: https://joy-corp.vercel.app)');
+    }
+    if (val) {
+      localStorage.setItem(BACKEND_STORAGE_KEY, val);
+    } else {
+      localStorage.removeItem(BACKEND_STORAGE_KEY);
+    }
+    updateEndpointInfo();
     initApp();
   }
 
   async function apiFetch(path, options = {}) {
-    const base = getProxyBase();
-    if (!base) {
-      throw new Error('URL Backend Proxy belum diisi. Buka tab Pengaturan dan masukkan URL backend kamu.');
-    }
-
     const cleanPath = path.replace(/^\/+/, '');
-    const url = `${base}/${cleanPath}`;
+    const url = `${getProxyBase()}/${cleanPath}`;
     const headers = {
       'Content-Type': 'application/json',
       'Prefer': 'return=representation',
@@ -198,39 +214,35 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     el.style.color = color || 'var(--muted)';
   }
 
-  function updateProxyInfoUI() {
-    const saved = localStorage.getItem(PROXY_STORAGE_KEY) || '';
-    const input = document.getElementById('proxyUrlInput');
-    if (input && !input.value && saved) {
-      input.value = saved;
-    }
-    const base = getProxyBase();
-    const info = document.getElementById('activeProxyInfo');
-    if (info) {
-      info.textContent = base
-        ? `Endpoint aktif: ${base}`
-        : 'Terdeteksi di GitHub Pages: masukkan URL backend (Vercel/Render) agar terhubung ke Supabase.';
-    }
-  }
-
   async function initApp() {
     connected = false;
-    updateProxyInfoUI();
-    setAuthStatus('Memeriksa Supabase… (v4)', 'var(--muted)');
+    document.getElementById('backendUrlInput').value = localStorage.getItem(BACKEND_STORAGE_KEY) || '';
+    updateEndpointInfo();
+
+    const isGitHubPages = location.hostname.endsWith('github.io');
+    const hasCustomBackend = Boolean((localStorage.getItem(BACKEND_STORAGE_KEY) || '').trim());
+
+    if (isGitHubPages && !hasCustomBackend) {
+      setAuthStatus('Perlu URL Backend (Pengaturan)', 'var(--gold)');
+      document.getElementById('catalogGrid').innerHTML =
+        '<div class="notice">Kamu membuka Joy Corp melalui <b>GitHub Pages</b>. Buka tab <b>Pengaturan</b> lalu masukkan URL deployment <b>Vercel / Render</b> kamu (tempat folder <code>/api/proxy</code> berjalan) agar terhubung ke Supabase.</div>';
+      return;
+    }
+
+    setAuthStatus('Memeriksa Supabase… (v5)', 'var(--muted)');
 
     try {
       await apiFetch('rest/v1/products?select=id&limit=1');
       connected = true;
-      setAuthStatus('Supabase Terhubung (v4)', 'var(--green)');
+      setAuthStatus('Supabase Terhubung (v5)', 'var(--green)');
       await Promise.all([loadCatalog(), loadProduction(), loadOrders()]);
     } catch (err) {
       connected = false;
-      setAuthStatus('Supabase Gagal', 'var(--red)');
+      const code = err.message.split(':')[0];
+      setAuthStatus(`Supabase Gagal (${code})`, 'var(--red)');
       document.getElementById('catalogGrid').innerHTML =
-        '<p style="color:var(--red)">Koneksi Supabase bermasalah: ' + escapeHtml(err.message) + '</p>';
-      if (isGitHubPages() && !getProxyBase()) {
-        setTab('settings');
-      }
+        '<p style="color:var(--red);font-size:.85rem">Gagal terhubung ke Supabase lewat <code>' +
+        escapeHtml(getProxyBase()) + '</code>.<br>Detail: ' + escapeHtml(err.message.slice(0, 220)) + '</p>';
       console.error('Supabase connection error:', err);
     }
   }
@@ -268,4 +280,204 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
 
         const pd = document.createElement('p');
         pd.style.fontSize = '.8rem';
-        pd.style.color
+        pd.style.color = 'var(--muted)';
+        pd.textContent = p.description || '';
+
+        const price = document.createElement('div');
+        price.className = 'price';
+        price.textContent = '$' + Number(p.price_usd || 0).toFixed(2);
+
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-gold';
+        btn.textContent = 'Beli Sekarang';
+        btn.addEventListener('click', () => startCheckout(p));
+
+        card.append(h3, pd, price, btn);
+        grid.appendChild(card);
+      });
+    } catch (err) {
+      grid.innerHTML = '<p style="color:var(--red)">Kesalahan: ' + escapeHtml(err.message) + '</p>';
+    }
+  }
+
+  async function startCheckout(product) {
+    if (!connected) return alert('Supabase belum terhubung.');
+    const email = prompt('Masukkan email untuk menerima produk:');
+    if (!email) return;
+
+    try {
+      const created = await apiFetch('rest/v1/orders', {
+        method: 'POST',
+        body: {
+          product_id: product.id,
+          customer_email: email.trim(),
+          amount: product.price_usd,
+          currency: 'USD',
+          payment_provider: 'pending',
+          payment_status: 'pending'
+        }
+      });
+      const orderId = Array.isArray(created) && created[0] ? created[0].id : '';
+      alert('Pesanan dibuat.' + (orderId ? ' Link unduhan: download.html?order=' + encodeURIComponent(orderId) : ''));
+      loadOrders();
+    } catch (err) {
+      alert('Gagal: ' + err.message);
+    }
+  }
+
+  async function loadProduction() {
+    const body = document.getElementById('productionBody');
+    body.innerHTML = '';
+    if (!connected) return;
+
+    try {
+      const data = await apiFetch('rest/v1/production_items?select=*&order=created_at.desc');
+
+      if (!data || data.length === 0) {
+        body.innerHTML = '<tr><td colspan="4" style="color:var(--muted)">Belum ada item produksi.</td></tr>';
+        return;
+      }
+
+      data.forEach(item => {
+        const tr = document.createElement('tr');
+
+        const c1 = document.createElement('td');
+        c1.textContent = item.title;
+
+        const c2 = document.createElement('td');
+        c2.textContent = item.product_type || '-';
+
+        const c3 = document.createElement('td');
+        const sp = document.createElement('span');
+        sp.className = 'status ' + item.status;
+        sp.textContent = item.status;
+        c3.appendChild(sp);
+
+        const c4 = document.createElement('td');
+        if (item.status !== 'published') {
+          const btn = document.createElement('button');
+          btn.className = 'btn';
+          btn.textContent = item.status === 'ready' ? 'Publikasikan' : 'Majukan';
+          btn.addEventListener('click', () => advanceStatus(item));
+          c4.appendChild(btn);
+        } else {
+          c4.innerHTML = '<span style="font-size:.75rem;color:var(--green)">Tayang</span>';
+        }
+
+        tr.append(c1, c2, c3, c4);
+        body.appendChild(tr);
+      });
+    } catch (err) {
+      body.innerHTML = '<tr><td colspan="4" style="color:var(--red)">Error: ' + escapeHtml(err.message) + '</td></tr>';
+    }
+  }
+
+  async function createProductionItem() {
+    if (!connected) return alert('Supabase belum terhubung.');
+
+    const title = document.getElementById('pTitle').value.trim();
+    const type = document.getElementById('pType').value;
+    const idea = document.getElementById('pIdea').value.trim();
+
+    if (!title || !idea) return alert('Isi judul dan ide produk dulu.');
+
+    try {
+      await apiFetch('rest/v1/production_items', {
+        method: 'POST',
+        body: {
+          title,
+          product_type: type,
+          idea,
+          status: 'idea'
+        }
+      });
+
+      document.getElementById('pTitle').value = '';
+      document.getElementById('pIdea').value = '';
+      loadProduction();
+    } catch (err) {
+      alert('Gagal: ' + err.message);
+    }
+  }
+
+  async function advanceStatus(item) {
+    const flow = ['idea', 'drafting', 'owner_review', 'qc', 'ready', 'published'];
+    const next = flow[Math.min(flow.indexOf(item.status) + 1, flow.length - 1)];
+
+    if (item.status === 'qc' && next === 'ready' && !confirm('Sudah selesai checklist QC?')) return;
+
+    let priceUsd = null;
+    if (next === 'published') {
+      const rawPrice = prompt('Setujui & masukkan harga jual produk (USD):', '29.00');
+      if (rawPrice === null) return;
+      priceUsd = parseFloat(rawPrice);
+      if (isNaN(priceUsd) || priceUsd <= 0) return alert('Harga USD tidak valid.');
+    }
+
+    try {
+      await apiFetch(`rest/v1/production_items?id=eq.${encodeURIComponent(item.id)}`, {
+        method: 'PATCH',
+        body: { status: next }
+      });
+
+      if (next === 'published') {
+        await apiFetch('rest/v1/products', {
+          method: 'POST',
+          body: {
+            title: item.title,
+            description: item.idea || '',
+            price_usd: priceUsd,
+            status: 'published'
+          }
+        });
+        loadCatalog();
+      }
+
+      loadProduction();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function loadOrders() {
+    const body = document.getElementById('ordersBody');
+    body.innerHTML = '';
+    if (!connected) return;
+
+    try {
+      const data = await apiFetch('rest/v1/orders?select=*,products(title)&order=created_at.desc&limit=50');
+
+      if (!data || data.length === 0) {
+        body.innerHTML = '<tr><td colspan="6" style="color:var(--muted)">Belum ada pesanan.</td></tr>';
+        return;
+      }
+
+      data.forEach(o => {
+        const tr = document.createElement('tr');
+        const prodTitle = (o.products && o.products.title) || 'Produk';
+        const dlUrl = `download.html?order=${encodeURIComponent(o.id)}`;
+
+        tr.innerHTML =
+          '<td>' + escapeHtml(new Date(o.created_at).toLocaleString('id-ID')) + '</td>' +
+          '<td>' + escapeHtml(prodTitle) + '</td>' +
+          '<td>$' + Number(o.amount).toFixed(2) + '</td>' +
+          '<td>' + escapeHtml(o.payment_provider) + '</td>' +
+          '<td><span class="status ' + escapeHtml(o.payment_status) + '">' + escapeHtml(o.payment_status) + '</span></td>' +
+          '<td><a class="btn" href="' + dlUrl + '" target="_blank" rel="noopener">Unduh</a></td>';
+        body.appendChild(tr);
+      });
+    } catch (err) {
+      body.innerHTML = '<tr><td colspan="6" style="color:var(--red)">Error: ' + escapeHtml(err.message) + '</td></tr>';
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, m => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[m]));
+  }
+
+  window.addEventListener('DOMContentLoaded', initApp);
+</script>
+</body>
+</html>
