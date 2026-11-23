@@ -4,8 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0d0f12">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JOY CORP">
+<link id="dynamicManifestLink" rel="manifest">
 <title>JOY CORPORATION - Command & Production Center</title>
 <style>
 :root{--bg:#0d0f12;--panel:#14171d;--card:#1a1e26;--border:#2a303c;--text:#e6e8ec;--muted:#8f96a6;--gold:#c5a059;--green:#4caf50;--red:#ef4444}
@@ -263,7 +266,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       </div>
     </section>
 
-    <!-- ARSIP OWNER (TERKUNCI PIN TANPA IKON GEMBOK) -->
+    <!-- ARSIP OWNER -->
     <section id="owner-vault" class="section">
       <h2>Arsip & Download Owner (Semua Produk)</h2>
       <div id="archiveLockedBanner" class="card">
@@ -355,7 +358,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       </div>
     </section>
 
-    <!-- OWNER VAULT (TERKUNCI PIN TANPA IKON GEMBOK) -->
+    <!-- OWNER VAULT -->
     <section id="owner-admin" class="section">
       <h2>Owner Vault</h2>
       <div id="ownerLockedBanner" class="card">
@@ -506,7 +509,6 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   const DAILY_TARGET_COUNT = 10;
   const ONE_HOUR_MS = 60 * 60 * 1000;
 
-  // PIN aktif bawaan: 123123 | PIN dasar rahasia reset: 444033 (tidak pernah ditampilkan ke UI)
   const INITIAL_ACTIVE_PIN = '123123';
   const BASE_RESET_PIN = '444033';
 
@@ -523,7 +525,75 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   let allOrdersCache = [];
   let activeBlobUrls = [];
   let deferredInstallPrompt = null;
+  let manifestBlobUrl = null;
   const busyLocks = new Set();
+
+  function createAppIconDataUrl(size) {
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return '';
+    ctx.fillStyle = '#0d0f12';
+    ctx.fillRect(0, 0, size, size);
+    ctx.strokeStyle = '#c5a059';
+    ctx.lineWidth = Math.max(4, Math.round(size * 0.04));
+    ctx.strokeRect(ctx.lineWidth, ctx.lineWidth, size - ctx.lineWidth * 2, size - ctx.lineWidth * 2);
+    ctx.fillStyle = '#c5a059';
+    ctx.font = `bold ${Math.round(size * 0.24)}px Inter, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('JOY', size / 2, size / 2);
+    return canvas.toDataURL('image/png');
+  }
+
+  function setupInlinePwaManifestAndWorker() {
+    try {
+      const icon192 = createAppIconDataUrl(192);
+      const icon512 = createAppIconDataUrl(512);
+      const startUrl = window.location.href;
+
+      const manifestObj = {
+        name: 'JOY CORPORATION',
+        short_name: 'JOY CORP',
+        start_url: startUrl,
+        scope: startUrl.replace(/[^/]*$/, ''),
+        display: 'standalone',
+        background_color: '#0d0f12',
+        theme_color: '#0d0f12',
+        icons: [
+          { src: icon192, sizes: '192x192', type: 'image/png' },
+          { src: icon512, sizes: '512x512', type: 'image/png' }
+        ]
+      };
+
+      const mBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+      manifestBlobUrl = URL.createObjectURL(mBlob);
+      const linkEl = document.getElementById('dynamicManifestLink');
+      if (linkEl) linkEl.href = manifestBlobUrl;
+
+      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+        const swCode = `
+          const CACHE_NAME = 'joy-corp-inline-v1';
+          self.addEventListener('install', (event) => {
+            self.skipWaiting();
+          });
+          self.addEventListener('activate', (event) => {
+            event.waitUntil(self.clients.claim());
+          });
+          self.addEventListener('fetch', (event) => {
+            if (event.request.method !== 'GET') return;
+            event.respondWith(
+              fetch(event.request).catch(() => caches.match(event.request))
+            );
+          });
+        `;
+        const swBlob = new Blob([swCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(swBlob);
+        navigator.serviceWorker.register(swUrl).catch(() => {});
+      }
+    } catch (_) {}
+  }
 
   function triggerLivePulse(channel = 'worklog', label = 'Aktivitas Real-Time', agent = 'Agency', status = 'ok') {
     notifCount += 1;
@@ -1740,7 +1810,14 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     e.preventDefault();
     deferredInstallPrompt = e;
     const msg = document.getElementById('installStatusMsg');
-    if (msg) msg.textContent = 'Siap diinstal langsung ke perangkat Anda.';
+    if (msg) msg.textContent = 'Siap diinstal langsung ke perangkat Anda. Klik "Install Aplikasi Sekarang".';
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    const msg = document.getElementById('installStatusMsg');
+    if (msg) msg.textContent = 'JOY CORPORATION berhasil diinstal ke layar utama perangkat Anda.';
+    appendWorklogEntry('System', 'Aplikasi diinstal ke perangkat', 'ok');
   });
 
   async function triggerInstallPrompt() {
@@ -1758,7 +1835,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       return;
     }
     if (msg) {
-      msg.textContent = 'Gunakan menu browser (⋮ / Bagikan) lalu pilih "Tambahkan ke Layar Utama" / "Instal aplikasi", atau unduh paket .html di samping.';
+      msg.textContent = 'Buka menu browser (⋮ / Bagikan) lalu pilih "Tambahkan ke Layar Utama" atau "Instal aplikasi", atau klik "Unduh Paket Aplikasi (.html)".';
     }
   }
 
@@ -1782,6 +1859,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   }
 
   window.addEventListener('DOMContentLoaded', () => {
+    setupInlinePwaManifestAndWorker();
     ensurePinInitialized();
     renderWorklogTable();
 
