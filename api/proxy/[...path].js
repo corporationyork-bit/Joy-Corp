@@ -16,8 +16,8 @@ export default async function handler(req, res) {
   const url = new URL(req.url, `${protocol}://${host}`);
   const queryString = url.search;
 
-  const rawSupabaseUrl = process.env.SUPABASE_URL;
-  const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+  const rawSupabaseUrl = (process.env.SUPABASE_URL || '').trim();
+  const SUPABASE_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '').trim();
 
   if (!rawSupabaseUrl || !SUPABASE_KEY) {
     return res.status(500).json({
