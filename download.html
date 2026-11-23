@@ -57,28 +57,23 @@ input:focus{outline:none;border-color:var(--gold)}
   </div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const BACKEND_STORAGE_KEY = 'joy_corp_backend_url';
+  const DEFAULT_SUPABASE_URL = 'https://nszdjbnoikdvqquhxrhe.supabase.co';
+  const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU';
 
-  function getProxyBase() {
-    const saved = (localStorage.getItem(BACKEND_STORAGE_KEY) || '').trim().replace(/\/+$/, '');
-    if (saved) {
-      return saved.endsWith('/api/proxy') ? saved : `${saved}/api/proxy`;
+  const SUPABASE_URL_KEY = 'joy_supabase_url';
+  const SUPABASE_ANON_KEY = 'joy_supabase_anon_key';
+
+  function getSupabaseClient() {
+    const url = ((localStorage.getItem(SUPABASE_URL_KEY) || '').trim().replace(/\/+$/, '')) || DEFAULT_SUPABASE_URL;
+    const anonKey = ((localStorage.getItem(SUPABASE_ANON_KEY) || '').trim()) || DEFAULT_SUPABASE_ANON_KEY;
+    if (!window.supabase || !window.supabase.createClient) {
+      throw new Error('SDK Supabase gagal dimuat');
     }
-    return '/api/proxy';
-  }
-
-  async function apiFetch(path) {
-    const cleanPath = path.replace(/^\/+/, '');
-    const res = await fetch(`${getProxyBase()}/${cleanPath}`, {
-      headers: { 'Content-Type': 'application/json' }
+    return window.supabase.createClient(url, anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
     });
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(`HTTP ${res.status}: ${err}`);
-    }
-    const text = await res.text();
-    return text ? JSON.parse(text) : null;
   }
 
   async function lookupOrder(overrideId) {
@@ -96,7 +91,14 @@ input:focus{outline:none;border-color:var(--gold)}
     box.innerHTML = '<p style="font-size:.82rem;color:var(--muted);margin-top:12px">Mencari data pesanan…</p>';
 
     try {
-      const rows = await apiFetch(`rest/v1/orders?id=eq.${encodeURIComponent(orderId)}&select=*,products(title,description)&limit=1`);
+      const sb = getSupabaseClient();
+      const { data: rows, error } = await sb
+        .from('orders')
+        .select('*,products(title,description)')
+        .eq('id', orderId)
+        .limit(1);
+
+      if (error) throw new Error(error.message);
       statusEl.textContent = 'Terhubung';
 
       if (!Array.isArray(rows) || rows.length === 0) {
