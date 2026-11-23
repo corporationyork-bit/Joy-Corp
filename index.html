@@ -108,7 +108,6 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     </div>
     <div class="badge" id="autoOptBadge">Auto-Opt 1j: Aktif</div>
     <div class="badge" id="authStatus">Memeriksa Supabase…</div>
-    <button class="btn" onclick="clearNotifPulse()">Reset Notif</button>
   </div>
 </header>
 
@@ -550,18 +549,6 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     pulseTimer = setTimeout(() => {
       if (dot && busyLocks.size === 0) dot.classList.remove('active');
     }, 6000);
-  }
-
-  function clearNotifPulse() {
-    notifCount = 0;
-    const dot = document.getElementById('livePulseDot');
-    const txt = document.getElementById('livePulseText');
-    if (dot) dot.classList.remove('active');
-    if (txt) txt.textContent = 'Siaga • 0 Notif';
-    ['pipProduction', 'pipWorklog', 'pipOrders'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.classList.remove('on');
-    });
   }
 
   function getWorklogEntries() {
@@ -1041,7 +1028,6 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     }
   }
 
-  // Setiap kali memilih Arsip Owner atau Owner Vault, selalu kunci kembali & minta PIN
   function setTab(tab) {
     if (tab === 'owner-admin' || tab === 'owner-vault') {
       isOwnerUnlocked = false;
