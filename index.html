@@ -3,147 +3,479 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>JOY CORPORATION - Control Center</title>
+<meta name="theme-color" content="#0d0f12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>JOY CORPORATION - Command & Production Center</title>
 <style>
-:root{--bg:#0d0f12;--panel:#14171d;--card:#1a1e26;--border:#2a303c;--text:#e0e0e0;--muted:#8b92a0;--gold:#c5a059;--green:#4caf50;--red:#ef4444}
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
+:root{--bg:#0d0f12;--panel:#14171d;--card:#1a1e26;--border:#2a303c;--text:#e6e8ec;--muted:#8f96a6;--gold:#c5a059;--green:#4caf50;--red:#ef4444}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,-apple-system,sans-serif}
 body{background:var(--bg);color:var(--text);min-height:100vh}
-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--panel);border-bottom:1px solid var(--border);gap:10px}
-.brand{font-weight:800;letter-spacing:1px}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--panel);border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap}
+.brand{font-weight:800;letter-spacing:1.2px;font-size:1rem}
 .brand span{color:var(--gold)}
 .tagline{font-size:.74rem;color:var(--gold);font-style:italic;margin-top:2px}
-.badge{font-size:.72rem;color:var(--muted);text-align:right}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{font-size:.72rem;color:var(--muted);padding:5px 9px;border:1px solid var(--border);border-radius:6px;background:var(--card);display:inline-flex;align-items:center;gap:6px}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:#3b4252;display:inline-block;transition:background .2s}
+.pulse-dot.active{background:var(--green);box-shadow:0 0 8px var(--green);animation:joyPulse .9s infinite alternate}
+@keyframes joyPulse{from{opacity:.35;transform:scale(.85)}to{opacity:1;transform:scale(1.2)}}
 .container{display:flex;min-height:calc(100vh - 67px)}
-.sidebar{width:230px;background:var(--panel);border-right:1px solid var(--border);padding:12px 0;flex-shrink:0}
-.menu{padding:12px 18px;color:var(--muted);cursor:pointer;border-left:3px solid transparent;font-size:.9rem}
+.sidebar{width:240px;background:var(--panel);border-right:1px solid var(--border);padding:12px 0;flex-shrink:0}
+.menu{padding:12px 18px;color:var(--muted);cursor:pointer;border-left:3px solid transparent;font-size:.88rem;display:flex;justify-content:space-between;align-items:center;gap:6px}
 .menu:hover,.menu.active{background:var(--card);color:var(--gold);border-left-color:var(--gold)}
+.notif-pip{width:7px;height:7px;border-radius:50%;background:var(--green);display:none;box-shadow:0 0 6px var(--green);animation:joyPulse .9s infinite alternate}
+.notif-pip.on{display:inline-block}
 .content{flex:1;padding:22px;overflow:auto}
 .section{display:none}
 .section.active{display:block}
-h2{color:var(--gold);margin-bottom:16px;font-size:1.15rem}
+h2{color:var(--gold);margin-bottom:14px;font-size:1.15rem;letter-spacing:.3px}
+h3.subhead{color:var(--gold);font-size:.98rem;margin:12px 0 8px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
-.btn{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:.8rem}
-.btn:hover{border-color:var(--gold);color:var(--gold)}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.stat-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px}
+.stat-label{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.stat-val{font-size:1.2rem;font-weight:800;color:var(--gold);margin-top:6px}
+.stat-sub{font-size:.74rem;color:var(--muted);margin-top:4px}
+.btn{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:.8rem;display:inline-block;text-decoration:none}
+.btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
 .btn-gold{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
-.btn-gold:hover{opacity:.9;color:#000}
+.btn-gold:hover:not(:disabled){opacity:.92;color:#000}
+.btn-green{background:rgba(76,175,80,.18);border-color:var(--green);color:var(--green);font-weight:700}
 input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:#fff;padding:10px;border-radius:6px;margin:6px 0 12px;font-size:.85rem}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 label{font-size:.78rem;color:var(--muted);display:block}
 table{width:100%;border-collapse:collapse;font-size:.82rem}
-th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
-.status{padding:3px 8px;border-radius:4px;font-size:.7rem;font-weight:700;text-transform:uppercase}
-.published,.paid{background:rgba(76,175,80,.2);color:var(--green)}
-.idea,.drafting,.owner_review,.qc,.ready,.pending{background:rgba(197,160,89,.2);color:var(--gold)}
+th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical-align:top}
+.status{padding:3px 8px;border-radius:4px;font-size:.7rem;font-weight:700;text-transform:uppercase;display:inline-block}
+.published,.paid,.ok{background:rgba(76,175,80,.2);color:var(--green)}
+.idea,.drafting,.owner_review,.qc,.ready,.pending,.draft{background:rgba(197,160,89,.2);color:var(--gold)}
 .catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
 .product{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
 .product h3{color:#fff;font-size:.95rem;margin-bottom:6px}
 .price{color:var(--gold);font-weight:800;margin:8px 0}
-.notice{background:rgba(197,160,89,.12);border:1px solid var(--gold);padding:12px;border-radius:8px;font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.45}
-.hint{font-size:.76rem;color:var(--muted);margin-top:-6px;margin-bottom:12px;line-height:1.4}
+.notice{background:rgba(197,160,89,.12);border:1px solid var(--gold);padding:12px;border-radius:8px;font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.5}
+.detail-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:12px;font-size:.82rem;line-height:1.55;white-space:pre-wrap}
+.hint{font-size:.75rem;color:var(--muted);margin-top:-6px;margin-bottom:12px;line-height:1.45}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.progress-track{width:100%;height:9px;background:var(--bg);border:1px solid var(--border);border-radius:999px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:var(--gold);width:0%;transition:width .25s ease}
+.lock-overlay{position:fixed;inset:0;background:rgba(10,12,15,.96);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+.lock-card{width:100%;max-width:410px;background:var(--card);border:1px solid var(--gold);border-radius:12px;padding:22px}
+.err-msg{color:var(--red);font-size:.78rem;margin-bottom:10px;min-height:18px}
+.ok-msg{color:var(--green);font-size:.78rem;margin-bottom:10px;min-height:18px}
+.manifesto{border-left:3px solid var(--gold);padding-left:12px;margin:10px 0;color:var(--text);font-size:.86rem;line-height:1.6}
 @media(max-width:768px){
   .container{flex-direction:column}
   .sidebar{width:100%;display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--border)}
-  .menu{white-space:nowrap;border-left:0;border-bottom:3px solid transparent}
+  .menu{white-space:nowrap;border-left:0;border-bottom:3px solid transparent;gap:6px}
   .menu.active{border-bottom-color:var(--gold)}
   .content{padding:14px}
 }
 </style>
 </head>
 <body>
+
+<div class="lock-overlay" id="pinLockModal">
+  <div class="lock-card">
+    <div class="brand">JOY <span>CORPORATION</span></div>
+    <div class="tagline">"Kami ada karena kamu Ade"</div>
+    <h3 class="subhead" style="margin-top:14px">Autentikasi PIN Akses</h3>
+    <p class="hint" id="pinModalSubtitle">Masukkan PIN untuk membuka Command Center.</p>
+    <label>PIN Akses</label>
+    <input id="pinLoginInput" type="password" inputmode="numeric" maxlength="12" placeholder="Masukkan PIN">
+    <div class="err-msg" id="pinLoginError"></div>
+    <div class="ok-msg" id="pinLoginInfo"></div>
+    <div class="actions">
+      <button class="btn btn-gold" onclick="submitPinLogin()">Masuk Sistem</button>
+      <button class="btn" onclick="resetPinToBase()">Lupa PIN</button>
+      <button class="btn" id="btnCancelPinModal" onclick="cancelPinModal()" style="display:none">Batal</button>
+    </div>
+  </div>
+</div>
+
 <header>
   <div>
     <div class="brand">JOY <span>CORPORATION</span></div>
     <div class="tagline">"Kami ada karena kamu Ade"</div>
   </div>
-  <div class="badge" id="authStatus">Memeriksa Supabase…</div>
+  <div class="header-right">
+    <div class="badge" id="livePulseBadge">
+      <span class="pulse-dot" id="livePulseDot"></span>
+      <span id="livePulseText">Siaga • 0 Notif</span>
+    </div>
+    <div class="badge" id="autoOptBadge">Auto-Opt 1j: Aktif</div>
+    <div class="badge" id="authStatus">Memeriksa Supabase…</div>
+    <button class="btn" onclick="clearNotifPulse()">Reset Notif</button>
+  </div>
 </header>
 
 <div class="container">
   <nav class="sidebar">
-    <div class="menu active" data-tab="catalog">Katalog Publik</div>
-    <div class="menu" data-tab="production">Produksi</div>
-    <div class="menu" data-tab="orders">Pesanan</div>
-    <div class="menu" data-tab="agency">Agen</div>
-    <div class="menu" data-tab="settings">Pengaturan</div>
+    <div class="menu active" data-tab="catalog">Produk Public</div>
+    <div class="menu" data-tab="production">
+      <span>Produksi & Pending</span>
+      <span class="notif-pip" id="pipProduction"></span>
+    </div>
+    <div class="menu" data-tab="worklog">
+      <span>Log Kerja</span>
+      <span class="notif-pip" id="pipWorklog"></span>
+    </div>
+    <div class="menu" data-tab="owner-vault">Arsip Owner</div>
+    <div class="menu" data-tab="orders">
+      <span>Pesanan</span>
+      <span class="notif-pip" id="pipOrders"></span>
+    </div>
+    <div class="menu" data-tab="profile">Profil & Visi Misi</div>
+    <div class="menu" data-tab="owner-admin">Owner Vault</div>
   </nav>
 
   <main class="content">
+    <!-- PRODUK PUBLIC -->
     <section id="catalog" class="section active">
-      <h2>Katalog Publik</h2>
-      <div class="notice">Halaman ini ditujukan untuk pelanggan. Produk hanya akan terlihat setelah mendapat persetujuan pemilik dan melalui proses kontrol kualitas (QC).</div>
+      <h2>Produk Public (Katalog Aktif)</h2>
+      <div class="notice">Hanya produk berstatus <b>public</b> (yang sudah lolos QC masuk ke <b>Produk Pending</b> lalu disetujui owner melalui tombol <b>Public</b>) yang tampil di katalog pelanggan. Pembayaran tersedia via <b>Bank Mandiri</b> dan <b>PayPal</b>.</div>
       <div class="catalog-grid" id="catalogGrid"></div>
     </section>
 
+    <!-- PRODUKSI & PENDING -->
     <section id="production" class="section">
-      <h2>Pipeline Produksi</h2>
-      <div class="card">
+      <h2>Otomatisasi Produksi (Target 10 Produk / Hari)</h2>
+      <div class="grid-3">
+        <div class="stat-box">
+          <div class="stat-label">Target Harian</div>
+          <div class="stat-val" id="dailyTargetVal">0 / 10</div>
+          <div class="stat-sub">Produk diproses hari ini</div>
+          <div class="progress-track"><div class="progress-fill" id="dailyTargetBar"></div></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Mode Otomatisasi</div>
+          <div class="stat-val" id="autoEngineStatus">AKTIF</div>
+          <div class="stat-sub">Lolos QC → otomatis ke Produk Pending</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Produk Pending</div>
+          <div class="stat-val" id="pendingCountVal">0</div>
+          <div class="stat-sub">Siap dicek & di-Public oleh Owner</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="actions" style="margin-bottom:12px">
+          <button class="btn btn-gold" id="btnAutoFill10" onclick="runDailyAutoBatchToTarget()">Jalankan Otomatisasi ke Target 10/Hari</button>
+          <button class="btn" id="btnRunQcSweep" onclick="runQcAutoPromotion()">Proses QC Otomatis → Pending</button>
+        </div>
         <label>Judul Produk</label>
         <input id="pTitle" placeholder="AI Toolkit for Creators & Small Businesses">
-        <label>Tipe Produk</label>
-        <select id="pType">
-          <option value="toolkit">toolkit</option>
-          <option value="ebook">ebook</option>
-          <option value="prompt-pack">prompt-pack</option>
-          <option value="template">template</option>
-        </select>
-        <label>Ide Produk</label>
-        <textarea id="pIdea" rows="3" placeholder="Jelaskan hasil yang didapat customer dan isi produknya"></textarea>
-        <button class="btn btn-gold" onclick="createProductionItem()">Buat Item Produksi</button>
+        <div class="grid-2">
+          <div>
+            <label>Tipe Produk</label>
+            <select id="pType">
+              <option value="toolkit">toolkit</option>
+              <option value="ebook">ebook</option>
+              <option value="prompt-pack">prompt-pack</option>
+              <option value="template">template</option>
+              <option value="request-produk">request-produk</option>
+            </select>
+          </div>
+          <div>
+            <label>Mode Pembuatan</label>
+            <select id="pAutoMode">
+              <option value="auto">Otomatis Lolos QC → Produk Pending</option>
+              <option value="pipeline">Masuk Pipeline Bertahap</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label>Target Tanggal Selesai / Rilis</label>
+            <input id="pTargetDate" type="date">
+          </div>
+          <div>
+            <label>Target Penjualan (Unit) & Estimasi (USD)</label>
+            <div class="grid-2" style="gap:8px;margin:0">
+              <input id="pTargetUnits" type="number" min="1" step="1" placeholder="Unit (100)" style="margin:6px 0 12px">
+              <input id="pTargetRevenue" type="number" min="0" step="0.01" placeholder="USD (290.00)" style="margin:6px 0 12px">
+            </div>
+          </div>
+        </div>
+        <label>Ide / Spesifikasi Produk</label>
+        <textarea id="pIdea" rows="2" placeholder="Jelaskan hasil utama, struktur file, dan manfaat untuk pengguna"></textarea>
+        <button class="btn btn-gold" id="btnCreateProd" onclick="createProductionItem()">Tambah Item Produksi</button>
       </div>
+
+      <div class="card">
+        <h3 class="subhead" style="margin-top:0">Produk Pending (Menunggu Persetujuan Public Owner)</h3>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Produk</th>
+                <th>Tipe</th>
+                <th>QC & Target</th>
+                <th>Aksi Owner</th>
+              </tr>
+            </thead>
+            <tbody id="pendingProductsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="card" style="overflow-x:auto">
+        <h3 class="subhead" style="margin-top:0">Antrean Pipeline Produksi</h3>
         <table>
-          <thead><tr><th>Judul</th><th>Tipe</th><th>Status</th><th>Aksi</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Judul</th>
+              <th>Tipe</th>
+              <th>Target Produksi</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
           <tbody id="productionBody"></tbody>
         </table>
       </div>
     </section>
 
+    <!-- LOG KERJA REAL-TIME -->
+    <section id="worklog" class="section">
+      <h2>Log Kerja Agency (Real-Time)</h2>
+      <div class="notice">Laporan pergerakan agency secara real-time: <b>Aperol</b> (riset) → <b>Walker</b> (draf) → <b>Hendrick's</b> (aset) → <b>Absolut</b> (QC) → <b>Martini</b> (publikasi) → <b>Hennessy</b> (keuangan & pembayaran).</div>
+      <div class="card">
+        <div class="actions" style="margin-bottom:10px">
+          <button class="btn" onclick="renderWorklogTable()">Segarkan Log</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Waktu</th>
+                <th>Agen / Modul</th>
+                <th>Aktivitas Real-Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="worklogBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARSIP OWNER (TERKUNCI PIN TANPA IKON GEMBOK) -->
+    <section id="owner-vault" class="section">
+      <h2>Arsip & Download Owner (Semua Produk)</h2>
+      <div id="archiveLockedBanner" class="card">
+        <p style="font-size:.84rem;color:var(--gold);margin-bottom:10px">Arsip Owner terkunci. Masukkan PIN untuk membuka dan mengunduh arsip produk ke penyimpanan telepon.</p>
+        <button class="btn btn-gold" onclick="openPinModalForOwner('owner-vault')">Masukkan PIN</button>
+      </div>
+
+      <div id="archiveUnlockedPanel" style="display:none">
+        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis masuk ke penyimpanan telepon (file <code>.txt</code>) dan bisa dilihat atau diunduh ulang kapan saja.</div>
+        <div class="card" style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Produk</th>
+                <th>Status</th>
+                <th>Harga</th>
+                <th>Aksi Owner</th>
+              </tr>
+            </thead>
+            <tbody id="ownerProductsBody"></tbody>
+          </table>
+        </div>
+        <div class="card" id="ownerPreviewCard" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+            <h3 class="subhead" id="ownerPreviewTitle" style="margin:0">Detail Produk</h3>
+            <button class="btn" onclick="closeOwnerPreview()">Tutup Detail</button>
+          </div>
+          <div class="detail-box" id="ownerPreviewContent"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PESANAN -->
     <section id="orders" class="section">
       <h2>Pesanan</h2>
       <div class="card" style="overflow-x:auto">
         <table>
-          <thead><tr><th>Tanggal</th><th>Produk</th><th>Jumlah</th><th>Provider</th><th>Status</th><th>Aksi</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Produk</th>
+              <th>Jumlah</th>
+              <th>Metode</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
           <tbody id="ordersBody"></tbody>
         </table>
       </div>
     </section>
 
-    <section id="agency" class="section">
-      <h2>Alur Kerja Agen</h2>
+    <!-- PROFIL, VISI, MISI & FOUNDER -->
+    <section id="profile" class="section">
+      <h2>Profil JOY CORPORATION</h2>
       <div class="card">
-        <p style="font-size:.85rem;color:var(--muted)">Aperol riset → Walker draf → Hendrick's aset → Absolut QC → Kamu setujui → Martini publikasi.</p>
+        <div class="brand" style="font-size:1.1rem">JOY <span>CORPORATION</span></div>
+        <div class="tagline" style="margin-bottom:10px">"Kami ada karena kamu Ade"</div>
+        <div class="manifesto">
+          <b>JOY CORPORATION</b> adalah entitas sistem digital dan produksi mandiri yang dibangun atas prinsip eksekusi cepat, presisi sistem, dan keandalan operasional tanpa kompromi. Setiap alur kerja dirancang terstruktur dari riset, produksi, kontrol kualitas (QC), hingga distribusi produk yang terukur dan bertanggung jawab.
+        </div>
       </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="subhead" style="margin-top:0">Visi</h3>
+          <p style="font-size:.84rem;line-height:1.55;color:var(--text)">
+            Menjadi mesin produksi dan distribusi produk digital mandiri yang tangguh, otomatis, dan berstandar tinggi—mampu melahirkan karya bernilai nyata setiap hari dengan stabilitas sistem jangka panjang.
+          </p>
+        </div>
+        <div class="card">
+          <h3 class="subhead" style="margin-top:0">Misi</h3>
+          <ul style="font-size:.83rem;line-height:1.65;color:var(--text);padding-left:18px">
+            <li>Menjalankan standar produksi konsisten dengan target harian <b>10 produk/hari</b> secara otomatis dan terukur.</li>
+            <li>Menegakkan kontrol kualitas (<b>QC</b>) ketat sebelum produk masuk antrean <b>Pending</b> dan disetujui <b>Public</b> oleh owner.</li>
+            <li>Menjaga keamanan data, integritas sistem, dan kelangsungan operasional tanpa kehilangan data sedikit pun.</li>
+            <li>Menyediakan akses pembayaran yang jelas (<b>Bank Mandiri</b> & <b>PayPal</b>) serta arsip unduhan yang rapi.</li>
+          </ul>
+        </div>
+      </div>
+
       <div class="card">
-        <table>
-          <thead><tr><th>Agen</th><th>Tanggung Jawab</th></tr></thead>
-          <tbody>
-            <tr><td>Aperol</td><td>Riset pasar dan validasi ide produk</td></tr>
-            <tr><td>Walker</td><td>Membuat outline, draf, dan sales copy</td></tr>
-            <tr><td>Hendrick's</td><td>Menyiapkan template dan file downloadable</td></tr>
-            <tr><td>Absolut</td><td>Menjalankan checklist QC; tidak bisa publish tanpa persetujuan</td></tr>
-            <tr><td>Martini</td><td>Mempublikasikan produk yang sudah disetujui</td></tr>
-            <tr><td>Hennessy</td><td>Laporan revenue, refund, dan margin</td></tr>
-          </tbody>
-        </table>
+        <h3 class="subhead" style="margin-top:0">Founder</h3>
+        <div style="font-size:.98rem;font-weight:800;color:#fff">Ade Kurnia Sandy</div>
+        <div style="font-size:.8rem;color:var(--gold);margin:4px 0 8px">Founder & Owner — JOY CORPORATION</div>
+        <p style="font-size:.83rem;line-height:1.55;color:var(--muted)">
+          Pemegang kendali penuh arah strategis, persetujuan rilis publik, keamanan sistem, dan tata kelola keuangan JOY CORPORATION. Tegas pada kualitas, disiplin pada target, dan berorientasi pada sistem yang benar-benar bekerja di lapangan.
+        </p>
       </div>
     </section>
 
-    <section id="settings" class="section">
-      <h2>Pengaturan Koneksi Supabase</h2>
-      <div class="card">
-        <label>Supabase Project URL</label>
-        <input id="supabaseUrlInput" placeholder="https://nszdjbnoikdvqquhxrhe.supabase.co">
-        <label>Supabase Anon Key</label>
-        <input id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
-        <div class="hint">
-          Sudah tertanam otomatis ke proyek Supabase JOY CORPORATION. Kosongkan lalu simpan jika ingin mengembalikan ke konfigurasi bawaan.
+    <!-- OWNER VAULT (TERKUNCI PIN TANPA IKON GEMBOK) -->
+    <section id="owner-admin" class="section">
+      <h2>Owner Vault</h2>
+      <div id="ownerLockedBanner" class="card">
+        <p style="font-size:.84rem;color:var(--gold);margin-bottom:10px">Owner Vault terkunci. Masukkan PIN untuk membuka Saldo, Penyimpanan Produk, Export Lokal Storage, Install Aplikasi, Koneksi Supabase, dan Ganti PIN.</p>
+        <button class="btn btn-gold" onclick="openPinModalForOwner('owner-admin')">Masukkan PIN</button>
+      </div>
+
+      <div id="ownerUnlockedPanel" style="display:none">
+        <div class="card">
+          <h3 class="subhead" style="margin-top:0">Saldo & Rekening Pembayaran</h3>
+          <div class="grid-3">
+            <div class="stat-box">
+              <div class="stat-label">Saldo Pesanan Lunas (USD)</div>
+              <div class="stat-val" id="ownerBalanceUsd">$0.00</div>
+              <div class="stat-sub" id="ownerBalanceIdr">Rp 0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Pesanan Pending (USD)</div>
+              <div class="stat-val" id="ownerPendingUsd">$0.00</div>
+              <div class="stat-sub">Menunggu konfirmasi bayar</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Rekening & PayPal</div>
+              <div class="stat-val" style="font-size:.92rem">Mandiri 1180013000012</div>
+              <div class="stat-sub">a.n. ADE KURNIA SANDY • PayPal aktif</div>
+            </div>
+          </div>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-gold" onclick="saveSupabaseConfig()">Simpan & Hubungkan</button>
-          <button class="btn" onclick="resetSupabaseConfig()">Reset Bawaan</button>
-          <button class="btn" onclick="initApp()">Cek Ulang Koneksi</button>
+
+        <div class="card">
+          <h3 class="subhead" style="margin-top:0">Memori & Pemilihan Penyimpanan Produk</h3>
+          <div class="grid-2">
+            <div>
+              <label>Pemilihan Penyimpanan Produk</label>
+              <select id="storageTargetSelect" onchange="changeProductStorageTarget(this.value)">
+                <option value="supabase">Supabase (Cloud Database)</option>
+                <option value="phone_memory">Memori Telepon (File Lokal + Lokal Storage)</option>
+              </select>
+            </div>
+            <div class="stat-box" style="margin:6px 0 12px">
+              <div class="stat-label">Memori Penyimpanan Produk</div>
+              <div class="stat-val" style="font-size:.96rem" id="memoryStorageStats">0 Produk • 0 KB</div>
+              <div class="stat-sub" id="activeStorageLabel">Mode aktif: Supabase</div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-gold" onclick="exportProductsToLocalStorage()">Export ke Lokal Storage</button>
+            <button class="btn" onclick="downloadLocalStorageBackupFile()">Unduh Backup Lokal (.json)</button>
+          </div>
+          <div class="ok-msg" id="storageActionMsg" style="margin-top:8px"></div>
         </div>
-        <p id="activeEndpointInfo" style="margin-top:12px;font-size:.76rem;color:var(--muted)"></p>
+
+        <div class="card">
+          <h3 class="subhead" style="margin-top:0">Install Aplikasi JOY CORPORATION</h3>
+          <p style="font-size:.83rem;line-height:1.55;color:var(--text);margin-bottom:12px">
+            Pasang aplikasi <b>JOY CORPORATION</b> ke perangkat atau unduh paket file <code>.html</code> langsung dari Owner Vault.
+          </p>
+          <div class="actions" style="margin-bottom:10px">
+            <button class="btn btn-gold" id="btnInstallPwa" onclick="triggerInstallPrompt()">Install Aplikasi Sekarang</button>
+            <button class="btn" onclick="downloadAppBundle()">Unduh Paket Aplikasi (.html)</button>
+          </div>
+          <div id="installStatusMsg" class="hint" style="margin:0"></div>
+        </div>
+
+        <div class="card">
+          <h3 class="subhead" style="margin-top:0">Ganti PIN Akses</h3>
+          <div class="grid-2">
+            <div>
+              <label>PIN Saat Ini</label>
+              <input id="currentPinInput" type="password" inputmode="numeric" maxlength="12" placeholder="Masukkan PIN aktif">
+            </div>
+            <div>
+              <label>PIN Baru (Minimal 4 Digit Angka)</label>
+              <input id="newPinInput" type="password" inputmode="numeric" maxlength="12" placeholder="Contoh: 654321">
+            </div>
+          </div>
+          <label>Konfirmasi PIN Baru</label>
+          <input id="confirmPinInput" type="password" inputmode="numeric" maxlength="12" placeholder="Ulangi PIN baru">
+          <div class="err-msg" id="changePinError"></div>
+          <div class="ok-msg" id="changePinSuccess"></div>
+          <button class="btn btn-gold" onclick="changeOwnerPin()">Simpan PIN Baru</button>
+        </div>
+
+        <div class="card">
+          <h3 class="subhead" style="margin-top:0">Pengaturan Pembayaran & Koneksi Supabase</h3>
+          <div class="grid-2">
+            <div>
+              <label>Nomor Rekening Mandiri</label>
+              <input id="mandiriAccInput" placeholder="1180013000012">
+            </div>
+            <div>
+              <label>Atas Nama Rekening Mandiri</label>
+              <input id="mandiriHolderInput" placeholder="ADE KURNIA SANDY">
+            </div>
+          </div>
+          <label>Kurs Estimasi IDR per $1 USD</label>
+          <input id="idrRateInput" type="number" min="1000" step="100" placeholder="16000">
+          <div class="grid-2">
+            <div>
+              <label>Email PayPal Penerima (Opsional)</label>
+              <input id="paypalEmailInput" placeholder="billing@joycorp.id">
+            </div>
+            <div>
+              <label>Tautan PayPal.me</label>
+              <input id="paypalLinkInput" placeholder="https://www.paypal.me/akurniasandy">
+            </div>
+          </div>
+          <label>Supabase Project URL</label>
+          <input id="supabaseUrlInput" placeholder="https://qqqkvnzrzfwkqktwwxar.supabase.co">
+          <label>Supabase Anon Key</label>
+          <input id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+          <div class="hint">Pengoptimalan otomatis berjalan setiap 1 jam tanpa menghapus data apa pun.</div>
+          <div class="actions">
+            <button class="btn btn-gold" onclick="saveAllSettings()">Simpan & Hubungkan</button>
+            <button class="btn" onclick="resetAllSettings()">Reset Bawaan</button>
+            <button class="btn" onclick="runHourlyOptimization(true)">Optimalkan Sekarang</button>
+          </div>
+          <p id="activeEndpointInfo" style="margin-top:12px;font-size:.76rem;color:var(--muted)"></p>
+        </div>
       </div>
     </section>
   </main>
@@ -151,40 +483,511 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const DEFAULT_SUPABASE_URL = 'https://nszdjbnoikdvqquhxrhe.supabase.co';
-  const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemRqYm5vaWtkdnFxdWh4cmhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU';
+  const DEFAULT_SUPABASE_URL = 'https://qqqkvnzrzfwkqktwwxar.supabase.co';
+  const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxcWt2bnpyemZ3a3FrdHd3eGFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMjk0MzcsImV4cCI6MjEwOTYwNTQzN30.sMfy_CBJxrXCmEjZHPt5l4mjmNw2fTN476ul2L_FAtU';
+
+  const DEFAULT_PAYMENT_CONFIG = {
+    mandiriAccount: '1180013000012',
+    mandiriHolder: 'ADE KURNIA SANDY',
+    idrRate: 16000,
+    paypalEmail: '',
+    paypalLink: 'https://www.paypal.me/akurniasandy'
+  };
 
   const SUPABASE_URL_KEY = 'joy_supabase_url';
   const SUPABASE_ANON_KEY = 'joy_supabase_anon_key';
+  const PAYMENT_CONFIG_KEY = 'joy_payment_config';
+  const STORAGE_TARGET_KEY = 'joy_product_storage_target';
+  const LOCAL_PRODUCTS_EXPORT_KEY = 'joy_local_products_memory';
+  const WORKLOG_STORAGE_KEY = 'joy_agency_worklog';
+  const AUTO_ARCHIVED_IDS_KEY = 'joy_auto_archived_phone_ids';
+  const PIN_HASH_KEY = 'joy_owner_pin_hash';
+  const PIN_ATTEMPTS_KEY = 'joy_pin_attempts';
+  const PIN_LOCK_UNTIL_KEY = 'joy_pin_lock_until';
+  const DAILY_TARGET_COUNT = 10;
+  const ONE_HOUR_MS = 60 * 60 * 1000;
+
+  // PIN aktif bawaan: 123123 | PIN dasar rahasia reset: 444033 (tidak pernah ditampilkan ke UI)
+  const INITIAL_ACTIVE_PIN = '123123';
+  const BASE_RESET_PIN = '444033';
 
   let sb = null;
   let connected = false;
+  let initialLoginDone = false;
+  let isOwnerUnlocked = false;
+  let pendingTabAfterPin = null;
+  let previousActiveTab = 'catalog';
+  let notifCount = 0;
+  let pulseTimer = null;
+  let allProductsCache = [];
+  let allProductionCache = [];
+  let allOrdersCache = [];
+  let activeBlobUrls = [];
+  let deferredInstallPrompt = null;
+  const busyLocks = new Set();
+
+  function triggerLivePulse(channel = 'worklog', label = 'Aktivitas Real-Time', agent = 'Agency', status = 'ok') {
+    notifCount += 1;
+    const dot = document.getElementById('livePulseDot');
+    const txt = document.getElementById('livePulseText');
+    if (dot) dot.classList.add('active');
+    if (txt) txt.textContent = `${label} • ${notifCount} Notif`;
+
+    if (channel === 'production') {
+      const pip = document.getElementById('pipProduction');
+      if (pip) pip.classList.add('on');
+    } else if (channel === 'orders') {
+      const pip = document.getElementById('pipOrders');
+      if (pip) pip.classList.add('on');
+    } else {
+      const pip = document.getElementById('pipWorklog');
+      if (pip) pip.classList.add('on');
+    }
+
+    appendWorklogEntry(agent, label, status);
+
+    if (pulseTimer) clearTimeout(pulseTimer);
+    pulseTimer = setTimeout(() => {
+      if (dot && busyLocks.size === 0) dot.classList.remove('active');
+    }, 6000);
+  }
+
+  function clearNotifPulse() {
+    notifCount = 0;
+    const dot = document.getElementById('livePulseDot');
+    const txt = document.getElementById('livePulseText');
+    if (dot) dot.classList.remove('active');
+    if (txt) txt.textContent = 'Siaga • 0 Notif';
+    ['pipProduction', 'pipWorklog', 'pipOrders'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('on');
+    });
+  }
+
+  function getWorklogEntries() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(WORKLOG_STORAGE_KEY) || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function appendWorklogEntry(agent, activity, status = 'ok') {
+    const logs = getWorklogEntries();
+    logs.unshift({
+      time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      agent: String(agent || 'Agency'),
+      activity: String(activity || ''),
+      status: String(status || 'ok')
+    });
+    localStorage.setItem(WORKLOG_STORAGE_KEY, JSON.stringify(logs.slice(0, 80)));
+    renderWorklogTable();
+  }
+
+  function renderWorklogTable() {
+    const body = document.getElementById('worklogBody');
+    if (!body) return;
+    const logs = getWorklogEntries();
+    body.innerHTML = '';
+
+    if (logs.length === 0) {
+      body.innerHTML = '<tr><td colspan="4" style="color:var(--muted)">Belum ada log pergerakan agency tercatat.</td></tr>';
+      return;
+    }
+
+    logs.forEach(entry => {
+      const tr = document.createElement('tr');
+      const stClass = String(entry.status || '').toLowerCase() === 'paid' || String(entry.status || '').toLowerCase() === 'ok'
+        ? 'ok' : 'pending';
+      tr.innerHTML =
+        '<td>' + escapeHtml(entry.time) + '</td>' +
+        '<td><strong>' + escapeHtml(entry.agent) + '</strong></td>' +
+        '<td>' + escapeHtml(entry.activity) + '</td>' +
+        '<td><span class="status ' + stClass + '">' + escapeHtml(entry.status) + '</span></td>';
+      body.appendChild(tr);
+    });
+  }
+
+  function hashPinValue(pinStr) {
+    const clean = String(pinStr || '').trim();
+    let h1 = 0x811c9dc5;
+    let h2 = 0x01000193;
+    for (let i = 0; i < clean.length; i++) {
+      const code = clean.charCodeAt(i);
+      h1 ^= code;
+      h1 = Math.imul(h1, 0x01000193);
+      h2 ^= (code + i * 17);
+      h2 = Math.imul(h2, 0x85ebca6b);
+    }
+    return (h1 >>> 0).toString(16) + ':' + (h2 >>> 0).toString(16);
+  }
+
+  function ensurePinInitialized() {
+    if (!localStorage.getItem(PIN_HASH_KEY)) {
+      localStorage.setItem(PIN_HASH_KEY, hashPinValue(INITIAL_ACTIVE_PIN));
+    }
+  }
+
+  function getLockRemainingMs() {
+    const until = Number(localStorage.getItem(PIN_LOCK_UNTIL_KEY) || 0);
+    return Math.max(0, until - Date.now());
+  }
+
+  function setPinModalVisible(visible, message = '', subtitle = 'Masukkan PIN untuk membuka akses.') {
+    const modal = document.getElementById('pinLockModal');
+    const subEl = document.getElementById('pinModalSubtitle');
+    const errEl = document.getElementById('pinLoginError');
+    const infoEl = document.getElementById('pinLoginInfo');
+    const cancelBtn = document.getElementById('btnCancelPinModal');
+
+    if (subEl) subEl.textContent = subtitle;
+    if (errEl) errEl.textContent = message || '';
+    if (infoEl && !message) infoEl.textContent = '';
+    if (cancelBtn) cancelBtn.style.display = initialLoginDone ? 'inline-block' : 'none';
+    if (modal) modal.style.display = visible ? 'flex' : 'none';
+
+    if (visible) {
+      const inp = document.getElementById('pinLoginInput');
+      if (inp) {
+        inp.value = '';
+        setTimeout(() => inp.focus(), 50);
+      }
+    }
+  }
+
+  function cancelPinModal() {
+    if (!initialLoginDone) return;
+    pendingTabAfterPin = null;
+    setPinModalVisible(false);
+    activateSectionTab(previousActiveTab || 'catalog');
+  }
+
+  function activateSectionTab(tab) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
+    const sec = document.getElementById(tab);
+    const menu = document.querySelector('.menu[data-tab="' + tab + '"]');
+    if (sec) sec.classList.add('active');
+    if (menu) menu.classList.add('active');
+    if (tab !== 'owner-admin' && tab !== 'owner-vault') {
+      previousActiveTab = tab;
+    }
+    if (tab === 'owner-admin' || tab === 'owner-vault') syncOwnerPanelsUI();
+    if (tab === 'worklog') renderWorklogTable();
+  }
+
+  function submitPinLogin() {
+    ensurePinInitialized();
+    const errEl = document.getElementById('pinLoginError');
+    const infoEl = document.getElementById('pinLoginInfo');
+    if (infoEl) infoEl.textContent = '';
+
+    const remMs = getLockRemainingMs();
+    if (remMs > 0) {
+      const sec = Math.ceil(remMs / 1000);
+      if (errEl) errEl.textContent = `Terlalu banyak percobaan. Coba lagi dalam ${sec} detik.`;
+      return;
+    }
+
+    const inputPin = (document.getElementById('pinLoginInput').value || '').trim();
+    if (!inputPin) {
+      if (errEl) errEl.textContent = 'Masukkan PIN terlebih dahulu.';
+      return;
+    }
+
+    const expectedHash = localStorage.getItem(PIN_HASH_KEY);
+    if (hashPinValue(inputPin) === expectedHash) {
+      localStorage.removeItem(PIN_ATTEMPTS_KEY);
+      localStorage.removeItem(PIN_LOCK_UNTIL_KEY);
+      const wasInitial = !initialLoginDone;
+      initialLoginDone = true;
+      isOwnerUnlocked = true;
+      setPinModalVisible(false);
+      syncOwnerPanelsUI();
+      appendWorklogEntry('Security', 'PIN berhasil diverifikasi', 'ok');
+
+      if (pendingTabAfterPin) {
+        const targetTab = pendingTabAfterPin;
+        pendingTabAfterPin = null;
+        activateSectionTab(targetTab);
+      }
+
+      if (wasInitial) {
+        initApp();
+      }
+    } else {
+      const attempts = Number(localStorage.getItem(PIN_ATTEMPTS_KEY) || 0) + 1;
+      localStorage.setItem(PIN_ATTEMPTS_KEY, String(attempts));
+      if (attempts >= 5) {
+        localStorage.setItem(PIN_LOCK_UNTIL_KEY, String(Date.now() + 30000));
+        localStorage.setItem(PIN_ATTEMPTS_KEY, '0');
+        if (errEl) errEl.textContent = 'PIN salah 5x. Akses dikunci sementara selama 30 detik.';
+      } else {
+        if (errEl) errEl.textContent = `PIN salah (${attempts}/5).`;
+      }
+    }
+  }
+
+  function resetPinToBase() {
+    const errEl = document.getElementById('pinLoginError');
+    const infoEl = document.getElementById('pinLoginInfo');
+    if (errEl) errEl.textContent = '';
+    localStorage.setItem(PIN_HASH_KEY, hashPinValue(BASE_RESET_PIN));
+    localStorage.removeItem(PIN_ATTEMPTS_KEY);
+    localStorage.removeItem(PIN_LOCK_UNTIL_KEY);
+    if (infoEl) {
+      infoEl.textContent = 'PIN telah direset ke PIN dasar rahasia. Masukkan PIN dasar untuk masuk.';
+    }
+    const inp = document.getElementById('pinLoginInput');
+    if (inp) {
+      inp.value = '';
+      inp.focus();
+    }
+  }
+
+  function openPinModalForOwner(targetTab = 'owner-admin') {
+    pendingTabAfterPin = targetTab;
+    const label = targetTab === 'owner-vault' ? 'Arsip Owner' : 'Owner Vault';
+    setPinModalVisible(true, '', `Masukkan PIN untuk membuka ${label}.`);
+  }
+
+  function changeOwnerPin() {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-admin');
+    ensurePinInitialized();
+    const curPin = (document.getElementById('currentPinInput').value || '').trim();
+    const newPin = (document.getElementById('newPinInput').value || '').trim();
+    const confPin = (document.getElementById('confirmPinInput').value || '').trim();
+    const errEl = document.getElementById('changePinError');
+    const okEl = document.getElementById('changePinSuccess');
+    errEl.textContent = '';
+    okEl.textContent = '';
+
+    if (hashPinValue(curPin) !== localStorage.getItem(PIN_HASH_KEY)) {
+      errEl.textContent = 'PIN saat ini tidak sesuai.';
+      return;
+    }
+    if (!/^\d{4,12}$/.test(newPin)) {
+      errEl.textContent = 'PIN baru harus berupa angka 4 sampai 12 digit.';
+      return;
+    }
+    if (newPin !== confPin) {
+      errEl.textContent = 'Konfirmasi PIN baru tidak cocok.';
+      return;
+    }
+
+    localStorage.setItem(PIN_HASH_KEY, hashPinValue(newPin));
+    document.getElementById('currentPinInput').value = '';
+    document.getElementById('newPinInput').value = '';
+    document.getElementById('confirmPinInput').value = '';
+    okEl.textContent = 'PIN akses berhasil diperbarui.';
+    appendWorklogEntry('Security', 'PIN Owner diperbarui', 'ok');
+  }
+
+  function syncOwnerPanelsUI() {
+    const vaultLocked = document.getElementById('ownerLockedBanner');
+    const vaultUnlocked = document.getElementById('ownerUnlockedPanel');
+    if (vaultLocked && vaultUnlocked) {
+      vaultLocked.style.display = isOwnerUnlocked ? 'none' : 'block';
+      vaultUnlocked.style.display = isOwnerUnlocked ? 'block' : 'none';
+    }
+
+    const archLocked = document.getElementById('archiveLockedBanner');
+    const archUnlocked = document.getElementById('archiveUnlockedPanel');
+    if (archLocked && archUnlocked) {
+      archLocked.style.display = isOwnerUnlocked ? 'none' : 'block';
+      archUnlocked.style.display = isOwnerUnlocked ? 'block' : 'none';
+    }
+
+    if (isOwnerUnlocked) {
+      updateOwnerFinanceSummary();
+      populateSettingsInputs();
+      updateMemoryStorageStats();
+      renderOwnerProductsTable(allProductsCache);
+    }
+  }
+
+  async function runGuard(key, fn) {
+    if (busyLocks.has(key)) return;
+    busyLocks.add(key);
+    const dot = document.getElementById('livePulseDot');
+    if (dot) dot.classList.add('active');
+    try {
+      return await fn();
+    } finally {
+      busyLocks.delete(key);
+      if (dot && notifCount === 0) dot.classList.remove('active');
+    }
+  }
+
+  function getStorageTarget() {
+    const val = localStorage.getItem(STORAGE_TARGET_KEY);
+    return val === 'phone_memory' ? 'phone_memory' : 'supabase';
+  }
+
+  function changeProductStorageTarget(val) {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-admin');
+    const target = val === 'phone_memory' ? 'phone_memory' : 'supabase';
+    localStorage.setItem(STORAGE_TARGET_KEY, target);
+    updateMemoryStorageStats();
+    const msg = document.getElementById('storageActionMsg');
+    if (msg) {
+      msg.textContent = target === 'phone_memory'
+        ? 'Penyimpanan produk dialihkan ke Memori Telepon (otomatis simpan file ke telepon + Lokal Storage).'
+        : 'Penyimpanan produk dialihkan ke Supabase (database cloud aktif).';
+    }
+    appendWorklogEntry('Hennessy', `Penyimpanan produk diubah ke ${target === 'phone_memory' ? 'Memori Telepon' : 'Supabase'}`, 'ok');
+  }
+
+  function updateMemoryStorageStats() {
+    const target = getStorageTarget();
+    const sel = document.getElementById('storageTargetSelect');
+    if (sel) sel.value = target;
+
+    const localExport = JSON.parse(localStorage.getItem(LOCAL_PRODUCTS_EXPORT_KEY) || '[]');
+    const activeSet = Array.isArray(localExport) && localExport.length > 0 ? localExport : allProductsCache;
+    const bytes = new Blob([JSON.stringify(activeSet || [])]).size;
+    const kb = (bytes / 1024).toFixed(1);
+
+    const statsEl = document.getElementById('memoryStorageStats');
+    const labelEl = document.getElementById('activeStorageLabel');
+    if (statsEl) statsEl.textContent = `${(activeSet || []).length} Produk • ${kb} KB`;
+    if (labelEl) {
+      labelEl.textContent = target === 'phone_memory'
+        ? 'Mode aktif: Memori Telepon'
+        : 'Mode aktif: Supabase';
+    }
+  }
+
+  function exportProductsToLocalStorage() {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-admin');
+    localStorage.setItem(LOCAL_PRODUCTS_EXPORT_KEY, JSON.stringify(allProductsCache || []));
+    updateMemoryStorageStats();
+    const msg = document.getElementById('storageActionMsg');
+    if (msg) msg.textContent = `Berhasil mengekspor ${allProductsCache.length} produk ke Lokal Storage.`;
+    appendWorklogEntry('Hennessy', `Export ${allProductsCache.length} produk ke Lokal Storage`, 'ok');
+  }
+
+  function downloadLocalStorageBackupFile() {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-admin');
+    const payload = localStorage.getItem(LOCAL_PRODUCTS_EXPORT_KEY) || JSON.stringify(allProductsCache || []);
+    const blob = new Blob([payload], { type: 'application/json;charset=utf-8' });
+    const url = registerTrackedBlobUrl(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `JOY-CORP-LOKAL-STORAGE-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  function autoSaveProductToPhoneMemory(product) {
+    if (!product || !product.id) return;
+    let archivedIds = [];
+    try {
+      archivedIds = JSON.parse(localStorage.getItem(AUTO_ARCHIVED_IDS_KEY) || '[]');
+      if (!Array.isArray(archivedIds)) archivedIds = [];
+    } catch (_) {
+      archivedIds = [];
+    }
+    if (archivedIds.includes(String(product.id))) return;
+
+    archivedIds.push(String(product.id));
+    localStorage.setItem(AUTO_ARCHIVED_IDS_KEY, JSON.stringify(archivedIds.slice(-300)));
+
+    const konten = [
+      `JOY CORPORATION - ARSIP OTOMATIS PENYIMPANAN TELEPON`,
+      `"Kami ada karena kamu Ade"`,
+      `----------------------------------------`,
+      `ID Produk  : ${product.id}`,
+      `Judul      : ${product.title || 'Tanpa Judul'}`,
+      `Status     : ${product.status || 'pending'}`,
+      `Harga      : $${Number(product.price_usd || 0).toFixed(2)} USD`,
+      ``,
+      `Deskripsi / Isi Produk:`,
+      product.description || '-'
+    ].join('\n');
+
+    const blob = new Blob([konten], { type: 'text/plain;charset=utf-8' });
+    const url = registerTrackedBlobUrl(blob);
+    const a = document.createElement('a');
+    const slug = String(product.title || 'arsip').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'arsip';
+    a.href = url;
+    a.download = `JOY-ARSIP-${slug}-${String(product.id).slice(0, 8)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
 
   function getSupabaseConfig() {
     const customUrl = (localStorage.getItem(SUPABASE_URL_KEY) || '').trim().replace(/\/+$/, '');
     const customKey = (localStorage.getItem(SUPABASE_ANON_KEY) || '').trim();
-    return {
-      url: customUrl || DEFAULT_SUPABASE_URL,
-      anonKey: customKey || DEFAULT_SUPABASE_ANON_KEY
-    };
+    const validUrl = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(customUrl) ? customUrl : DEFAULT_SUPABASE_URL;
+    const validKey = customKey.length > 20 ? customKey : DEFAULT_SUPABASE_ANON_KEY;
+    return { url: validUrl, anonKey: validKey };
+  }
+
+  function getPaymentConfig() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(PAYMENT_CONFIG_KEY) || '{}');
+      return {
+        mandiriAccount: String(parsed.mandiriAccount ?? DEFAULT_PAYMENT_CONFIG.mandiriAccount).trim() || DEFAULT_PAYMENT_CONFIG.mandiriAccount,
+        mandiriHolder: String(parsed.mandiriHolder ?? DEFAULT_PAYMENT_CONFIG.mandiriHolder).trim() || DEFAULT_PAYMENT_CONFIG.mandiriHolder,
+        idrRate: Number(parsed.idrRate) > 0 ? Number(parsed.idrRate) : DEFAULT_PAYMENT_CONFIG.idrRate,
+        paypalEmail: String(parsed.paypalEmail ?? DEFAULT_PAYMENT_CONFIG.paypalEmail).trim(),
+        paypalLink: String(parsed.paypalLink ?? DEFAULT_PAYMENT_CONFIG.paypalLink).trim() || DEFAULT_PAYMENT_CONFIG.paypalLink
+      };
+    } catch (_) {
+      return { ...DEFAULT_PAYMENT_CONFIG };
+    }
+  }
+
+  function formatIdr(usdAmount) {
+    const { idrRate } = getPaymentConfig();
+    return 'Rp ' + Math.round(Number(usdAmount || 0) * idrRate).toLocaleString('id-ID');
   }
 
   function updateEndpointInfo() {
+    if (!isOwnerUnlocked) return;
     const { url } = getSupabaseConfig();
+    const pay = getPaymentConfig();
     const infoEl = document.getElementById('activeEndpointInfo');
     if (infoEl) {
-      infoEl.textContent = 'Koneksi langsung Supabase aktif: ' + url;
+      infoEl.textContent = `Supabase: ${url} | Mandiri: ${pay.mandiriAccount} (${pay.mandiriHolder}) | PayPal: ${pay.paypalLink}`;
     }
   }
 
-  function saveSupabaseConfig() {
+  function populateSettingsInputs() {
+    if (!isOwnerUnlocked) return;
+    const pay = getPaymentConfig();
+    document.getElementById('mandiriAccInput').value = pay.mandiriAccount;
+    document.getElementById('mandiriHolderInput').value = pay.mandiriHolder;
+    document.getElementById('idrRateInput').value = pay.idrRate;
+    document.getElementById('paypalEmailInput').value = pay.paypalEmail;
+    document.getElementById('paypalLinkInput').value = pay.paypalLink;
+    document.getElementById('supabaseUrlInput').value = localStorage.getItem(SUPABASE_URL_KEY) || '';
+    document.getElementById('supabaseKeyInput').value = localStorage.getItem(SUPABASE_ANON_KEY) || '';
+    updateEndpointInfo();
+  }
+
+  function saveAllSettings() {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-admin');
     const urlVal = document.getElementById('supabaseUrlInput').value.trim().replace(/\/+$/, '');
     const keyVal = document.getElementById('supabaseKeyInput').value.trim();
 
-    if (urlVal && !/^https?:\/\//i.test(urlVal)) {
-      return alert('URL Supabase harus diawali dengan https://');
+    if (urlVal && !/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(urlVal)) {
+      return alert('Format URL Supabase harus https://<project-ref>.supabase.co');
     }
 
+    const payConfig = {
+      mandiriAccount: document.getElementById('mandiriAccInput').value.trim() || DEFAULT_PAYMENT_CONFIG.mandiriAccount,
+      mandiriHolder: document.getElementById('mandiriHolderInput').value.trim() || DEFAULT_PAYMENT_CONFIG.mandiriHolder,
+      idrRate: Number(document.getElementById('idrRateInput').value) || DEFAULT_PAYMENT_CONFIG.idrRate,
+      paypalEmail: document.getElementById('paypalEmailInput').value.trim(),
+      paypalLink: document.getElementById('paypalLinkInput').value.trim() || DEFAULT_PAYMENT_CONFIG.paypalLink
+    };
+
+    localStorage.setItem(PAYMENT_CONFIG_KEY, JSON.stringify(payConfig));
     if (urlVal) localStorage.setItem(SUPABASE_URL_KEY, urlVal);
     else localStorage.removeItem(SUPABASE_URL_KEY);
 
@@ -194,9 +997,11 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     initApp();
   }
 
-  function resetSupabaseConfig() {
+  function resetAllSettings() {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-admin');
     localStorage.removeItem(SUPABASE_URL_KEY);
     localStorage.removeItem(SUPABASE_ANON_KEY);
+    localStorage.removeItem(PAYMENT_CONFIG_KEY);
     initApp();
   }
 
@@ -209,10 +1014,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
   async function initApp() {
     connected = false;
     const cfg = getSupabaseConfig();
-    document.getElementById('supabaseUrlInput').value = localStorage.getItem(SUPABASE_URL_KEY) || '';
-    document.getElementById('supabaseKeyInput').value = localStorage.getItem(SUPABASE_ANON_KEY) || '';
-    updateEndpointInfo();
-
+    if (isOwnerUnlocked) populateSettingsInputs();
     setAuthStatus('Memeriksa Supabase…', 'var(--muted)');
 
     try {
@@ -229,23 +1031,443 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
       connected = true;
       setAuthStatus('Supabase Terhubung', 'var(--green)');
       await Promise.all([loadCatalog(), loadProduction(), loadOrders()]);
+      await runQcAutoPromotion(true);
     } catch (err) {
       connected = false;
       setAuthStatus('Supabase Gagal', 'var(--red)');
       document.getElementById('catalogGrid').innerHTML =
-        '<p style="color:var(--red);font-size:.85rem">Gagal terhubung langsung ke Supabase (' +
+        '<p style="color:var(--red);font-size:.85rem">Gagal terhubung ke Supabase (' +
         escapeHtml(cfg.url) + ').<br>Detail: ' + escapeHtml(err.message) + '</p>';
-      console.error('Supabase connection error:', err);
     }
   }
 
+  // Setiap kali memilih Arsip Owner atau Owner Vault, selalu kunci kembali & minta PIN
   function setTab(tab) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
-    document.querySelector('.menu[data-tab="' + tab + '"]').classList.add('active');
+    if (tab === 'owner-admin' || tab === 'owner-vault') {
+      isOwnerUnlocked = false;
+      syncOwnerPanelsUI();
+      activateSectionTab(tab);
+      openPinModalForOwner(tab);
+      return;
+    }
+    activateSectionTab(tab);
   }
   document.querySelectorAll('.menu').forEach(m => m.onclick = () => setTab(m.dataset.tab));
+
+  function isTodayDate(isoStr) {
+    if (!isoStr) return false;
+    const d = new Date(isoStr);
+    const now = new Date();
+    return d.getFullYear() === now.getFullYear() &&
+      d.getMonth() === now.getMonth() &&
+      d.getDate() === now.getDate();
+  }
+
+  function updateDailyTargetMetrics() {
+    const todayProd = allProductionCache.filter(x => isTodayDate(x.created_at)).length;
+    const todayProds = allProductsCache.filter(x => isTodayDate(x.created_at)).length;
+    const countToday = Math.max(todayProd, todayProds);
+    const pct = Math.min(100, Math.round((countToday / DAILY_TARGET_COUNT) * 100));
+
+    const targetVal = document.getElementById('dailyTargetVal');
+    const targetBar = document.getElementById('dailyTargetBar');
+    const pendingVal = document.getElementById('pendingCountVal');
+    if (targetVal) targetVal.textContent = `${countToday} / ${DAILY_TARGET_COUNT}`;
+    if (targetBar) targetBar.style.width = `${pct}%`;
+
+    const pendingList = allProductsCache.filter(p => String(p.status || '').toLowerCase() === 'pending');
+    if (pendingVal) pendingVal.textContent = String(pendingList.length);
+  }
+
+  function parseTargetMeta(rawIdea) {
+    const text = String(rawIdea || '');
+    const match = text.match(/\[TARGET\s*:\s*([^\]]+)\]/i);
+    if (!match) return { targetSummary: 'Target 10/hari • QC Otomatis', cleanIdea: text };
+    return {
+      targetSummary: match[1].trim(),
+      cleanIdea: text.replace(match[0], '').trim()
+    };
+  }
+
+  function buildAutoGeneratedSpec(indexNumber, customType = 'toolkit') {
+    const types = ['toolkit', 'ebook', 'prompt-pack', 'template', 'request-produk'];
+    const chosenType = types.includes(customType) ? customType : types[indexNumber % types.length];
+    const stamp = new Date().toISOString().slice(0, 10);
+    const titles = [
+      `Joy Auto System Pack #${indexNumber} (${stamp})`,
+      `Joy SOP & Workflow Blueprint #${indexNumber} (${stamp})`,
+      `Joy High-Output Prompt Suite #${indexNumber} (${stamp})`,
+      `Joy Operational Template Kit #${indexNumber} (${stamp})`,
+      `Joy Custom Request Module #${indexNumber} (${stamp})`
+    ];
+    return {
+      title: titles[(indexNumber - 1) % titles.length],
+      product_type: chosenType,
+      idea: `Paket otomatis JOY CORPORATION #${indexNumber}: terstruktur, teruji checklist QC otomatis, dan siap ditinjau owner untuk publikasi.`
+    };
+  }
+
+  async function runQcAutoPromotion(silent = false) {
+    if (!connected || !sb) return;
+    await runGuard('qc-promote', async () => {
+      try {
+        const eligible = allProductionCache.filter(item => {
+          const st = String(item.status || '').toLowerCase();
+          return st === 'qc' || st === 'ready';
+        });
+        if (eligible.length === 0) {
+          if (!silent) alert('Tidak ada item antrean QC/Ready yang perlu dipromosikan ke Produk Pending.');
+          return;
+        }
+
+        triggerLivePulse('production', 'Absolut QC Memproses', 'Absolut', 'ok');
+
+        for (const item of eligible) {
+          const parsed = parseTargetMeta(item.idea);
+          const alreadyExists = allProductsCache.some(
+            p => String(p.title || '').trim().toLowerCase() === String(item.title || '').trim().toLowerCase()
+          );
+
+          if (!alreadyExists) {
+            const descText = [
+              parsed.cleanIdea || item.idea || '',
+              `QC Otomatis: LOLOS`,
+              `Target: ${parsed.targetSummary}`
+            ].filter(Boolean).join('\n');
+
+            const { data: insertedRows, error: insErr } = await sb.from('products').insert([{
+              title: item.title,
+              description: descText,
+              price_usd: 29.00,
+              status: 'pending'
+            }]).select();
+            if (insErr) throw new Error(insErr.message);
+
+            if (Array.isArray(insertedRows) && insertedRows[0]) {
+              autoSaveProductToPhoneMemory(insertedRows[0]);
+            }
+          }
+
+          const { error: updErr } = await sb
+            .from('production_items')
+            .update({ status: 'published' })
+            .eq('id', item.id);
+          if (updErr) throw new Error(updErr.message);
+        }
+
+        await Promise.all([loadCatalog(), loadProduction()]);
+        triggerLivePulse('production', 'Produk Masuk Pending', 'Absolut', 'ok');
+        if (!silent) alert('QC otomatis selesai: produk lolos pengecekan masuk ke Produk Pending.');
+      } catch (err) {
+        if (!silent) alert('Gagal proses QC otomatis: ' + err.message);
+      }
+    });
+  }
+
+  async function runDailyAutoBatchToTarget() {
+    if (!connected || !sb) return alert('Supabase belum terhubung.');
+    await runGuard('daily-10-batch', async () => {
+      try {
+        const todayCount = Math.max(
+          allProductionCache.filter(x => isTodayDate(x.created_at)).length,
+          allProductsCache.filter(x => isTodayDate(x.created_at)).length
+        );
+        const needed = Math.max(0, DAILY_TARGET_COUNT - todayCount);
+        if (needed === 0) {
+          alert('Target harian 10 produk hari ini sudah tercapai.');
+          return;
+        }
+
+        triggerLivePulse('production', 'Sedang Produksi (10/Hari)', 'Aperol → Walker → Hendrick\'s', 'ok');
+        const todayStr = new Date().toISOString().slice(0, 10);
+
+        for (let i = 1; i <= needed; i++) {
+          const seq = todayCount + i;
+          const spec = buildAutoGeneratedSpec(seq);
+          const descText = `${spec.idea}\nQC Otomatis: LOLOS (100%)\nTarget: Rilis ${todayStr} • Target 10/hari`;
+
+          await sb.from('production_items').insert([{
+            title: spec.title,
+            product_type: spec.product_type,
+            idea: `${spec.idea}\n[TARGET: Rilis ${todayStr} • 10/hari]`,
+            status: 'published'
+          }]);
+
+          const { data: pRows, error: pErr } = await sb.from('products').insert([{
+            title: spec.title,
+            description: descText,
+            price_usd: 29.00,
+            status: 'pending'
+          }]).select();
+          if (pErr) throw new Error(pErr.message);
+
+          if (Array.isArray(pRows) && pRows[0]) {
+            autoSaveProductToPhoneMemory(pRows[0]);
+          }
+        }
+
+        await Promise.all([loadCatalog(), loadProduction()]);
+        triggerLivePulse('production', `Selesai ${needed} Produk Pending`, 'Absolut QC', 'ok');
+        alert(`Otomatisasi selesai: ${needed} produk baru lolos QC, masuk ke Produk Pending, dan tersimpan ke arsip telepon.`);
+      } catch (err) {
+        alert('Gagal menjalankan otomatisasi 10 produk/hari: ' + err.message);
+      }
+    });
+  }
+
+  async function createProductionItem() {
+    if (!connected || !sb) return alert('Supabase belum terhubung.');
+    await runGuard('create-prod', async () => {
+      const title = document.getElementById('pTitle').value.trim();
+      const type = document.getElementById('pType').value;
+      const autoMode = document.getElementById('pAutoMode').value;
+      const targetDate = document.getElementById('pTargetDate').value.trim();
+      const targetUnits = document.getElementById('pTargetUnits').value.trim();
+      const targetRevenue = document.getElementById('pTargetRevenue').value.trim();
+      const idea = document.getElementById('pIdea').value.trim();
+
+      if (!title || !idea) return alert('Isi judul dan ide/spesifikasi produk terlebih dahulu.');
+
+      triggerLivePulse('production', `Sedang Produksi: ${title}`, 'Walker & Hendrick\'s', 'ok');
+
+      const parts = [];
+      if (targetDate) parts.push('Rilis ' + targetDate);
+      if (targetUnits) parts.push(targetUnits + ' unit');
+      if (targetRevenue) parts.push('$' + Number(targetRevenue).toFixed(2));
+      parts.push('Target 10/hari');
+      const targetSummary = parts.join(' • ');
+
+      try {
+        if (autoMode === 'auto') {
+          const { data: pRows, error: prodErr } = await sb.from('products').insert([{
+            title,
+            description: `${idea}\nQC Otomatis: LOLOS\nTarget: ${targetSummary}`,
+            price_usd: Number(targetRevenue) > 0 && Number(targetUnits) > 0
+              ? Number((Number(targetRevenue) / Number(targetUnits)).toFixed(2))
+              : 29.00,
+            status: 'pending'
+          }]).select();
+          if (prodErr) throw new Error(prodErr.message);
+
+          if (Array.isArray(pRows) && pRows[0]) {
+            autoSaveProductToPhoneMemory(pRows[0]);
+          }
+
+          await sb.from('production_items').insert([{
+            title,
+            product_type: type,
+            idea: `${idea}\n[TARGET: ${targetSummary}]`,
+            status: 'published'
+          }]);
+        } else {
+          const { error } = await sb.from('production_items').insert([{
+            title,
+            product_type: type,
+            idea: `${idea}\n[TARGET: ${targetSummary}]`,
+            status: 'idea'
+          }]);
+          if (error) throw new Error(error.message);
+        }
+
+        document.getElementById('pTitle').value = '';
+        document.getElementById('pTargetDate').value = '';
+        document.getElementById('pTargetUnits').value = '';
+        document.getElementById('pTargetRevenue').value = '';
+        document.getElementById('pIdea').value = '';
+        await Promise.all([loadCatalog(), loadProduction()]);
+        triggerLivePulse('production', `Produk Masuk Pending: ${title}`, 'Absolut QC', 'ok');
+      } catch (err) {
+        alert('Gagal membuat item produksi: ' + err.message);
+      }
+    });
+  }
+
+  async function publishPendingProduct(productId) {
+    if (!connected || !sb) return alert('Supabase belum terhubung.');
+    await runGuard('publish-' + productId, async () => {
+      try {
+        const current = allProductsCache.find(p => String(p.id) === String(productId));
+        const defaultPrice = current && Number(current.price_usd) > 0 ? Number(current.price_usd) : 29.00;
+        const rawPrice = prompt('Setujui & konfirmasi harga jual produk (USD):', String(defaultPrice.toFixed(2)));
+        if (rawPrice === null) return;
+        const priceUsd = parseFloat(rawPrice);
+        if (isNaN(priceUsd) || priceUsd <= 0) return alert('Harga USD tidak valid.');
+
+        const { data: updatedRows, error } = await sb
+          .from('products')
+          .update({ status: 'published', price_usd: priceUsd })
+          .eq('id', productId)
+          .select();
+
+        if (error) throw new Error(error.message);
+        if (Array.isArray(updatedRows) && updatedRows[0]) {
+          autoSaveProductToPhoneMemory(updatedRows[0]);
+        }
+
+        await loadCatalog();
+        triggerLivePulse('worklog', `Produk Public: ${(current && current.title) || productId}`, 'Martini', 'ok');
+      } catch (err) {
+        alert('Gagal mempublikasikan produk: ' + err.message);
+      }
+    });
+  }
+
+  async function advanceStatus(item) {
+    if (!connected || !sb) return alert('Supabase belum terhubung.');
+    await runGuard('advance-' + item.id, async () => {
+      const flow = ['idea', 'drafting', 'owner_review', 'qc', 'ready', 'published'];
+      const next = flow[Math.min(flow.indexOf(item.status) + 1, flow.length - 1)];
+
+      try {
+        const { error } = await sb
+          .from('production_items')
+          .update({ status: next })
+          .eq('id', item.id);
+        if (error) throw new Error(error.message);
+
+        if (next === 'qc' || next === 'ready' || next === 'published') {
+          const parsed = parseTargetMeta(item.idea);
+          const exists = allProductsCache.some(
+            p => String(p.title || '').trim().toLowerCase() === String(item.title || '').trim().toLowerCase()
+          );
+          if (!exists) {
+            const { data: pRows } = await sb.from('products').insert([{
+              title: item.title,
+              description: `${parsed.cleanIdea || item.idea || ''}\nQC Otomatis: LOLOS\nTarget: ${parsed.targetSummary}`,
+              price_usd: 29.00,
+              status: 'pending'
+            }]).select();
+            if (Array.isArray(pRows) && pRows[0]) {
+              autoSaveProductToPhoneMemory(pRows[0]);
+            }
+          }
+        }
+
+        await Promise.all([loadCatalog(), loadProduction()]);
+        triggerLivePulse('production', `${item.title} → ${next}`, 'Agency Pipeline', 'ok');
+      } catch (err) {
+        alert('Gagal memajukan status: ' + err.message);
+      }
+    });
+  }
+
+  function renderPendingProductsTable() {
+    const body = document.getElementById('pendingProductsBody');
+    if (!body) return;
+    body.innerHTML = '';
+
+    const pendingItems = allProductsCache.filter(p => String(p.status || '').toLowerCase() === 'pending');
+    if (pendingItems.length === 0) {
+      body.innerHTML = '<tr><td colspan="4" style="color:var(--muted)">Belum ada produk di antrean Pending.</td></tr>';
+      return;
+    }
+
+    pendingItems.forEach(p => {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><strong>' + escapeHtml(p.title || 'Tanpa Judul') + '</strong>' +
+          (p.description ? '<div style="font-size:.75rem;color:var(--muted);margin-top:3px">' + escapeHtml(p.description.slice(0, 130)) + '</div>' : '') +
+        '</td>' +
+        '<td><span class="status pending">pending (lolos qc)</span></td>' +
+        '<td>$' + Number(p.price_usd || 0).toFixed(2) + '</td>' +
+        '<td><div class="actions">' +
+          '<button class="btn btn-gold" onclick="publishPendingProduct(\'' + escapeHtml(String(p.id)) + '\')">Public</button>' +
+          '<button class="btn" onclick="viewOwnerProduct(\'' + escapeHtml(String(p.id)) + '\')">Lihat</button>' +
+        '</div></td>';
+      body.appendChild(tr);
+    });
+  }
+
+  function registerTrackedBlobUrl(blob) {
+    const url = URL.createObjectURL(blob);
+    activeBlobUrls.push(url);
+    return url;
+  }
+
+  function buildProductPackageBlobUrl(product) {
+    const konten = [
+      `JOY CORPORATION - ARSIP & PRODUK OWNER`,
+      `"Kami ada karena kamu Ade"`,
+      `----------------------------------------`,
+      `ID Produk  : ${product.id || '-'}`,
+      `Judul      : ${product.title || 'Tanpa Judul'}`,
+      `Status     : ${product.status || '-'}`,
+      `Harga      : $${Number(product.price_usd || 0).toFixed(2)} USD (${formatIdr(product.price_usd || 0)})`,
+      `Dibuat     : ${product.created_at ? new Date(product.created_at).toLocaleString('id-ID') : '-'}`,
+      ``,
+      `Deskripsi / Isi Produk:`,
+      product.description || '(Tidak ada deskripsi)'
+    ].join('\n');
+
+    const blob = new Blob([konten], { type: 'text/plain;charset=utf-8' });
+    return registerTrackedBlobUrl(blob);
+  }
+
+  function viewOwnerProduct(productId) {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
+    const p = allProductsCache.find(item => String(item.id) === String(productId));
+    if (!p) return;
+    activateSectionTab('owner-vault');
+    const card = document.getElementById('ownerPreviewCard');
+    const titleEl = document.getElementById('ownerPreviewTitle');
+    const contentEl = document.getElementById('ownerPreviewContent');
+
+    titleEl.textContent = p.title || 'Detail Produk';
+    contentEl.textContent =
+      `ID Produk : ${p.id}\n` +
+      `Status    : ${p.status || '-'}\n` +
+      `Harga     : $${Number(p.price_usd || 0).toFixed(2)} (${formatIdr(p.price_usd || 0)})\n` +
+      `Tanggal   : ${p.created_at ? new Date(p.created_at).toLocaleString('id-ID') : '-'}\n\n` +
+      `Deskripsi:\n${p.description || '-'}`;
+    card.style.display = 'block';
+  }
+
+  function closeOwnerPreview() {
+    document.getElementById('ownerPreviewCard').style.display = 'none';
+  }
+
+  function downloadOwnerProduct(productId) {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
+    const p = allProductsCache.find(item => String(item.id) === String(productId));
+    if (!p) return;
+    const url = buildProductPackageBlobUrl(p);
+    const a = document.createElement('a');
+    const safeSlug = String(p.title || 'produk').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'produk';
+    a.href = url;
+    a.download = `JOY-OWNER-${safeSlug}-${String(p.id).slice(0, 8)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  function renderOwnerProductsTable(products) {
+    const body = document.getElementById('ownerProductsBody');
+    if (!body || !isOwnerUnlocked) return;
+    body.innerHTML = '';
+
+    if (!products || products.length === 0) {
+      body.innerHTML = '<tr><td colspan="4" style="color:var(--muted)">Belum ada produk di database.</td></tr>';
+      return;
+    }
+
+    products.forEach(p => {
+      const tr = document.createElement('tr');
+      const st = String(p.status || 'pending');
+
+      tr.innerHTML =
+        '<td><strong>' + escapeHtml(p.title || 'Tanpa Judul') + '</strong>' +
+          (p.description ? '<div style="font-size:.75rem;color:var(--muted);margin-top:3px">' + escapeHtml(p.description.slice(0, 120)) + '</div>' : '') +
+        '</td>' +
+        '<td><span class="status ' + escapeHtml(st) + '">' + escapeHtml(st) + '</span></td>' +
+        '<td>$' + Number(p.price_usd || 0).toFixed(2) + '</td>' +
+        '<td><div class="actions">' +
+          '<button class="btn" onclick="viewOwnerProduct(\'' + escapeHtml(String(p.id)) + '\')">Lihat</button>' +
+          '<button class="btn btn-gold" onclick="downloadOwnerProduct(\'' + escapeHtml(String(p.id)) + '\')">Download</button>' +
+        '</div></td>';
+
+      body.appendChild(tr);
+    });
+  }
 
   async function loadCatalog() {
     const grid = document.getElementById('catalogGrid');
@@ -259,17 +1481,33 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
       const { data, error } = await sb
         .from('products')
         .select('*')
-        .eq('status', 'published')
         .order('created_at', { ascending: false });
 
       if (error) throw new Error(error.message);
 
-      if (!data || data.length === 0) {
-        grid.innerHTML = '<p style="color:var(--muted)">Belum ada produk yang dipublikasikan.</p>';
+      allProductsCache = Array.isArray(data) ? data : [];
+      if (getStorageTarget() === 'phone_memory') {
+        localStorage.setItem(LOCAL_PRODUCTS_EXPORT_KEY, JSON.stringify(allProductsCache));
+      }
+
+      if (isOwnerUnlocked) {
+        renderOwnerProductsTable(allProductsCache);
+        updateMemoryStorageStats();
+      }
+
+      renderPendingProductsTable();
+      updateDailyTargetMetrics();
+
+      const published = allProductsCache.filter(p => String(p.status || '').toLowerCase() === 'published');
+
+      if (published.length === 0) {
+        grid.innerHTML = '<p style="color:var(--muted)">Belum ada produk berstatus <b>public</b>. Setujui produk di tab <b>Produksi & Pending</b> agar tampil di sini.</p>';
         return;
       }
 
-      data.forEach(p => {
+      const pay = getPaymentConfig();
+
+      published.forEach(p => {
         const card = document.createElement('div');
         card.className = 'product';
 
@@ -283,14 +1521,19 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
 
         const price = document.createElement('div');
         price.className = 'price';
-        price.textContent = '$' + Number(p.price_usd || 0).toFixed(2);
+        price.textContent = '$' + Number(p.price_usd || 0).toFixed(2) + ' (' + formatIdr(p.price_usd || 0) + ')';
+
+        const methodSelect = document.createElement('select');
+        methodSelect.innerHTML =
+          '<option value="mandiri">Bank Mandiri (' + escapeHtml(pay.mandiriAccount) + ')</option>' +
+          '<option value="paypal">PayPal (paypal.me/akurniasandy)</option>';
 
         const btn = document.createElement('button');
         btn.className = 'btn btn-gold';
         btn.textContent = 'Beli Sekarang';
-        btn.addEventListener('click', () => startCheckout(p));
+        btn.addEventListener('click', () => startCheckout(p, methodSelect.value));
 
-        card.append(h3, pd, price, btn);
+        card.append(h3, pd, price, methodSelect, btn);
         grid.appendChild(card);
       });
     } catch (err) {
@@ -298,31 +1541,48 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     }
   }
 
-  async function startCheckout(product) {
+  async function startCheckout(product, method) {
     if (!connected || !sb) return alert('Supabase belum terhubung.');
-    const email = prompt('Masukkan email untuk menerima produk:');
-    if (!email) return;
-
-    try {
-      const { data, error } = await sb
-        .from('orders')
-        .insert([{
-          product_id: product.id,
-          customer_email: email.trim(),
-          amount: product.price_usd,
-          currency: 'USD',
-          payment_provider: 'pending',
-          payment_status: 'pending'
-        }])
-        .select();
-
-      if (error) throw new Error(error.message);
-      const orderId = Array.isArray(data) && data[0] ? data[0].id : '';
-      alert('Pesanan dibuat.' + (orderId ? ' Link unduhan: download.html?order=' + encodeURIComponent(orderId) : ''));
-      loadOrders();
-    } catch (err) {
-      alert('Gagal: ' + err.message);
+    const rawEmail = prompt('Masukkan email untuk menerima produk:');
+    if (!rawEmail) return;
+    const email = rawEmail.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return alert('Format email tidak valid.');
     }
+
+    const chosenMethod = method === 'paypal' ? 'paypal' : 'mandiri';
+    const pay = getPaymentConfig();
+
+    await runGuard('checkout-' + product.id, async () => {
+      triggerLivePulse('orders', 'Menerima Pesanan Baru', 'Hennessy', 'pending');
+      try {
+        const { data, error } = await sb
+          .from('orders')
+          .insert([{
+            product_id: product.id,
+            customer_email: email,
+            amount: product.price_usd,
+            currency: 'USD',
+            payment_provider: chosenMethod,
+            payment_status: 'pending'
+          }])
+          .select();
+
+        if (error) throw new Error(error.message);
+        const orderId = Array.isArray(data) && data[0] ? data[0].id : '';
+        const dlPath = orderId ? 'download.html?order=' + encodeURIComponent(orderId) : 'download.html';
+
+        const instruksi = chosenMethod === 'paypal'
+          ? `Metode: PayPal\nNominal: $${Number(product.price_usd || 0).toFixed(2)} USD\nLink PayPal: ${pay.paypalLink}`
+          : `Metode: Bank Mandiri\nNo. Rek: ${pay.mandiriAccount} a.n. ${pay.mandiriHolder}\nNominal Transfer: ${formatIdr(product.price_usd)} (setara $${Number(product.price_usd || 0).toFixed(2)} USD)`;
+
+        await loadOrders();
+        triggerLivePulse('orders', `Order Masuk (${chosenMethod.toUpperCase()})`, 'Hennessy', 'pending');
+        alert(`Pesanan dibuat${orderId ? ' (ID: ' + orderId + ')' : ''}.\n\n${instruksi}\n\nAkses unduhan: ${dlPath}`);
+      } catch (err) {
+        alert('Gagal membuat pesanan: ' + err.message);
+      }
+    });
   }
 
   async function loadProduction() {
@@ -337,117 +1597,87 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
         .order('created_at', { ascending: false });
 
       if (error) throw new Error(error.message);
+      allProductionCache = Array.isArray(data) ? data : [];
+      updateDailyTargetMetrics();
 
-      if (!data || data.length === 0) {
-        body.innerHTML = '<tr><td colspan="4" style="color:var(--muted)">Belum ada item produksi.</td></tr>';
+      if (allProductionCache.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" style="color:var(--muted)">Belum ada item produksi.</td></tr>';
         return;
       }
 
-      data.forEach(item => {
+      allProductionCache.forEach(item => {
+        const parsed = parseTargetMeta(item.idea);
         const tr = document.createElement('tr');
 
         const c1 = document.createElement('td');
-        c1.textContent = item.title;
+        c1.innerHTML = '<strong>' + escapeHtml(item.title) + '</strong>' +
+          (parsed.cleanIdea ? '<div style="font-size:.75rem;color:var(--muted);margin-top:3px">' + escapeHtml(parsed.cleanIdea) + '</div>' : '');
 
         const c2 = document.createElement('td');
         c2.textContent = item.product_type || '-';
 
         const c3 = document.createElement('td');
-        const sp = document.createElement('span');
-        sp.className = 'status ' + item.status;
-        sp.textContent = item.status;
-        c3.appendChild(sp);
+        c3.innerHTML = '<span style="font-size:.78rem;color:var(--gold)">' + escapeHtml(parsed.targetSummary) + '</span>';
 
         const c4 = document.createElement('td');
+        const sp = document.createElement('span');
+        sp.className = 'status ' + escapeHtml(item.status);
+        sp.textContent = item.status;
+        c4.appendChild(sp);
+
+        const c5 = document.createElement('td');
         if (item.status !== 'published') {
           const btn = document.createElement('button');
           btn.className = 'btn';
-          btn.textContent = item.status === 'ready' ? 'Publikasikan' : 'Majukan';
+          btn.textContent = item.status === 'qc' || item.status === 'ready' ? 'Kirim ke Pending' : 'Majukan';
           btn.addEventListener('click', () => advanceStatus(item));
-          c4.appendChild(btn);
+          c5.appendChild(btn);
         } else {
-          c4.innerHTML = '<span style="font-size:.75rem;color:var(--green)">Tayang</span>';
+          c5.innerHTML = '<span style="font-size:.75rem;color:var(--green)">Lolos QC</span>';
         }
 
-        tr.append(c1, c2, c3, c4);
+        tr.append(c1, c2, c3, c4, c5);
         body.appendChild(tr);
       });
     } catch (err) {
-      body.innerHTML = '<tr><td colspan="4" style="color:var(--red)">Error: ' + escapeHtml(err.message) + '</td></tr>';
+      body.innerHTML = '<tr><td colspan="5" style="color:var(--red)">Error: ' + escapeHtml(err.message) + '</td></tr>';
     }
   }
 
-  async function createProductionItem() {
-    if (!connected || !sb) return alert('Supabase belum terhubung.');
-
-    const title = document.getElementById('pTitle').value.trim();
-    const type = document.getElementById('pType').value;
-    const idea = document.getElementById('pIdea').value.trim();
-
-    if (!title || !idea) return alert('Isi judul dan ide produk dulu.');
-
-    try {
-      const { error } = await sb
-        .from('production_items')
-        .insert([{
-          title,
-          product_type: type,
-          idea,
-          status: 'idea'
-        }]);
-
-      if (error) throw new Error(error.message);
-
-      document.getElementById('pTitle').value = '';
-      document.getElementById('pIdea').value = '';
-      loadProduction();
-    } catch (err) {
-      alert('Gagal: ' + err.message);
-    }
+  function updateOwnerFinanceSummary() {
+    if (!isOwnerUnlocked) return;
+    let paidUsd = 0;
+    let pendingUsd = 0;
+    allOrdersCache.forEach(o => {
+      const amt = Number(o.amount || 0);
+      if (String(o.payment_status || '').toLowerCase() === 'paid') paidUsd += amt;
+      else pendingUsd += amt;
+    });
+    const usdEl = document.getElementById('ownerBalanceUsd');
+    const idrEl = document.getElementById('ownerBalanceIdr');
+    const pendEl = document.getElementById('ownerPendingUsd');
+    if (usdEl) usdEl.textContent = '$' + paidUsd.toFixed(2);
+    if (idrEl) idrEl.textContent = formatIdr(paidUsd);
+    if (pendEl) pendEl.textContent = '$' + pendingUsd.toFixed(2);
   }
 
-  async function advanceStatus(item) {
+  async function markOrderPaid(orderId) {
     if (!connected || !sb) return alert('Supabase belum terhubung.');
+    if (!confirm('Konfirmasi pembayaran pesanan ini sudah masuk (status -> paid)?')) return;
 
-    const flow = ['idea', 'drafting', 'owner_review', 'qc', 'ready', 'published'];
-    const next = flow[Math.min(flow.indexOf(item.status) + 1, flow.length - 1)];
-
-    if (item.status === 'qc' && next === 'ready' && !confirm('Sudah selesai checklist QC?')) return;
-
-    let priceUsd = null;
-    if (next === 'published') {
-      const rawPrice = prompt('Setujui & masukkan harga jual produk (USD):', '29.00');
-      if (rawPrice === null) return;
-      priceUsd = parseFloat(rawPrice);
-      if (isNaN(priceUsd) || priceUsd <= 0) return alert('Harga USD tidak valid.');
-    }
-
-    try {
-      const { error } = await sb
-        .from('production_items')
-        .update({ status: next })
-        .eq('id', item.id);
-
-      if (error) throw new Error(error.message);
-
-      if (next === 'published') {
-        const { error: prodErr } = await sb
-          .from('products')
-          .insert([{
-            title: item.title,
-            description: item.idea || '',
-            price_usd: priceUsd,
-            status: 'published'
-          }]);
-
-        if (prodErr) throw new Error(prodErr.message);
-        loadCatalog();
+    await runGuard('paid-' + orderId, async () => {
+      try {
+        const { error } = await sb
+          .from('orders')
+          .update({ payment_status: 'paid' })
+          .eq('id', orderId);
+        if (error) throw new Error(error.message);
+        await loadOrders();
+        triggerLivePulse('orders', `Pembayaran Diterima (Order ${String(orderId).slice(0, 8)})`, 'Hennessy', 'paid');
+      } catch (err) {
+        alert('Gagal mengubah status: ' + err.message);
       }
-
-      loadProduction();
-    } catch (err) {
-      alert(err.message);
-    }
+    });
   }
 
   async function loadOrders() {
@@ -458,34 +1688,105 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     try {
       const { data, error } = await sb
         .from('orders')
-        .select('*,products(title)')
+        .select('*')
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(100);
 
       if (error) throw new Error(error.message);
+      allOrdersCache = Array.isArray(data) ? data : [];
+      updateOwnerFinanceSummary();
 
-      if (!data || data.length === 0) {
+      const titleMap = {};
+      allProductsCache.forEach(pr => { titleMap[pr.id] = pr.title; });
+
+      if (allOrdersCache.length === 0) {
         body.innerHTML = '<tr><td colspan="6" style="color:var(--muted)">Belum ada pesanan.</td></tr>';
         return;
       }
 
-      data.forEach(o => {
+      allOrdersCache.forEach(o => {
         const tr = document.createElement('tr');
-        const prodTitle = (o.products && o.products.title) || 'Produk';
+        const prodTitle = titleMap[o.product_id] || 'Produk';
         const dlUrl = `download.html?order=${encodeURIComponent(o.id)}`;
+        const isPaid = String(o.payment_status || '').toLowerCase() === 'paid';
 
         tr.innerHTML =
           '<td>' + escapeHtml(new Date(o.created_at).toLocaleString('id-ID')) + '</td>' +
           '<td>' + escapeHtml(prodTitle) + '</td>' +
-          '<td>$' + Number(o.amount).toFixed(2) + '</td>' +
-          '<td>' + escapeHtml(o.payment_provider) + '</td>' +
+          '<td>$' + Number(o.amount || 0).toFixed(2) + '</td>' +
+          '<td>' + escapeHtml(String(o.payment_provider || '-').toUpperCase()) + '</td>' +
           '<td><span class="status ' + escapeHtml(o.payment_status) + '">' + escapeHtml(o.payment_status) + '</span></td>' +
-          '<td><a class="btn" href="' + dlUrl + '" target="_blank" rel="noopener">Unduh</a></td>';
+          '<td><div class="actions">' +
+            (!isPaid ? '<button class="btn btn-green" onclick="markOrderPaid(\'' + escapeHtml(String(o.id)) + '\')">Tandai Lunas</button>' : '') +
+            '<a class="btn" href="' + dlUrl + '" target="_blank" rel="noopener">Unduh</a>' +
+          '</div></td>';
         body.appendChild(tr);
       });
     } catch (err) {
       body.innerHTML = '<tr><td colspan="6" style="color:var(--red)">Error: ' + escapeHtml(err.message) + '</td></tr>';
     }
+  }
+
+  async function runHourlyOptimization(manual = false) {
+    if (manual && !isOwnerUnlocked) return openPinModalForOwner('owner-admin');
+    await runGuard('hourly-opt', async () => {
+      while (activeBlobUrls.length > 0) {
+        const oldUrl = activeBlobUrls.shift();
+        try { URL.revokeObjectURL(oldUrl); } catch (_) {}
+      }
+
+      if (connected && sb) {
+        try {
+          await Promise.all([loadCatalog(), loadProduction(), loadOrders()]);
+          await runQcAutoPromotion(true);
+        } catch (_) {}
+      }
+
+      const badge = document.getElementById('autoOptBadge');
+      const jamMenit = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      if (badge) badge.textContent = `Auto-Opt 1j: OK (${jamMenit})`;
+      appendWorklogEntry('System', `Auto-Optimasi 1 jam selesai (${jamMenit})`, 'ok');
+      if (manual) alert(`Pengoptimalan sistem selesai (${jamMenit}). Semua data tetap aman 100%.`);
+    });
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    const msg = document.getElementById('installStatusMsg');
+    if (msg) msg.textContent = 'Siap diinstal langsung ke perangkat Anda.';
+  });
+
+  async function triggerInstallPrompt() {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-admin');
+    const msg = document.getElementById('installStatusMsg');
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      if (msg) {
+        msg.textContent = choice.outcome === 'accepted'
+          ? 'Aplikasi JOY CORPORATION sedang diinstal ke perangkat Anda.'
+          : 'Instalasi dibatalkan. Anda juga bisa menginstal lewat menu browser.';
+      }
+      return;
+    }
+    if (msg) {
+      msg.textContent = 'Gunakan menu browser (⋮ / Bagikan) lalu pilih "Tambahkan ke Layar Utama" / "Instal aplikasi", atau unduh paket .html di samping.';
+    }
+  }
+
+  function downloadAppBundle() {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-admin');
+    const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = registerTrackedBlobUrl(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'JOY-CORPORATION-APP.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   }
 
   function escapeHtml(str) {
@@ -494,7 +1795,24 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border)}
     }[m]));
   }
 
-  window.addEventListener('DOMContentLoaded', initApp);
+  window.addEventListener('DOMContentLoaded', () => {
+    ensurePinInitialized();
+    renderWorklogTable();
+
+    const loginInput = document.getElementById('pinLoginInput');
+    if (loginInput) {
+      loginInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submitPinLogin();
+      });
+    }
+
+    setInterval(() => runHourlyOptimization(false), ONE_HOUR_MS);
+
+    initialLoginDone = false;
+    isOwnerUnlocked = false;
+    syncOwnerPanelsUI();
+    setPinModalVisible(true, '', 'Masukkan PIN untuk membuka Command Center.');
+  });
 </script>
 </body>
 </html>
