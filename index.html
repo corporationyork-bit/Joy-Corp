@@ -631,7 +631,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
         const swCode = `
-          const CACHE_NAME = 'joy-corp-inline-v1';
+          const CACHE_NAME = 'joy-corp-inline-v2';
           self.addEventListener('install', (event) => {
             self.skipWaiting();
           });
@@ -1503,6 +1503,36 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     });
   }
 
+  async function publishFromPipeline(item) {
+    if (!connected || !sb) return alert('Supabase belum terhubung.');
+    await runGuard('pipe-pub-' + item.id, async () => {
+      try {
+        let prod = allProductsCache.find(
+          p => String(p.title || '').trim().toLowerCase() === String(item.title || '').trim().toLowerCase()
+        );
+
+        if (!prod) {
+          const parsed = parseTargetMeta(item.idea);
+          const { data: inserted, error: insErr } = await sb.from('products').insert([{
+            title: item.title,
+            description: `${parsed.cleanIdea || item.idea || ''}\nQC Otomatis: LOLOS`,
+            price_usd: 29.00,
+            status: 'pending'
+          }]).select();
+          if (insErr) throw new Error(insErr.message);
+          prod = inserted && inserted[0];
+          await loadCatalog();
+        }
+
+        if (prod && prod.id) {
+          await publishPendingProduct(prod.id);
+        }
+      } catch (err) {
+        alert('Gagal proses ke Public & Gumroad: ' + err.message);
+      }
+    });
+  }
+
   async function advanceStatus(item) {
     if (!connected || !sb) return alert('Supabase belum terhubung.');
     await runGuard('advance-' + item.id, async () => {
@@ -1834,7 +1864,11 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           btn.addEventListener('click', () => advanceStatus(item));
           c5.appendChild(btn);
         } else {
-          c5.innerHTML = '<span style="font-size:.75rem;color:var(--green)">Lolos QC</span>';
+          const btnGum = document.createElement('button');
+          btnGum.className = 'btn btn-gold';
+          btnGum.textContent = 'Public / Gumroad';
+          btnGum.addEventListener('click', () => publishFromPipeline(item));
+          c5.appendChild(btnGum);
         }
 
         tr.append(c1, c2, c3, c4, c5);
