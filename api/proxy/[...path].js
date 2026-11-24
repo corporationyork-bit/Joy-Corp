@@ -1,70 +1,81 @@
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Prefer, apikey');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+  if (req.method !== "POST") {
+    return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 
-  const pathSegments = req.query.path || [];
-  const rawPath = Array.isArray(pathSegments) ? pathSegments.join('/') : String(pathSegments || '');
-  const cleanPath = rawPath.replace(/^\/+/, '');
-
-  const host = req.headers.host || 'localhost';
-  const protocol = req.headers['x-forwarded-proto'] || 'https';
-  const url = new URL(req.url, `${protocol}://${host}`);
-  const queryString = url.search;
-
-  const rawSupabaseUrl = (process.env.SUPABASE_URL || '').trim();
-  const SUPABASE_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '').trim();
-
-  if (!rawSupabaseUrl || !SUPABASE_KEY) {
-    return res.status(500).json({
-      error: 'Server misconfigured',
-      message: 'SUPABASE_URL atau SUPABASE_KEY belum di-set di Environment Variables'
-    });
+  const token = process.env.GUMROAD_ACCESS_TOKEN;
+  if (!token) {
+    return res.status(500).json({ ok: false, error: "GUMROAD_ACCESS_TOKEN belum diatur di Vercel" });
   }
-
-  const SUPABASE_URL = rawSupabaseUrl.replace(/\/+$/, '');
-  const targetUrl = `${SUPABASE_URL}/${cleanPath}${queryString}`;
 
   try {
-    const headers = {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-    };
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
+    const title = String(body.title || body.name || "").trim();
+    const description = String(body.description || "");
+    const priceCents = Number(
+      body.price_cents || Math.round(Number(body.price_usd || 29) * 100)
+    );
 
-    if (req.headers.prefer) {
-      headers['Prefer'] = req.headers.prefer;
+    if (!title) {
+      return res.status(400).json({ ok: false, error: "Judul produk (title) wajib ada" });
     }
 
-    let body = undefined;
-    if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body !== undefined) {
-      body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+    // 1. Ambil daftar produk yang sudah ada di akun Gumroad
+    const listUrl = `https://api.gumroad.com/v2/products?access_token=${encodeURIComponent(token)}`;
+    const listRes = await fetch(listUrl);
+    const listData = await listRes.json();
+
+    if (!listRes.ok || !listData.success) {
+      return res.status(listRes.status || 401).json({
+        ok: false,
+        error: listData.message || "Token Gumroad tidak valid atau gagal membaca produk"
+      });
     }
 
-    const response = await fetch(targetUrl, {
-      method: req.method,
-      headers,
-      body,
+    // 2. Cocokkan produk berdasarkan judul (exact match dulu, lalu fallback awalan sebelum [...] jika ada)
+    const products = Array.isArray(listData.products) ? listData.products : [];
+    const baseTitle = title.replace(/\s*\[[^\]]*\]\s*$/g, "").trim().toLowerCase();
+
+    const existing =
+      products.find((p) => String(p.name || "").trim().toLowerCase() === title.toLowerCase()) ||
+      products.find((p) => String(p.name || "").trim().toLowerCase() === baseTitle);
+
+    if (!existing) {
+      return res.status(404).json({
+        ok: false,
+        error: `Produk "${title}" belum ada di Gumroad. Buat produk dengan judul yang sama di dashboard Gumroad terlebih dahulu (API Gumroad tidak mendukung pembuatan produk baru).`
+      });
+    }
+
+    // 3. Perbarui detail dan aktifkan produk di Gumroad
+    const params = new URLSearchParams({
+      access_token: token,
+      name: existing.name || title,
+      description,
+      price: String(Number.isFinite(priceCents) && priceCents > 0 ? priceCents : 2900),
+      published: "true"
     });
 
-    const responseText = await response.text();
-    res.status(response.status);
+    const updRes = await fetch(`https://api.gumroad.com/v2/products/${existing.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString()
+    });
 
-    const contentType = response.headers.get('content-type');
-    if (contentType) {
-      res.setHeader('Content-Type', contentType);
+    const updData = await updRes.json();
+    if (!updRes.ok || !updData.success) {
+      return res.status(updRes.status || 400).json({
+        ok: false,
+        error: updData.message || "Gagal memperbarui produk di Gumroad"
+      });
     }
 
-    return res.send(responseText);
-  } catch (error) {
-    console.error('[Proxy Error]', error.message);
-    return res.status(500).json({
-      error: 'Proxy request failed',
-      message: error.message
+    return res.status(200).json({
+      ok: true,
+      product_id: existing.id,
+      product: updData.product
     });
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: err.message || "Server error" });
   }
 }
