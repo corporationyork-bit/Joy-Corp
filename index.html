@@ -585,6 +585,16 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   let manifestBlobUrl = null;
   const busyLocks = new Set();
 
+  function makeProductSlug(title) {
+    const base = String(title || 'produk')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 60) || 'produk';
+    const suffix = Date.now().toString(36).slice(-4) + Math.random().toString(36).slice(2, 5);
+    return `${base}-${suffix}`;
+  }
+
   function createAppIconDataUrl(size) {
     const canvas = document.createElement('canvas');
     canvas.width = size;
@@ -631,7 +641,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
         const swCode = `
-          const CACHE_NAME = 'joy-corp-inline-v2';
+          const CACHE_NAME = 'joy-corp-inline-v3';
           self.addEventListener('install', (event) => {
             self.skipWaiting();
           });
@@ -1258,6 +1268,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
             const { data: insertedRows, error: insErr } = await sb.from('products').insert([{
               title: item.title,
+              slug: makeProductSlug(item.title),
               description: descText,
               price_usd: 29.00,
               status: 'pending'
@@ -1317,6 +1328,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
           const { data: pRows, error: pErr } = await sb.from('products').insert([{
             title: spec.title,
+            slug: makeProductSlug(spec.title),
             description: descText,
             price_usd: 29.00,
             status: 'pending'
@@ -1363,6 +1375,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         if (autoMode === 'auto') {
           const { data: pRows, error: prodErr } = await sb.from('products').insert([{
             title,
+            slug: makeProductSlug(title),
             description: `${idea}\nQC Otomatis: LOLOS\nTarget: ${targetSummary}`,
             price_usd: Number(targetRevenue) > 0 && Number(targetUnits) > 0
               ? Number((Number(targetRevenue) / Number(targetUnits)).toFixed(2))
@@ -1515,6 +1528,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           const parsed = parseTargetMeta(item.idea);
           const { data: inserted, error: insErr } = await sb.from('products').insert([{
             title: item.title,
+            slug: makeProductSlug(item.title),
             description: `${parsed.cleanIdea || item.idea || ''}\nQC Otomatis: LOLOS`,
             price_usd: 29.00,
             status: 'pending'
@@ -1554,6 +1568,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           if (!exists) {
             const { data: pRows } = await sb.from('products').insert([{
               title: item.title,
+              slug: makeProductSlug(item.title),
               description: `${parsed.cleanIdea || item.idea || ''}\nQC Otomatis: LOLOS\nTarget: ${parsed.targetSummary}`,
               price_usd: 29.00,
               status: 'pending'
