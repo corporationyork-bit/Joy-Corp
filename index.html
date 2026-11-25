@@ -285,7 +285,7 @@ th{color:var(--muted);font-weight:700}
           <h3 class="subhead" style="margin:0">Kotak 4 — Otomatis Produksi Berbeda & Request Produk</h3>
           <button class="btn" onclick="toggleProdBox(4)" style="padding:4px 9px;font-size:.72rem">Tutup</button>
         </div>
-        <p class="hint" style="margin-bottom:10px">Otomatis produksi dengan jenis yang berbeda (riset pasar global) & request produk.</p>
+        <p class="hint" style="margin-bottom:10px">Otomatis produksi jenis terlaris (Prompt Vault, Template, Playbook, Social/Wall Art Kit) & request produk.</p>
 
         <div class="grid-2">
           <div>
@@ -293,10 +293,10 @@ th{color:var(--muted);font-weight:700}
             <select id="pType" onchange="syncBox4Defaults()">
               <option value="auto-global">Otomatis Produksi Jenis Berbeda (Riset Pasar Global)</option>
               <option value="request-produk">Request Produk</option>
-              <option value="toolkit">Toolkit</option>
-              <option value="ebook">Ebook</option>
               <option value="prompt-pack">Prompt Pack</option>
               <option value="template">Template</option>
+              <option value="ebook">Ebook / Playbook</option>
+              <option value="toolkit">Toolkit & Aset Visual</option>
             </select>
           </div>
           <div>
@@ -611,54 +611,54 @@ th{color:var(--muted);font-weight:700}
 
   const GLOBAL_TRENDING_BLUEPRINTS = [
     {
-      title: 'AI Workflow Automation Pack for Solopreneurs',
-      product_type: 'toolkit',
-      idea: 'Riset pasar global: otomatisasi alur kerja harian, routing tugas, dan SOP eksekusi cepat.'
-    },
-    {
-      title: 'Digital Product Launch & Validation Playbook',
-      product_type: 'ebook',
-      idea: 'Riset pasar global: validasi permintaan pembeli, penyusunan penawaran, dan alur rilis produk digital.'
-    },
-    {
-      title: 'High-Conversion Sales & Outreach Prompt Vault',
+      title: 'Faceless Reels & TikTok Hook + Script Vault',
       product_type: 'prompt-pack',
-      idea: 'Riset pasar global: koleksi prompt terstruktur untuk prospek, tindak lanjut, dan skrip penawaran.'
+      idea: 'Riset pasar global terlaris: bank hook pembuka, skrip video pendek tanpa tampil wajah, dan CTA konversi.'
     },
     {
-      title: 'Startup Cashflow & Runway Tracker System',
+      title: 'Small Business Cashflow, Margin & Stock Tracker',
       product_type: 'template',
-      idea: 'Riset pasar global: struktur pencatatan arus kas, margin, dan proyeksi ketahanan kas.'
+      idea: 'Riset pasar global terlaris: sistem pencatatan arus kas harian, margin laba, dan kontrol stok siap pakai.'
     },
     {
-      title: 'Short-Form Video Hook & Script System',
-      product_type: 'prompt-pack',
-      idea: 'Riset pasar global: pola hook pembuka, alur retensi, dan naskah video pendek siap pakai.'
-    },
-    {
-      title: 'Client Onboarding & Scope Control Kit',
-      product_type: 'toolkit',
-      idea: 'Riset pasar global: formulir masuk klien, kontrol ruang lingkup kerja, dan jadwal serah terima.'
-    },
-    {
-      title: 'Personal Knowledge & Second Brain Blueprint',
-      product_type: 'template',
-      idea: 'Riset pasar global: sistem pengelolaan catatan, referensi proyek, dan arsip ide menjadi aset.'
-    },
-    {
-      title: 'E-Commerce Conversion & Retention Audit Guide',
+      title: '7-Day Digital Product Launch & Sales Playbook',
       product_type: 'ebook',
-      idea: 'Riset pasar global: panduan audit halaman produk, alur checkout, dan retensi pembeli berulang.'
+      idea: 'Riset pasar global terlaris: panduan praktis validasi ide, penyusunan penawaran, dan rilis produk digital.'
     },
     {
-      title: 'Weekly Executive Review & KPI Dashboard Template',
+      title: 'AI Sales Outreach, Offer & Objection Prompt Pack',
+      product_type: 'prompt-pack',
+      idea: 'Riset pasar global terlaris: prompt copy-paste untuk prospek, penawaran bernilai tinggi, dan penanganan keberatan.'
+    },
+    {
+      title: '90-Day Content Calendar & Social Media Planner',
       product_type: 'template',
-      idea: 'Riset pasar global: format evaluasi mingguan indikator utama, hambatan, dan prioritas kerja.'
+      idea: 'Riset pasar global terlaris: jadwal konten 90 hari, pilar topik, dan pelacak performa posting.'
     },
     {
-      title: 'Niche Demand Research & Offer Scoping Kit',
-      product_type: 'request-produk',
-      idea: 'Riset pasar global: pemetaan permintaan niche, pengujian sudut penawaran, dan spesifikasi produk.'
+      title: 'Canva Brand Kit & Social Carousel Starter Pack',
+      product_type: 'toolkit',
+      idea: 'Riset pasar global terlaris: aset desain carousel, story, dan identitas visual cepat untuk kreator & UMKM.'
+    },
+    {
+      title: 'Minimalist Printable Wall Art Bundle (High-Res Set)',
+      product_type: 'toolkit',
+      idea: 'Riset pasar global terlaris: koleksi poster dekorasi minimalis siap cetak untuk ruang kerja & hunian.'
+    },
+    {
+      title: 'Cold DM & Client Closing Script Playbook',
+      product_type: 'ebook',
+      idea: 'Riset pasar global terlaris: skrip prospek langsung, follow-up terukur, dan alur penutupan klien.'
+    },
+    {
+      title: 'Freelancer Client Onboarding, Scope & Invoice Kit',
+      product_type: 'template',
+      idea: 'Riset pasar global terlaris: template brief klien, kontrol ruang lingkup kerja, dan rekap tagihan.'
+    },
+    {
+      title: 'Faceless Aesthetic Photo & B-Roll Content Kit',
+      product_type: 'toolkit',
+      idea: 'Riset pasar global terlaris: paket aset visual estetik untuk kebutuhan konten harian & katalog produk.'
     }
   ];
 
@@ -696,9 +696,9 @@ th{color:var(--muted);font-weight:700}
     const reqEl = document.getElementById('pRequestInput');
     if (!typeEl || !reqEl) return;
     if (typeEl.value === 'request-produk') {
-      reqEl.placeholder = 'Tulis detail request produk (contoh: Paket SOP kasir & laporan stok harian)';
+      reqEl.placeholder = 'Tulis detail request produk (contoh: Prompt Pack TikTok Affiliate atau Cashflow Tracker)';
     } else if (typeEl.value === 'auto-global') {
-      reqEl.placeholder = 'Opsional: isi topik tambahan atau biarkan kosong untuk riset pasar global otomatis';
+      reqEl.placeholder = 'Opsional: isi topik tambahan atau biarkan kosong untuk riset produk terlaris otomatis';
     } else {
       reqEl.placeholder = `Opsional: detail khusus untuk jenis ${typeEl.value}`;
     }
@@ -1658,10 +1658,10 @@ th{color:var(--muted);font-weight:700}
     if (customType === 'request-produk') {
       const reqLabel = customRequestText || `Request Produk #${indexNumber}`;
       itemTitle = `${reqLabel} — ${picked.title}`;
-      itemIdea = `Request produk: ${customRequestText || reqLabel} | Acuan riset pasar global: ${picked.idea}`;
+      itemIdea = `Request produk: ${customRequestText || reqLabel} | Acuan riset pasar global terlaris: ${picked.idea}`;
     } else if (customRequestText) {
       itemTitle = `${customRequestText} — ${picked.title}`;
-      itemIdea = `${customRequestText} | Riset pasar global: ${picked.idea}`;
+      itemIdea = `${customRequestText} | Riset pasar global terlaris: ${picked.idea}`;
     }
 
     return {
@@ -2612,8 +2612,8 @@ th{color:var(--muted);font-weight:700}
   function detectProductCategory(title, rawDesc) {
     const text = `${title} ${rawDesc}`.toLowerCase();
     if (text.includes('prompt')) return 'prompt-pack';
-    if (text.includes('template') || text.includes('tracker') || text.includes('dashboard') || text.includes('cashflow') || text.includes('kpi')) return 'template';
-    if (text.includes('playbook') || text.includes('guide') || text.includes('ebook') || text.includes('audit')) return 'ebook';
+    if (text.includes('template') || text.includes('tracker') || text.includes('planner') || text.includes('cashflow')) return 'template';
+    if (text.includes('playbook') || text.includes('guide') || text.includes('ebook')) return 'ebook';
     return 'toolkit';
   }
 
@@ -2663,7 +2663,7 @@ th{color:var(--muted);font-weight:700}
     const category = detectProductCategory(`${cleanTitle} ${ctx.productType}`, `${ctx.researchDetail} ${ctx.requestDetail}`);
 
     const focusTopic = ctx.requestDetail || cleanTitle;
-    const researchNote = ctx.researchDetail || `Riset topik "${cleanTitle}" untuk kebutuhan eksekusi praktis.`;
+    const researchNote = ctx.researchDetail || `Riset produk terlaris "${cleanTitle}" untuk eksekusi cepat.`;
 
     const sections = [
       {
@@ -2688,76 +2688,76 @@ th{color:var(--muted);font-weight:700}
     if (category === 'prompt-pack') {
       sections.push(
         { type: 'divider' },
-        { type: 'header', title: '1. Landasan Riset & Prompt Utama', subtitle: focusTopic },
+        { type: 'header', title: '1. Prompt Pack Siap Copy-Paste', subtitle: focusTopic },
         {
           type: 'body',
           text:
-            `Acuan riset & kebutuhan:\n${researchNote}\n\n` +
-            `Prompt 1 (Riset & Pemetaan):\n` +
-            `"Bertindaklah sebagai spesialis untuk ${focusTopic}. Berdasarkan riset (${researchNote}), susun titik masalah utama, peluang tercepat, dan langkah eksekusi pertama."\n\n` +
-            `Prompt 2 (Produksi Konten / Draf):\n` +
-            `"Fokus pada ${focusTopic}. Hasilkan draf terstruktur, contoh nyata, dan langkah praktis tanpa bagian yang mengambang."\n\n` +
-            `Prompt 3 (Audit & Penyempurnaan):\n` +
-            `"Evaluasi draf untuk ${focusTopic} agar sesuai standar kualitas dan siap dipakai langsung."`
+            `Acuan riset pasar:\n${researchNote}\n\n` +
+            `Prompt 01 — Riset & Sudut Penawaran:\n` +
+            `"Susun 5 sudut angle paling relevan untuk ${focusTopic} berdasarkan kebutuhan pembeli (${researchNote}), lengkap dengan masalah utama dan solusi cepatnya."\n\n` +
+            `Prompt 02 — Produksi Hasil Jadi:\n` +
+            `"Hasilkan keluaran siap pakai untuk ${focusTopic} dengan struktur jelas, bahasa lugas, dan tanpa bagian generik."\n\n` +
+            `Prompt 03 — Optimasi & Konversi:\n` +
+            `"Perbaiki draf untuk ${focusTopic} agar lebih tajam, meyakinkan, dan mudah dieksekusi pembeli."`
         }
       );
     } else if (category === 'template') {
       sections.push(
         { type: 'divider' },
-        { type: 'header', title: '1. Struktur Template Berbasis Riset', subtitle: focusTopic },
+        { type: 'header', title: '1. Struktur Template & Tracker Siap Pakai', subtitle: focusTopic },
         {
           type: 'body',
           text:
-            `Acuan riset & kebutuhan:\n${researchNote}\n\n` +
-            `Kolom inti untuk ${focusTopic}:\n` +
+            `Acuan riset pasar:\n${researchNote}\n\n` +
+            `Kolom utama untuk ${focusTopic}:\n` +
             `- Tanggal / Periode\n` +
             `- Item / Aktivitas (${focusTopic})\n` +
-            `- Target / Rencana\n` +
-            `- Realisasi / Aktual\n` +
-            `- Selisih & Status\n` +
+            `- Target / Anggaran\n` +
+            `- Aktual / Realisasi\n` +
+            `- Selisih / Status\n` +
             `- Catatan Tindak Lanjut\n\n` +
-            `Aturan pemakaian: isi setiap baris secara konsisten, pisahkan target dan realisasi, lalu tinjau penyimpangan tiap periode.`
+            `Panduan pakai: isi data secara rutin per hari/minggu, bandingkan target vs aktual, dan evaluasi selisih utama di akhir periode.`
         }
       );
     } else if (category === 'ebook') {
       sections.push(
         { type: 'divider' },
-        { type: 'header', title: '1. Ringkasan Riset & Kerangka Panduan', subtitle: focusTopic },
+        { type: 'header', title: '1. Playbook Praktis Langkah demi Langkah', subtitle: focusTopic },
         {
           type: 'body',
           text:
-            `Temuan & arah riset:\n${researchNote}\n\n` +
-            `Langkah penerapan untuk ${focusTopic}:\n` +
-            `1. Petakan kondisi awal dan target hasil pada ${focusTopic}.\n` +
-            `2. Terapkan langkah inti berdasarkan temuan riset di atas.\n` +
-            `3. Uji pada skenario nyata, catat hambatan, lalu sempurnakan alurnya.`
+            `Ringkasan riset:\n${researchNote}\n\n` +
+            `Langkah eksekusi untuk ${focusTopic}:\n` +
+            `1. Tentukan target hasil dan batas waktu yang jelas pada ${focusTopic}.\n` +
+            `2. Terapkan kerangka kerja utama berdasarkan temuan riset.\n` +
+            `3. Uji coba langsung, ukur respons/hasil, lalu perbaiki bagian yang paling menghambat.`
         }
       );
     } else {
       sections.push(
         { type: 'divider' },
-        { type: 'header', title: '1. Spesifikasi Riset & SOP Eksekusi', subtitle: focusTopic },
+        { type: 'header', title: '1. Paket Aset & Panduan Pemakaian', subtitle: focusTopic },
         {
           type: 'body',
           text:
-            `Acuan riset & permintaan:\n${researchNote}\n\n` +
-            `Alur kerja ${focusTopic}:\n` +
-            `1. Siapkan input dan parameter sesuai kebutuhan ${focusTopic}.\n` +
-            `2. Jalankan langkah utama berdasarkan acuan riset.\n` +
-            `3. Periksa kelengkapan dan akurasi hasil (QC) sebelum digunakan atau dirilis.`
+            `Acuan riset pasar:\n${researchNote}\n\n` +
+            `Cara memakai aset untuk ${focusTopic}:\n` +
+            `1. Pilih aset atau variasi yang paling sesuai dengan kebutuhan ${focusTopic}.\n` +
+            `2. Sesuaikan judul, teks, atau komposisi visual sesuai identitas merek/konten.\n` +
+            `3. Periksa kualitas tampilan dan kelengkapan file sebelum dipublikasikan atau dicetak.`
         }
       );
     }
 
     sections.push(
       { type: 'divider' },
-      { type: 'header', title: '2. Checklist Validasi & Rencana 7 Hari', subtitle: 'Eksekusi Terukur' },
+      { type: 'header', title: '2. Rencana Eksekusi Cepat 7 Hari', subtitle: 'Konsistensi Harian' },
       {
         type: 'body',
         text:
-          `Hari 1–2: Sesuaikan materi "${cleanTitle}" dengan konteks ${focusTopic}.\n` +
-          `Hari 3–5: Jalankan implementasi harian dan catat hasil serta kendala.\n` +
-          `Hari 6–7: Audit hasil, rapikan format akhir, dan siapkan siklus berikutnya.`
+          `Hari 1–2: Siapkan materi dasar "${cleanTitle}" untuk ${focusTopic}.\n` +
+          `Hari 3–5: Jalankan rutinitas harian dan catat hasil nyata.\n` +
+          `Hari 6–7: Evaluasi performa, rapikan hasil akhir, dan siapkan rilis lanjutan.`
       }
     );
 
