@@ -259,9 +259,12 @@ th{color:var(--muted);font-weight:700}
 
       <!-- PANEL KOTAK 3 -->
       <div class="card" id="panelBox3" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
           <h3 class="subhead" style="margin:0">Kotak 3 — Antrean Pipeline</h3>
-          <button class="btn" onclick="toggleProdBox(3)" style="padding:4px 9px;font-size:.72rem">Tutup</button>
+          <div class="actions">
+            <button class="btn btn-red" onclick="deleteAllPipelineItems()" style="padding:4px 9px;font-size:.72rem">Hapus Semua</button>
+            <button class="btn" onclick="toggleProdBox(3)" style="padding:4px 9px;font-size:.72rem">Tutup</button>
+          </div>
         </div>
         <div style="overflow-x:auto">
           <table>
@@ -1298,7 +1301,7 @@ th{color:var(--muted);font-weight:700}
     pendingTabAfterPin = targetTab;
     const label = targetTab === 'owner-vault'
       ? 'Arsip Owner'
-      : (targetTab === 'worklog' ? 'Log Kerja' : 'Owner Vault');
+      : (targetTab === 'worklog' ? 'Log Kerja' : (targetTab === 'production' ? 'Pusat Produksi' : 'Owner Vault'));
     setPinModalVisible(true, '', `Masukkan PIN untuk membuka ${label}.`);
   }
 
@@ -1686,6 +1689,75 @@ th{color:var(--muted);font-weight:700}
       renderOwnerProductsTable(allProductsCache);
       updateMemoryStorageStats();
     }
+  }
+
+  function syncAfterPipelineRemoval(removedIds = null) {
+    if (removedIds && removedIds.length > 0) {
+      const remSet = new Set(removedIds.map(String));
+      allProductionCache = allProductionCache.filter(x => !remSet.has(String(x.id)));
+    } else {
+      allProductionCache = [];
+    }
+    updateDailyTargetMetrics();
+    loadProduction();
+  }
+
+  async function deleteSinglePipelineItem(itemId) {
+    if (!isOwnerUnlocked) return openPinModalForOwner('production');
+    if (!connected || !sb) return alert('Supabase belum terhubung.');
+    const target = allProductionCache.find(x => String(x.id) === String(itemId));
+    const label = target ? `"${target.title}"` : `ID ${itemId}`;
+    if (!confirm(`Hapus item pipeline ${label}?`)) return;
+
+    await runGuard('del-pipe-' + itemId, async () => {
+      try {
+        const { data: deletedRows, error } = await sb
+          .from('production_items')
+          .delete()
+          .eq('id', itemId)
+          .select();
+        if (error) throw new Error(error.message);
+
+        const blockedByRls = !Array.isArray(deletedRows) || deletedRows.length === 0;
+        syncAfterPipelineRemoval([itemId]);
+        triggerLivePulse('production', `Item pipeline dihapus: ${label}`, 'Agency Pipeline', 'ok');
+
+        if (blockedByRls) {
+          alert(`Item ${label} dihapus dari tampilan, namun Supabase mengembalikan 0 baris terhapus (cek policy DELETE pada production_items).`);
+        }
+      } catch (err) {
+        alert('Gagal menghapus item pipeline: ' + err.message);
+      }
+    });
+  }
+
+  async function deleteAllPipelineItems() {
+    if (!isOwnerUnlocked) return openPinModalForOwner('production');
+    if (!connected || !sb) return alert('Supabase belum terhubung.');
+    if (allProductionCache.length === 0) return alert('Antrean pipeline memang sudah kosong.');
+    if (!confirm('Hapus SEMUA item di Antrean Pipeline?')) return;
+
+    await runGuard('del-all-pipe', async () => {
+      try {
+        const ids = allProductionCache.map(x => x.id).filter(Boolean);
+        const { data: deletedRows, error } = await sb
+          .from('production_items')
+          .delete()
+          .not('id', 'is', null)
+          .select();
+        if (error) throw new Error(error.message);
+
+        const blockedByRls = ids.length > 0 && (!Array.isArray(deletedRows) || deletedRows.length === 0);
+        syncAfterPipelineRemoval(null);
+        triggerLivePulse('production', 'Semua item pipeline dihapus', 'Agency Pipeline', 'ok');
+
+        if (blockedByRls) {
+          alert('Semua item dibersihkan dari tampilan, namun Supabase mengembalikan 0 baris terhapus (cek policy DELETE pada production_items).');
+        }
+      } catch (err) {
+        alert('Gagal menghapus semua item pipeline: ' + err.message);
+      }
+    });
   }
 
   async function deleteSingleProduct(productId) {
@@ -3255,20 +3327,30 @@ th{color:var(--muted);font-weight:700}
         c4.appendChild(sp);
 
         const c5 = document.createElement('td');
+        const actWrap = document.createElement('div');
+        actWrap.className = 'actions';
+
         if (item.status !== 'published') {
           const btn = document.createElement('button');
           btn.className = 'btn';
           btn.textContent = item.status === 'qc' || item.status === 'ready' ? 'Pending' : 'Majukan';
           btn.addEventListener('click', () => advanceStatus(item));
-          c5.appendChild(btn);
+          actWrap.appendChild(btn);
         } else {
           const btnGum = document.createElement('button');
           btnGum.className = 'btn btn-gold';
           btnGum.textContent = 'Gumroad';
           btnGum.addEventListener('click', () => publishFromPipeline(item));
-          c5.appendChild(btnGum);
+          actWrap.appendChild(btnGum);
         }
 
+        const btnDel = document.createElement('button');
+        btnDel.className = 'btn btn-red';
+        btnDel.textContent = 'Hapus';
+        btnDel.addEventListener('click', () => deleteSinglePipelineItem(item.id));
+        actWrap.appendChild(btnDel);
+
+        c5.appendChild(actWrap);
         tr.append(c1, c2, c3, c4, c5);
         body.appendChild(tr);
       });
