@@ -279,9 +279,10 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       </div>
 
       <div id="archiveUnlockedPanel" style="display:none">
-        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis dibuatkan <b>cover</b> & <b>thumbnail</b>, masuk ke penyimpanan telepon (file <code>.txt</code>), dan bisa dilihat, diunduh ulang, dihapus per item/aset, atau dikirim ke Gumroad kapan saja.</div>
+        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis dibuatkan <b>cover</b> & <b>thumbnail</b>, masuk ke penyimpanan telepon (file <code>.txt</code>), dan bisa dilihat, diunduh ulang, diekspor ke PDF anti-terpotong, dihapus per item/aset, atau dikirim ke Gumroad kapan saja.</div>
         <div class="card">
           <div class="actions" style="margin-bottom:12px">
+            <button class="btn btn-gold" id="btnExportAllPdf" onclick="exportAllProductsPdf()">Export Semua PDF</button>
             <button class="btn btn-red" id="btnDeleteAllProducts" onclick="deleteAllProducts()">Hapus Semua Produk</button>
             <button class="btn" onclick="clearVisualAssetsCache()">Bersihkan Cache Aset Gambar</button>
           </div>
@@ -523,6 +524,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   const LOCAL_PRODUCTS_EXPORT_KEY = 'joy_local_products_memory';
   const PRODUCT_VISUALS_KEY = 'joy_product_visuals_v1';
   const DELETED_VISUAL_KEYS = 'joy_deleted_visual_keys_v1';
+  const DELETED_PRODUCT_IDS_KEY = 'joy_deleted_product_ids_v1';
   const WORKLOG_STORAGE_KEY = 'joy_agency_worklog';
   const AUTO_ARCHIVED_IDS_KEY = 'joy_auto_archived_phone_ids';
   const PIN_HASH_KEY = 'joy_owner_pin_hash';
@@ -755,6 +757,24 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     } catch (_) {}
   }
 
+  function getDeletedProductIds() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(DELETED_PRODUCT_IDS_KEY) || '[]');
+      return new Set(Array.isArray(parsed) ? parsed.map(String) : []);
+    } catch (_) {
+      return new Set();
+    }
+  }
+
+  function addDeletedProductId(id) {
+    if (!id) return;
+    const set = getDeletedProductIds();
+    set.add(String(id));
+    try {
+      localStorage.setItem(DELETED_PRODUCT_IDS_KEY, JSON.stringify([...set].slice(-500)));
+    } catch (_) {}
+  }
+
   function getVisualsStore() {
     try {
       const parsed = JSON.parse(localStorage.getItem(PRODUCT_VISUALS_KEY) || '{}');
@@ -895,7 +915,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
         const swCode = `
-          const CACHE_NAME = 'joy-corp-inline-v6';
+          const CACHE_NAME = 'joy-corp-inline-v7';
           self.addEventListener('install', (event) => {
             self.skipWaiting();
           });
@@ -1527,20 +1547,29 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           .delete()
           .eq('id', productId)
           .select();
-        if (error) throw new Error(error.message);
-        if (!Array.isArray(deletedRows) || deletedRows.length === 0) {
-          throw new Error('Tidak ada baris yang terhapus di Supabase (cek RLS Policy DELETE pada tabel products).');
-        }
 
+        if (error) throw new Error(error.message);
+
+        const blockedByRls = !Array.isArray(deletedRows) || deletedRows.length === 0;
+        addDeletedProductId(productId);
         if (target) removeProductVisualFromStore(target);
         addDeletedVisualKey(`id:${String(productId)}`);
+
         if (activePreviewProduct && String(activePreviewProduct.id) === String(productId)) {
           closeOwnerPreview();
         }
 
         syncAfterProductRemoval([productId]);
         triggerLivePulse('worklog', `Produk & Aset Dihapus: ${label}`, 'Hennessy', 'ok');
-        alert(`Produk ${label} berhasil dihapus dari publik & aset.`);
+
+        if (blockedByRls) {
+          alert(
+            `Produk ${label} disembunyikan dari tampilan & aset lokal, tetapi Supabase mengembalikan 0 baris terhapus.\n` +
+            `Pastikan policy DELETE pada tabel public.products di Supabase sudah aktif.`
+          );
+        } else {
+          alert(`Produk ${label} berhasil dihapus permanen dari database, publik & aset.`);
+        }
       } catch (err) {
         alert('Gagal menghapus produk: ' + err.message);
       }
@@ -1564,14 +1593,17 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     await runGuard('del-all-prod', async () => {
       try {
         const idsToDelete = allProductsCache.map(p => p.id).filter(Boolean);
-        let query = sb.from('products').delete();
-        if (idsToDelete.length > 0) {
-          query = query.in('id', idsToDelete);
-        } else {
-          query = query.not('id', 'is', null);
-        }
-        const { error } = await query.select();
+        idsToDelete.forEach(id => addDeletedProductId(id));
+
+        const { data: deletedRows, error } = await sb
+          .from('products')
+          .delete()
+          .not('id', 'is', null)
+          .select();
+
         if (error) throw new Error(error.message);
+
+        const blockedByRls = idsToDelete.length > 0 && (!Array.isArray(deletedRows) || deletedRows.length === 0);
 
         allProductsCache.forEach(p => removeProductVisualFromStore(p));
         localStorage.removeItem(PRODUCT_VISUALS_KEY);
@@ -1580,9 +1612,16 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         closeOwnerPreview();
 
         syncAfterProductRemoval(null);
-        await loadCatalog();
         triggerLivePulse('worklog', 'Semua Produk & Aset Dihapus', 'Hennessy', 'ok');
-        alert('Semua produk dan aset terkait berhasil dihapus.');
+
+        if (blockedByRls) {
+          alert(
+            `Semua produk dibersihkan dari tampilan & aset lokal, tetapi Supabase mengembalikan 0 baris terhapus.\n` +
+            `Pastikan policy DELETE pada tabel public.products di Supabase sudah aktif.`
+          );
+        } else {
+          alert('Semua produk dan aset terkait berhasil dihapus permanen.');
+        }
       } catch (err) {
         alert('Gagal menghapus semua produk: ' + err.message);
       }
@@ -2083,6 +2122,347 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     else alert(`Pengiriman ke Gumroad belum terkirim: ${res?.error || 'cek endpoint Gumroad di Owner Vault'}.`);
   }
 
+  function wrapPdfLines(ctx, text, maxWidth) {
+    const paragraphs = String(text || '').replace(/\r\n/g, '\n').split('\n');
+    const allLines = [];
+
+    for (const para of paragraphs) {
+      if (!para.trim()) {
+        allLines.push('');
+        continue;
+      }
+      const words = para.split(/\s+/).filter(Boolean);
+      let line = '';
+      for (const word of words) {
+        const candidate = line ? `${line} ${word}` : word;
+        if (ctx.measureText(candidate).width <= maxWidth) {
+          line = candidate;
+        } else {
+          if (line) allLines.push(line);
+          if (ctx.measureText(word).width > maxWidth) {
+            let chunk = '';
+            for (const ch of word) {
+              const testChunk = chunk + ch;
+              if (ctx.measureText(testChunk).width <= maxWidth) {
+                chunk = testChunk;
+              } else {
+                if (chunk) allLines.push(chunk);
+                chunk = ch;
+              }
+            }
+            line = chunk;
+          } else {
+            line = word;
+          }
+        }
+      }
+      if (line) allLines.push(line);
+    }
+    return allLines;
+  }
+
+  function loadImageElement(src) {
+    return new Promise((resolve) => {
+      if (!src) return resolve(null);
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = src;
+    });
+  }
+
+  function dataUrlToUint8Array(dataUrl) {
+    const base64 = String(dataUrl || '').split(',')[1] || '';
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  }
+
+  function buildPdfFromJpegPages(jpegDataUrls, pageWidthPt = 595.28, pageHeightPt = 841.89) {
+    const encoder = new TextEncoder();
+    const chunks = [];
+    let totalBytes = 0;
+    const offsets = [];
+
+    function pushStr(str) {
+      const arr = encoder.encode(str);
+      chunks.push(arr);
+      totalBytes += arr.length;
+    }
+
+    function pushBytes(arr) {
+      chunks.push(arr);
+      totalBytes += arr.length;
+    }
+
+    pushStr('%PDF-1.4\n');
+
+    const pageCount = jpegDataUrls.length;
+    const catalogObjNum = 1;
+    const pagesObjNum = 2;
+    const firstPageObjNum = 3;
+    const pageRefs = [];
+
+    for (let i = 0; i < pageCount; i++) {
+      pageRefs.push(`${firstPageObjNum + i * 3} 0 R`);
+    }
+
+    offsets[catalogObjNum] = totalBytes;
+    pushStr(`${catalogObjNum} 0 obj\n<< /Type /Catalog /Pages ${pagesObjNum} 0 R >>\nendobj\n`);
+
+    offsets[pagesObjNum] = totalBytes;
+    pushStr(`${pagesObjNum} 0 obj\n<< /Type /Pages /Kids [${pageRefs.join(' ')}] /Count ${pageCount} >>\nendobj\n`);
+
+    for (let i = 0; i < pageCount; i++) {
+      const pageObjNum = firstPageObjNum + i * 3;
+      const contentObjNum = pageObjNum + 1;
+      const imgObjNum = pageObjNum + 2;
+      const imgBytes = dataUrlToUint8Array(jpegDataUrls[i]);
+
+      const contentStream =
+        `q\n${pageWidthPt.toFixed(2)} 0 0 ${pageHeightPt.toFixed(2)} 0 0 cm\n/Im1 Do\nQ\n`;
+      const contentBytes = encoder.encode(contentStream);
+
+      offsets[pageObjNum] = totalBytes;
+      pushStr(
+        `${pageObjNum} 0 obj\n` +
+        `<< /Type /Page /Parent ${pagesObjNum} 0 R /MediaBox [0 0 ${pageWidthPt.toFixed(2)} ${pageHeightPt.toFixed(2)}] ` +
+        `/Resources << /XObject << /Im1 ${imgObjNum} 0 R >> >> /Contents ${contentObjNum} 0 R >>\nendobj\n`
+      );
+
+      offsets[contentObjNum] = totalBytes;
+      pushStr(`${contentObjNum} 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n`);
+      pushBytes(contentBytes);
+      pushStr('\nendstream\nendobj\n');
+
+      offsets[imgObjNum] = totalBytes;
+      pushStr(
+        `${imgObjNum} 0 obj\n` +
+        `<< /Type /XObject /Subtype /Image /Width 1240 /Height 1754 ` +
+        `/ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imgBytes.length} >>\nstream\n`
+      );
+      pushBytes(imgBytes);
+      pushStr('\nendstream\nendobj\n');
+    }
+
+    const xrefOffset = totalBytes;
+    const maxObjNum = firstPageObjNum + pageCount * 3 - 1;
+    pushStr(`xref\n0 ${maxObjNum + 1}\n`);
+    pushStr('0000000000 65535 f \n');
+    for (let n = 1; n <= maxObjNum; n++) {
+      pushStr(`${String(offsets[n] || 0).padStart(10, '0')} 00000 n \n`);
+    }
+    pushStr(`trailer\n<< /Size ${maxObjNum + 1} /Root ${catalogObjNum} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
+
+    return new Blob(chunks, { type: 'application/pdf' });
+  }
+
+  async function renderSectionsToPaginatedPdf(sections, fileName) {
+    const PAGE_W = 1240;
+    const PAGE_H = 1754;
+    const MARGIN_X = 84;
+    const MARGIN_TOP = 84;
+    const MARGIN_BOTTOM = 96;
+    const CONTENT_W = PAGE_W - MARGIN_X * 2;
+    const MAX_Y = PAGE_H - MARGIN_BOTTOM;
+
+    const pages = [];
+    let ctx = null;
+    let cursorY = MARGIN_TOP;
+    let pageNum = 0;
+
+    function startNewPage() {
+      pageNum += 1;
+      const canvas = document.createElement('canvas');
+      canvas.width = PAGE_W;
+      canvas.height = PAGE_H;
+      const c = canvas.getContext('2d');
+      c.fillStyle = '#ffffff';
+      c.fillRect(0, 0, PAGE_W, PAGE_H);
+
+      c.fillStyle = '#14171d';
+      c.fillRect(0, 0, PAGE_W, 56);
+      c.fillStyle = '#c5a059';
+      c.font = '700 18px Inter, sans-serif';
+      c.textAlign = 'left';
+      c.fillText('JOY CORPORATION • "Kami ada karena kamu Ade"', MARGIN_X, 35);
+      c.textAlign = 'right';
+      c.fillStyle = '#e6e8ec';
+      c.fillText(`Halaman ${pageNum}`, PAGE_W - MARGIN_X, 35);
+
+      ctx = c;
+      cursorY = MARGIN_TOP;
+      pages.push(canvas);
+    }
+
+    function ensureVerticalSpace(neededH) {
+      if (!ctx) startNewPage();
+      if (cursorY + neededH > MAX_Y) {
+        startNewPage();
+      }
+    }
+
+    startNewPage();
+
+    for (const sec of sections) {
+      if (sec.type === 'header') {
+        ensureVerticalSpace(110);
+        ctx.fillStyle = '#c5a059';
+        ctx.fillRect(MARGIN_X, cursorY, 8, 52);
+        ctx.fillStyle = '#111318';
+        ctx.font = '800 32px Inter, sans-serif';
+        ctx.textAlign = 'left';
+        const hLines = wrapPdfLines(ctx, sec.title || 'Dokumen Produk', CONTENT_W - 24);
+        for (const hl of hLines) {
+          ensureVerticalSpace(42);
+          ctx.fillText(hl, MARGIN_X + 20, cursorY + 30);
+          cursorY += 40;
+        }
+        if (sec.subtitle) {
+          ctx.fillStyle = '#4b5563';
+          ctx.font = '500 20px Inter, sans-serif';
+          const sLines = wrapPdfLines(ctx, sec.subtitle, CONTENT_W - 24);
+          for (const sl of sLines) {
+            ensureVerticalSpace(30);
+            ctx.fillText(sl, MARGIN_X + 20, cursorY + 8);
+            cursorY += 28;
+          }
+        }
+        cursorY += 18;
+      } else if (sec.type === 'meta') {
+        ctx.font = '600 20px Inter, sans-serif';
+        const lines = wrapPdfLines(ctx, sec.text || '', CONTENT_W - 32);
+        const boxH = Math.max(54, lines.length * 30 + 24);
+        ensureVerticalSpace(boxH + 14);
+
+        ctx.fillStyle = '#f8f9fb';
+        ctx.fillRect(MARGIN_X, cursorY, CONTENT_W, boxH);
+        ctx.strokeStyle = '#d1d5db';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(MARGIN_X, cursorY, CONTENT_W, boxH);
+
+        ctx.fillStyle = '#1f2937';
+        ctx.textAlign = 'left';
+        let ty = cursorY + 30;
+        for (const l of lines) {
+          ctx.fillText(l, MARGIN_X + 16, ty);
+          ty += 30;
+        }
+        cursorY += boxH + 18;
+      } else if (sec.type === 'image' && sec.dataUrl) {
+        const img = await loadImageElement(sec.dataUrl);
+        if (img && img.width > 0 && img.height > 0) {
+          const ratio = img.height / img.width;
+          const drawW = Math.min(CONTENT_W, 920);
+          const drawH = Math.min(MAX_Y - MARGIN_TOP - 20, Math.round(drawW * ratio));
+          ensureVerticalSpace(drawH + 22);
+          ctx.drawImage(img, MARGIN_X, cursorY, drawW, drawH);
+          cursorY += drawH + 22;
+        }
+      } else if (sec.type === 'body') {
+        ctx.font = '400 21px Inter, sans-serif';
+        const lines = wrapPdfLines(ctx, sec.text || '-', CONTENT_W);
+        const lineH = 32;
+        ctx.fillStyle = '#111827';
+        ctx.textAlign = 'left';
+
+        for (const line of lines) {
+          ensureVerticalSpace(lineH);
+          if (line) {
+            ctx.fillText(line, MARGIN_X, cursorY + 22);
+          }
+          cursorY += lineH;
+        }
+        cursorY += 16;
+      } else if (sec.type === 'divider') {
+        ensureVerticalSpace(28);
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(MARGIN_X, cursorY + 8);
+        ctx.lineTo(PAGE_W - MARGIN_X, cursorY + 8);
+        ctx.stroke();
+        cursorY += 24;
+      }
+    }
+
+    const jpegPages = pages.map(c => c.toDataURL('image/jpeg', 0.9));
+    const pdfBlob = buildPdfFromJpegPages(jpegPages);
+    const url = registerTrackedBlobUrl(pdfBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  async function exportProductPdf(productId) {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
+    const p = allProductsCache.find(item => String(item.id) === String(productId));
+    if (!p) return alert('Produk tidak ditemukan.');
+
+    const visuals = getProductVisuals(p);
+    const slug = String(p.title || 'produk').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'produk';
+
+    await renderSectionsToPaginatedPdf([
+      {
+        type: 'header',
+        title: p.title || 'Produk Digital',
+        subtitle: `Status: ${p.status || '-'} • Harga: $${Number(p.price_usd || 0).toFixed(2)} (${formatIdr(p.price_usd || 0)})`
+      },
+      {
+        type: 'meta',
+        text: `ID Produk: ${p.id}\nTanggal: ${p.created_at ? new Date(p.created_at).toLocaleString('id-ID') : '-'}`
+      },
+      ...(visuals.cover_data_url ? [{ type: 'image', dataUrl: visuals.cover_data_url }] : []),
+      {
+        type: 'body',
+        text: p.description || 'Tidak ada deskripsi produk.'
+      }
+    ], `JOY-PRODUK-${slug}.pdf`);
+  }
+
+  async function exportAllProductsPdf() {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
+    if (!allProductsCache || allProductsCache.length === 0) {
+      return alert('Belum ada produk untuk diekspor ke PDF.');
+    }
+
+    const sections = [
+      {
+        type: 'header',
+        title: 'KATALOG & ARSIP PRODUK JOY CORPORATION',
+        subtitle: `Total Produk: ${allProductsCache.length} • Diekspor: ${new Date().toLocaleString('id-ID')}`
+      }
+    ];
+
+    for (let i = 0; i < allProductsCache.length; i++) {
+      const p = allProductsCache[i];
+      const visuals = getProductVisuals(p);
+      sections.push({
+        type: 'meta',
+        text: `${i + 1}. ${p.title || 'Tanpa Judul'} [${p.status || '-'}] — $${Number(p.price_usd || 0).toFixed(2)} (${formatIdr(p.price_usd || 0)})`
+      });
+      if (visuals.thumbnail_data_url) {
+        sections.push({ type: 'image', dataUrl: visuals.thumbnail_data_url });
+      }
+      sections.push({
+        type: 'body',
+        text: p.description || '-'
+      });
+      sections.push({ type: 'divider' });
+    }
+
+    await renderSectionsToPaginatedPdf(
+      sections,
+      `JOY-SEMUA-PRODUK-${new Date().toISOString().slice(0, 10)}.pdf`
+    );
+  }
+
   function renderOwnerProductsTable(products) {
     const body = document.getElementById('ownerProductsBody');
     if (!body || !isOwnerUnlocked) return;
@@ -2106,6 +2486,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         '<td><div class="actions">' +
           '<button class="btn" onclick="viewOwnerProduct(\'' + escapeHtml(String(p.id)) + '\')">Lihat</button>' +
           '<button class="btn btn-gold" onclick="downloadOwnerProduct(\'' + escapeHtml(String(p.id)) + '\')">Download</button>' +
+          '<button class="btn" onclick="exportProductPdf(\'' + escapeHtml(String(p.id)) + '\')">PDF</button>' +
           '<button class="btn" onclick="resendProductToGumroad(\'' + escapeHtml(String(p.id)) + '\')">Kirim Gumroad</button>' +
           '<button class="btn btn-red" onclick="deleteSingleProduct(\'' + escapeHtml(String(p.id)) + '\')">Hapus</button>' +
         '</div></td>';
@@ -2182,7 +2563,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
       if (error) throw new Error(error.message);
 
-      allProductsCache = Array.isArray(data) ? data : [];
+      const deletedIds = getDeletedProductIds();
+      allProductsCache = (Array.isArray(data) ? data : []).filter(p => !deletedIds.has(String(p.id)));
       if (getStorageTarget() === 'phone_memory') {
         localStorage.setItem(LOCAL_PRODUCTS_EXPORT_KEY, JSON.stringify(allProductsCache));
       }
