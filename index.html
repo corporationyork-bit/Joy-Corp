@@ -47,6 +47,8 @@ h3.subhead{color:var(--gold);font-size:.98rem;margin:12px 0 8px}
 .btn-gold{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
 .btn-gold:hover:not(:disabled){opacity:.92;color:#000}
 .btn-green{background:rgba(76,175,80,.18);border-color:var(--green);color:var(--green);font-weight:700}
+.btn-red{background:rgba(239,68,68,.15);border-color:var(--red);color:#fca5a5;font-weight:700}
+.btn-red:hover:not(:disabled){background:rgba(239,68,68,.28);color:#fff}
 input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:#fff;padding:10px;border-radius:6px;margin:6px 0 12px;font-size:.85rem}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 label{font-size:.78rem;color:var(--muted);display:block}
@@ -58,6 +60,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 .catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
 .product{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
 .product h3{color:#fff;font-size:.95rem;margin-bottom:6px}
+.prod-thumb{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;background:var(--bg)}
+.prod-cover-preview{width:100%;max-width:560px;aspect-ratio:16/9;object-fit:cover;border-radius:8px;border:1px solid var(--gold);margin-top:10px;background:var(--bg);display:block}
 .price{color:var(--gold);font-weight:800;margin:8px 0}
 .notice{background:rgba(197,160,89,.12);border:1px solid var(--gold);padding:12px;border-radius:8px;font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.5}
 .detail-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:12px;font-size:.82rem;line-height:1.55;white-space:pre-wrap}
@@ -245,7 +249,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     <!-- LOG KERJA REAL-TIME -->
     <section id="worklog" class="section">
       <h2>Log Kerja Agency (Real-Time)</h2>
-      <div class="notice">Laporan pergerakan agency secara real-time: <b>Aperol</b> (riset) → <b>Walker</b> (draf) → <b>Hendrick's</b> (aset) → <b>Absolut</b> (QC) → <b>Martini</b> (publikasi & Gumroad) → <b>Hennessy</b> (keuangan & pembayaran).</div>
+      <div class="notice">Laporan pergerakan agency secara real-time: <b>Aperol</b> (riset) → <b>Walker</b> (draf) → <b>Hendrick's</b> (aset, cover & thumbnail) → <b>Absolut</b> (QC) → <b>Martini</b> (publikasi & Gumroad) → <b>Hennessy</b> (keuangan & pembayaran).</div>
       <div class="card">
         <div class="actions" style="margin-bottom:10px">
           <button class="btn" onclick="renderWorklogTable()">Segarkan Log</button>
@@ -275,25 +279,37 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       </div>
 
       <div id="archiveUnlockedPanel" style="display:none">
-        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis masuk ke penyimpanan telepon (file <code>.txt</code>) dan bisa dilihat, diunduh ulang, atau dikirim ke Gumroad kapan saja.</div>
-        <div class="card" style="overflow-x:auto">
-          <table>
-            <thead>
-              <tr>
-                <th>Produk</th>
-                <th>Status</th>
-                <th>Harga</th>
-                <th>Aksi Owner</th>
-              </tr>
-            </thead>
-            <tbody id="ownerProductsBody"></tbody>
-          </table>
+        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis dibuatkan <b>cover</b> & <b>thumbnail</b>, masuk ke penyimpanan telepon (file <code>.txt</code>), dan bisa dilihat, diunduh ulang, dihapus per item/aset, atau dikirim ke Gumroad kapan saja.</div>
+        <div class="card">
+          <div class="actions" style="margin-bottom:12px">
+            <button class="btn btn-red" id="btnDeleteAllProducts" onclick="deleteAllProducts()">Hapus Semua Produk</button>
+            <button class="btn" onclick="clearVisualAssetsCache()">Bersihkan Cache Aset Gambar</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Produk</th>
+                  <th>Status</th>
+                  <th>Harga</th>
+                  <th>Aksi Owner</th>
+                </tr>
+              </thead>
+              <tbody id="ownerProductsBody"></tbody>
+            </table>
+          </div>
         </div>
         <div class="card" id="ownerPreviewCard" style="display:none">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
             <h3 class="subhead" id="ownerPreviewTitle" style="margin:0">Detail Produk</h3>
-            <button class="btn" onclick="closeOwnerPreview()">Tutup Detail</button>
+            <div class="actions">
+              <button class="btn" id="btnDownloadCover" onclick="downloadVisualAsset('cover')">Unduh Cover (.png)</button>
+              <button class="btn" id="btnDownloadThumb" onclick="downloadVisualAsset('thumbnail')">Unduh Thumbnail (.png)</button>
+              <button class="btn btn-red" id="btnDeletePreviewAsset" onclick="deleteActiveProductAsset()">Hapus Aset Produk</button>
+              <button class="btn" onclick="closeOwnerPreview()">Tutup Detail</button>
+            </div>
           </div>
+          <img id="ownerCoverImg" class="prod-cover-preview" alt="Cover Produk" style="display:none">
           <div class="detail-box" id="ownerPreviewContent"></div>
         </div>
       </div>
@@ -505,6 +521,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   const GUMROAD_ENDPOINT_KEY = 'joy_gumroad_endpoint';
   const STORAGE_TARGET_KEY = 'joy_product_storage_target';
   const LOCAL_PRODUCTS_EXPORT_KEY = 'joy_local_products_memory';
+  const PRODUCT_VISUALS_KEY = 'joy_product_visuals_v1';
   const WORKLOG_STORAGE_KEY = 'joy_agency_worklog';
   const AUTO_ARCHIVED_IDS_KEY = 'joy_auto_archived_phone_ids';
   const PIN_HASH_KEY = 'joy_owner_pin_hash';
@@ -583,6 +600,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   let activeBlobUrls = [];
   let deferredInstallPrompt = null;
   let manifestBlobUrl = null;
+  let activePreviewProduct = null;
   const busyLocks = new Set();
 
   function makeProductSlug(title) {
@@ -593,6 +611,197 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       .slice(0, 60) || 'produk';
     const suffix = Date.now().toString(36).slice(-4) + Math.random().toString(36).slice(2, 5);
     return `${base}-${suffix}`;
+  }
+
+  function wrapCanvasText(ctx, text, maxWidth) {
+    const words = String(text || '').split(/\s+/).filter(Boolean);
+    const lines = [];
+    let current = '';
+    for (const w of words) {
+      const test = current ? `${current} ${w}` : w;
+      if (ctx.measureText(test).width <= maxWidth) {
+        current = test;
+      } else {
+        if (current) lines.push(current);
+        current = w;
+      }
+    }
+    if (current) lines.push(current);
+    return lines;
+  }
+
+  function generateProductCoverDataUrl(title, productType, ideaText) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1280;
+    canvas.height = 720;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return '';
+
+    const grad = ctx.createLinearGradient(0, 0, 1280, 720);
+    grad.addColorStop(0, '#0d0f12');
+    grad.addColorStop(0.55, '#171b24');
+    grad.addColorStop(1, '#231d14');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1280, 720);
+
+    ctx.strokeStyle = 'rgba(197, 160, 89, 0.45)';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(36, 36, 1208, 648);
+
+    ctx.fillStyle = '#c5a059';
+    ctx.fillRect(84, 88, 180, 6);
+
+    ctx.font = '700 24px Inter, sans-serif';
+    ctx.fillStyle = '#c5a059';
+    ctx.textAlign = 'left';
+    ctx.fillText(`JOY CORPORATION • ${String(productType || 'DIGITAL ASSET').toUpperCase()}`, 84, 134);
+
+    ctx.font = '800 54px Inter, sans-serif';
+    ctx.fillStyle = '#f3f4f6';
+    const titleLines = wrapCanvasText(ctx, title || 'Digital Product', 1080).slice(0, 3);
+    let y = 225;
+    for (const line of titleLines) {
+      ctx.fillText(line, 84, y);
+      y += 68;
+    }
+
+    ctx.font = '400 26px Inter, sans-serif';
+    ctx.fillStyle = '#a3aab8';
+    const cleanDesc = String(ideaText || '').replace(/\[TARGET\s*:[^\]]+\]/gi, '').trim();
+    const descLines = wrapCanvasText(ctx, cleanDesc || 'Structured digital asset with auto-QC verification.', 1060).slice(0, 3);
+    y = Math.max(430, y + 20);
+    for (const dLine of descLines) {
+      ctx.fillText(dLine, 84, y);
+      y += 38;
+    }
+
+    ctx.font = '600 22px Inter, sans-serif';
+    ctx.fillStyle = '#c5a059';
+    ctx.fillText('"Kami ada karena kamu Ade"', 84, 636);
+
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#8f96a6';
+    ctx.fillText('COVER & THUMBNAIL AUTO-READY', 1196, 636);
+
+    return canvas.toDataURL('image/png');
+  }
+
+  function generateProductThumbnailDataUrl(title, productType) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 600;
+    canvas.height = 600;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return '';
+
+    const grad = ctx.createLinearGradient(0, 0, 600, 600);
+    grad.addColorStop(0, '#101318');
+    grad.addColorStop(1, '#1f1b13');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 600, 600);
+
+    ctx.strokeStyle = '#c5a059';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(28, 28, 544, 544);
+
+    ctx.fillStyle = 'rgba(197, 160, 89, 0.16)';
+    ctx.fillRect(64, 64, 472, 46);
+
+    ctx.font = '700 20px Inter, sans-serif';
+    ctx.fillStyle = '#c5a059';
+    ctx.textAlign = 'center';
+    ctx.fillText(`JOY CORP • ${String(productType || 'ASSET').toUpperCase()}`, 300, 94);
+
+    ctx.font = '800 36px Inter, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    const lines = wrapCanvasText(ctx, title || 'Digital Product', 480).slice(0, 4);
+    let y = 185;
+    for (const line of lines) {
+      ctx.fillText(line, 300, y);
+      y += 48;
+    }
+
+    ctx.font = '600 18px Inter, sans-serif';
+    ctx.fillStyle = '#8f96a6';
+    ctx.fillText('AUTO-QC VERIFIED • DIGITAL PACK', 300, 526);
+
+    return canvas.toDataURL('image/png');
+  }
+
+  function getVisualsStore() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(PRODUCT_VISUALS_KEY) || '{}');
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function saveVisualsStore(store) {
+    const keys = Object.keys(store);
+    if (keys.length > 80) {
+      for (const k of keys.slice(0, keys.length - 80)) {
+        delete store[k];
+      }
+    }
+    try {
+      localStorage.setItem(PRODUCT_VISUALS_KEY, JSON.stringify(store));
+    } catch (_) {}
+  }
+
+  function removeProductVisualFromStore(product) {
+    if (!product || !product.title) return;
+    const normKey = String(product.title || '').trim().toLowerCase();
+    const store = getVisualsStore();
+    if (normKey && store[normKey]) {
+      delete store[normKey];
+      saveVisualsStore(store);
+    }
+  }
+
+  function clearVisualAssetsCache() {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
+    if (!confirm('Hapus semua cache aset cover & thumbnail lokal?')) return;
+    localStorage.removeItem(PRODUCT_VISUALS_KEY);
+    if (activePreviewProduct) {
+      viewOwnerProduct(activePreviewProduct.id);
+    }
+    loadCatalog();
+    appendWorklogEntry('Hendrick\'s', 'Cache aset cover & thumbnail dibersihkan', 'ok');
+    alert('Cache aset gambar lokal telah dibersihkan.');
+  }
+
+  function ensureProductVisuals(title, productType = 'digital-pack', ideaText = '') {
+    const normKey = String(title || '').trim().toLowerCase();
+    const store = getVisualsStore();
+    if (normKey && store[normKey] && store[normKey].cover_data_url && store[normKey].thumbnail_data_url) {
+      return store[normKey];
+    }
+
+    const cover_data_url = generateProductCoverDataUrl(title, productType, ideaText);
+    const thumbnail_data_url = generateProductThumbnailDataUrl(title, productType);
+    const visualObj = {
+      title: String(title || 'Produk'),
+      product_type: String(productType || 'digital-pack'),
+      cover_data_url,
+      thumbnail_data_url,
+      updated_at: new Date().toISOString()
+    };
+
+    if (normKey) {
+      store[normKey] = visualObj;
+      saveVisualsStore(store);
+    }
+    return visualObj;
+  }
+
+  function getProductVisuals(product) {
+    if (!product) return { cover_data_url: '', thumbnail_data_url: '' };
+    const normKey = String(product.title || '').trim().toLowerCase();
+    const store = getVisualsStore();
+    if (normKey && store[normKey] && store[normKey].cover_data_url && store[normKey].thumbnail_data_url) {
+      return store[normKey];
+    }
+    return ensureProductVisuals(product.title || 'Produk', 'digital-pack', product.description || '');
   }
 
   function createAppIconDataUrl(size) {
@@ -641,7 +850,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
         const swCode = `
-          const CACHE_NAME = 'joy-corp-inline-v3';
+          const CACHE_NAME = 'joy-corp-inline-v5';
           self.addEventListener('install', (event) => {
             self.skipWaiting();
           });
@@ -1019,6 +1228,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     archivedIds.push(String(product.id));
     localStorage.setItem(AUTO_ARCHIVED_IDS_KEY, JSON.stringify(archivedIds.slice(-300)));
 
+    const visuals = getProductVisuals(product);
+
     const konten = [
       `JOY CORPORATION - ARSIP OTOMATIS PENYIMPANAN TELEPON`,
       `"Kami ada karena kamu Ade"`,
@@ -1027,6 +1238,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       `Judul      : ${product.title || 'Tanpa Judul'}`,
       `Status     : ${product.status || 'pending'}`,
       `Harga      : $${Number(product.price_usd || 0).toFixed(2)} USD`,
+      `Cover      : ${visuals.cover_data_url ? 'Auto-Generated PNG (1280x720)' : '-'}`,
+      `Thumbnail  : ${visuals.thumbnail_data_url ? 'Auto-Generated PNG (600x600)' : '-'}`,
       ``,
       `Deskripsi / Isi Produk:`,
       product.description || '-'
@@ -1238,6 +1451,64 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     };
   }
 
+  async function deleteSingleProduct(productId) {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
+    if (!connected || !sb) return alert('Supabase belum terhubung.');
+    const target = allProductsCache.find(p => String(p.id) === String(productId));
+    const label = target ? `"${target.title}"` : `ID ${productId}`;
+    if (!confirm(`Hapus produk ${label} beserta aset lokalnya? Tindakan ini tidak bisa dibatalkan.`)) return;
+
+    await runGuard('del-prod-' + productId, async () => {
+      try {
+        const { error } = await sb.from('products').delete().eq('id', productId);
+        if (error) throw new Error(error.message);
+
+        if (target) removeProductVisualFromStore(target);
+        if (activePreviewProduct && String(activePreviewProduct.id) === String(productId)) {
+          closeOwnerPreview();
+        }
+
+        await loadCatalog();
+        triggerLivePulse('worklog', `Produk Dihapus: ${label}`, 'Hennessy', 'ok');
+        alert(`Produk ${label} berhasil dihapus.`);
+      } catch (err) {
+        alert('Gagal menghapus produk: ' + err.message);
+      }
+    });
+  }
+
+  async function deleteActiveProductAsset() {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
+    if (!activePreviewProduct) return;
+    await deleteSingleProduct(activePreviewProduct.id);
+  }
+
+  async function deleteAllProducts() {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
+    if (!connected || !sb) return alert('Supabase belum terhubung.');
+    if (!confirm('PERINGATAN: Hapus SEMUA produk yang ada di database & aset lokalnya?')) return;
+    if (!confirm('Konfirmasi terakhir: benar-benar ingin menghapus SEMUA produk?')) return;
+
+    await runGuard('del-all-prod', async () => {
+      try {
+        const { error } = await sb.from('products').delete().not('id', 'is', null);
+        if (error) throw new Error(error.message);
+
+        localStorage.removeItem(PRODUCT_VISUALS_KEY);
+        localStorage.removeItem(LOCAL_PRODUCTS_EXPORT_KEY);
+        localStorage.removeItem(AUTO_ARCHIVED_IDS_KEY);
+        allProductsCache = [];
+        closeOwnerPreview();
+
+        await loadCatalog();
+        triggerLivePulse('worklog', 'Semua Produk & Aset Dihapus', 'Hennessy', 'ok');
+        alert('Semua produk dan aset terkait berhasil dihapus.');
+      } catch (err) {
+        alert('Gagal menghapus semua produk: ' + err.message);
+      }
+    });
+  }
+
   async function runQcAutoPromotion(silent = false) {
     if (!connected || !sb) return;
     await runGuard('qc-promote', async () => {
@@ -1255,6 +1526,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
         for (const item of eligible) {
           const parsed = parseTargetMeta(item.idea);
+          ensureProductVisuals(item.title, item.product_type || 'digital-pack', parsed.cleanIdea || item.idea || '');
           const alreadyExists = allProductsCache.some(
             p => String(p.title || '').trim().toLowerCase() === String(item.title || '').trim().toLowerCase()
           );
@@ -1262,6 +1534,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           if (!alreadyExists) {
             const descText = [
               parsed.cleanIdea || item.idea || '',
+              `Cover & Thumbnail: AUTO-READY`,
               `QC Otomatis: LOLOS`,
               `Target: ${parsed.targetSummary}`
             ].filter(Boolean).join('\n');
@@ -1288,8 +1561,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         }
 
         await Promise.all([loadCatalog(), loadProduction()]);
-        triggerLivePulse('production', 'Produk Masuk Pending', 'Absolut', 'ok');
-        if (!silent) alert('QC otomatis selesai: produk lolos pengecekan masuk ke Produk Pending.');
+        triggerLivePulse('production', 'Produk Masuk Pending (+Cover & Thumb)', 'Absolut', 'ok');
+        if (!silent) alert('QC otomatis selesai: cover, thumbnail, dan produk lolos pengecekan masuk ke Produk Pending.');
       } catch (err) {
         if (!silent) alert('Gagal proses QC otomatis: ' + err.message);
       }
@@ -1310,14 +1583,15 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           return;
         }
 
-        triggerLivePulse('production', 'Riset & Produksi 10 Produk Berbeda', 'Aperol → Walker → Hendrick\'s', 'ok');
+        triggerLivePulse('production', 'Riset, Cover, Thumbnail & Produksi', 'Aperol → Walker → Hendrick\'s', 'ok');
         const todayStr = new Date().toISOString().slice(0, 10);
         const usedTitles = new Set();
 
         for (let i = 1; i <= needed; i++) {
           const seq = todayCount + i;
           const spec = buildAutoGeneratedSpec(seq, null, usedTitles);
-          const descText = `${spec.idea}\nQC Otomatis: LOLOS (100%)\nTarget: Rilis ${todayStr} • Target 10/hari`;
+          ensureProductVisuals(spec.title, spec.product_type, spec.idea);
+          const descText = `${spec.idea}\nCover & Thumbnail: AUTO-READY\nQC Otomatis: LOLOS (100%)\nTarget: Rilis ${todayStr} • Target 10/hari`;
 
           await sb.from('production_items').insert([{
             title: spec.title,
@@ -1341,8 +1615,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         }
 
         await Promise.all([loadCatalog(), loadProduction()]);
-        triggerLivePulse('production', `Selesai ${needed} Produk Pending`, 'Absolut QC', 'ok');
-        alert(`Otomatisasi selesai: ${needed} produk berbeda lolos QC, masuk ke Produk Pending untuk dicek & di-Public, serta tersimpan ke arsip telepon.`);
+        triggerLivePulse('production', `Selesai ${needed} Produk + Cover & Thumb`, 'Hendrick\'s & Absolut', 'ok');
+        alert(`Otomatisasi selesai: ${needed} produk berbeda lengkap dengan cover & thumbnail otomatis lolos QC dan masuk ke Produk Pending.`);
       } catch (err) {
         alert('Gagal menjalankan otomatisasi 10 produk/hari: ' + err.message);
       }
@@ -1362,7 +1636,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
       if (!title || !idea) return alert('Isi judul dan ide/spesifikasi produk terlebih dahulu.');
 
-      triggerLivePulse('production', `Sedang Produksi: ${title}`, 'Walker & Hendrick\'s', 'ok');
+      triggerLivePulse('production', `Produksi + Cover & Thumb: ${title}`, 'Walker & Hendrick\'s', 'ok');
+      ensureProductVisuals(title, type, idea);
 
       const parts = [];
       if (targetDate) parts.push('Rilis ' + targetDate);
@@ -1376,7 +1651,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           const { data: pRows, error: prodErr } = await sb.from('products').insert([{
             title,
             slug: makeProductSlug(title),
-            description: `${idea}\nQC Otomatis: LOLOS\nTarget: ${targetSummary}`,
+            description: `${idea}\nCover & Thumbnail: AUTO-READY\nQC Otomatis: LOLOS\nTarget: ${targetSummary}`,
             price_usd: Number(targetRevenue) > 0 && Number(targetUnits) > 0
               ? Number((Number(targetRevenue) / Number(targetUnits)).toFixed(2))
               : 29.00,
@@ -1410,7 +1685,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         document.getElementById('pTargetRevenue').value = '';
         document.getElementById('pIdea').value = '';
         await Promise.all([loadCatalog(), loadProduction()]);
-        triggerLivePulse('production', `Produk Masuk Pending: ${title}`, 'Absolut QC', 'ok');
+        triggerLivePulse('production', `Produk + Cover & Thumb Masuk Pending: ${title}`, 'Absolut QC', 'ok');
       } catch (err) {
         alert('Gagal membuat item produksi: ' + err.message);
       }
@@ -1424,6 +1699,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       return { skipped: true };
     }
 
+    const visuals = getProductVisuals(product);
+
     const payload = {
       source: 'JOY_CORPORATION',
       product_id: product.id,
@@ -1432,9 +1709,12 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       price_usd: Number(product.price_usd || 29),
       price_cents: Math.round(Number(product.price_usd || 29) * 100),
       status: 'published',
+      cover_data_url: visuals.cover_data_url || '',
+      thumbnail_data_url: visuals.thumbnail_data_url || '',
       content_txt: [
         `JOY CORPORATION - ${product.title || 'Produk'}`,
         `Harga: $${Number(product.price_usd || 29).toFixed(2)} USD`,
+        `Cover & Thumbnail: Auto-Generated Ready`,
         ``,
         product.description || ''
       ].join('\n')
@@ -1461,7 +1741,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         throw new Error(detail);
       }
 
-      appendWorklogEntry('Martini', `Terkirim ke Gumroad: ${product.title}`, 'ok');
+      appendWorklogEntry('Martini', `Terkirim ke Gumroad (+Cover & Thumb): ${product.title}`, 'ok');
       return { ok: true, data: parsedData };
     } catch (err) {
       appendWorklogEntry('Martini', `Gagal kirim "${product.title}" ke Gumroad: ${err.message}`, 'pending');
@@ -1474,6 +1754,9 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     await runGuard('publish-' + productId, async () => {
       try {
         const current = allProductsCache.find(p => String(p.id) === String(productId));
+        if (current) {
+          ensureProductVisuals(current.title, 'digital-pack', current.description || '');
+        }
         const defaultPrice = current && Number(current.price_usd) > 0 ? Number(current.price_usd) : 29.00;
         const rawPrice = prompt('Konfirmasi harga jual produk (USD) sebelum dipublikasikan ke Produk Public & Gumroad:', String(defaultPrice.toFixed(2)));
         if (rawPrice === null) return;
@@ -1503,7 +1786,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         if (publishedProd) {
           const gumResult = await sendProductToGumroad(publishedProd);
           if (gumResult && gumResult.ok) {
-            alert(`Produk "${publishedProd.title}" sudah masuk ke Produk Public dan terkirim ke Gumroad.`);
+            alert(`Produk "${publishedProd.title}" sudah masuk ke Produk Public dan terkirim ke Gumroad (cover & thumbnail siap).`);
           } else if (gumResult && gumResult.skipped) {
             alert(`Produk "${publishedProd.title}" sudah masuk ke Produk Public. Atur Gumroad Endpoint URL di Owner Vault jika ingin otomatis kirim ke Gumroad.`);
           } else {
@@ -1520,16 +1803,18 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     if (!connected || !sb) return alert('Supabase belum terhubung.');
     await runGuard('pipe-pub-' + item.id, async () => {
       try {
+        const parsed = parseTargetMeta(item.idea);
+        ensureProductVisuals(item.title, item.product_type || 'digital-pack', parsed.cleanIdea || item.idea || '');
+
         let prod = allProductsCache.find(
           p => String(p.title || '').trim().toLowerCase() === String(item.title || '').trim().toLowerCase()
         );
 
         if (!prod) {
-          const parsed = parseTargetMeta(item.idea);
           const { data: inserted, error: insErr } = await sb.from('products').insert([{
             title: item.title,
             slug: makeProductSlug(item.title),
-            description: `${parsed.cleanIdea || item.idea || ''}\nQC Otomatis: LOLOS`,
+            description: `${parsed.cleanIdea || item.idea || ''}\nCover & Thumbnail: AUTO-READY\nQC Otomatis: LOLOS`,
             price_usd: 29.00,
             status: 'pending'
           }]).select();
@@ -1562,6 +1847,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
         if (next === 'qc' || next === 'ready' || next === 'published') {
           const parsed = parseTargetMeta(item.idea);
+          ensureProductVisuals(item.title, item.product_type || 'digital-pack', parsed.cleanIdea || item.idea || '');
           const exists = allProductsCache.some(
             p => String(p.title || '').trim().toLowerCase() === String(item.title || '').trim().toLowerCase()
           );
@@ -1569,7 +1855,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
             const { data: pRows } = await sb.from('products').insert([{
               title: item.title,
               slug: makeProductSlug(item.title),
-              description: `${parsed.cleanIdea || item.idea || ''}\nQC Otomatis: LOLOS\nTarget: ${parsed.targetSummary}`,
+              description: `${parsed.cleanIdea || item.idea || ''}\nCover & Thumbnail: AUTO-READY\nQC Otomatis: LOLOS\nTarget: ${parsed.targetSummary}`,
               price_usd: 29.00,
               status: 'pending'
             }]).select();
@@ -1609,6 +1895,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         '<td><div class="actions">' +
           '<button class="btn btn-gold" onclick="publishPendingProduct(\'' + escapeHtml(String(p.id)) + '\')">Public</button>' +
           '<button class="btn" onclick="viewOwnerProduct(\'' + escapeHtml(String(p.id)) + '\')">Lihat</button>' +
+          '<button class="btn btn-red" onclick="deleteSingleProduct(\'' + escapeHtml(String(p.id)) + '\')">Hapus</button>' +
         '</div></td>';
       body.appendChild(tr);
     });
@@ -1621,6 +1908,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   }
 
   function buildProductPackageBlobUrl(product) {
+    const visuals = getProductVisuals(product);
     const konten = [
       `JOY CORPORATION - ARSIP & PRODUK OWNER`,
       `"Kami ada karena kamu Ade"`,
@@ -1629,6 +1917,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       `Judul      : ${product.title || 'Tanpa Judul'}`,
       `Status     : ${product.status || '-'}`,
       `Harga      : $${Number(product.price_usd || 0).toFixed(2)} USD (${formatIdr(product.price_usd || 0)})`,
+      `Cover      : ${visuals.cover_data_url ? 'Auto-Generated PNG (1280x720)' : '-'}`,
+      `Thumbnail  : ${visuals.thumbnail_data_url ? 'Auto-Generated PNG (600x600)' : '-'}`,
       `Dibuat     : ${product.created_at ? new Date(product.created_at).toLocaleString('id-ID') : '-'}`,
       ``,
       `Deskripsi / Isi Produk:`,
@@ -1643,22 +1933,50 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
     const p = allProductsCache.find(item => String(item.id) === String(productId));
     if (!p) return;
+    activePreviewProduct = p;
+    const visuals = getProductVisuals(p);
     activateSectionTab('owner-vault');
     const card = document.getElementById('ownerPreviewCard');
     const titleEl = document.getElementById('ownerPreviewTitle');
+    const coverEl = document.getElementById('ownerCoverImg');
     const contentEl = document.getElementById('ownerPreviewContent');
 
     titleEl.textContent = p.title || 'Detail Produk';
+    if (coverEl) {
+      if (visuals.cover_data_url) {
+        coverEl.src = visuals.cover_data_url;
+        coverEl.style.display = 'block';
+      } else {
+        coverEl.style.display = 'none';
+      }
+    }
     contentEl.textContent =
       `ID Produk : ${p.id}\n` +
       `Status    : ${p.status || '-'}\n` +
       `Harga     : $${Number(p.price_usd || 0).toFixed(2)} (${formatIdr(p.price_usd || 0)})\n` +
+      `Visual    : Cover (1280x720) & Thumbnail (600x600) Auto-Generated\n` +
       `Tanggal   : ${p.created_at ? new Date(p.created_at).toLocaleString('id-ID') : '-'}\n\n` +
       `Deskripsi:\n${p.description || '-'}`;
     card.style.display = 'block';
   }
 
+  function downloadVisualAsset(kind) {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
+    if (!activePreviewProduct) return;
+    const visuals = getProductVisuals(activePreviewProduct);
+    const dataUrl = kind === 'thumbnail' ? visuals.thumbnail_data_url : visuals.cover_data_url;
+    if (!dataUrl) return alert('Aset gambar belum tersedia.');
+    const safeSlug = String(activePreviewProduct.title || 'produk').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'produk';
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `JOY-${kind.toUpperCase()}-${safeSlug}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
   function closeOwnerPreview() {
+    activePreviewProduct = null;
     document.getElementById('ownerPreviewCard').style.display = 'none';
   }
 
@@ -1709,6 +2027,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           '<button class="btn" onclick="viewOwnerProduct(\'' + escapeHtml(String(p.id)) + '\')">Lihat</button>' +
           '<button class="btn btn-gold" onclick="downloadOwnerProduct(\'' + escapeHtml(String(p.id)) + '\')">Download</button>' +
           '<button class="btn" onclick="resendProductToGumroad(\'' + escapeHtml(String(p.id)) + '\')">Kirim Gumroad</button>' +
+          '<button class="btn btn-red" onclick="deleteSingleProduct(\'' + escapeHtml(String(p.id)) + '\')">Hapus</button>' +
         '</div></td>';
 
       body.appendChild(tr);
@@ -1754,8 +2073,17 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       const pay = getPaymentConfig();
 
       published.forEach(p => {
+        const visuals = getProductVisuals(p);
         const card = document.createElement('div');
         card.className = 'product';
+
+        if (visuals.thumbnail_data_url) {
+          const thumbImg = document.createElement('img');
+          thumbImg.className = 'prod-thumb';
+          thumbImg.src = visuals.thumbnail_data_url;
+          thumbImg.alt = p.title || 'Thumbnail Produk';
+          card.appendChild(thumbImg);
+        }
 
         const h3 = document.createElement('h3');
         h3.textContent = p.title || 'Tanpa Judul';
