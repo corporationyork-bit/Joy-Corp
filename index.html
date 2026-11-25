@@ -351,7 +351,7 @@ th{color:var(--muted);font-weight:700}
       </div>
 
       <div id="archiveUnlockedPanel" style="display:none">
-        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis dibuatkan <b>cover</b> & <b>thumbnail</b> terang yang nyaman di mata, masuk ke penyimpanan telepon (file <code>.txt</code>), dan bisa dilihat, diunduh ulang, diekspor ke <b>PDF komplit anti-terpotong</b>, disiapkan lewat <b>Paket Gumroad</b>, dihapus per item/aset, atau dikirim ke Gumroad kapan saja.</div>
+        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis dibuatkan <b>cover</b> & <b>thumbnail</b> terang yang nyaman di mata, mengunduh file <b>PDF komplit anti-terpotong</b> ke penyimpanan telepon, dan bisa dilihat, diunduh ulang, disiapkan lewat <b>Paket Gumroad</b>, dihapus per item/aset, atau dikirim ke Gumroad kapan saja.</div>
         <div class="card">
           <div class="actions" style="margin-bottom:12px">
             <button class="btn btn-gold" id="btnExportAllPdf" onclick="exportAllProductsPdf()">Export Semua PDF</button>
@@ -484,7 +484,7 @@ th{color:var(--muted);font-weight:700}
               <label>Pemilihan Penyimpanan Produk</label>
               <select id="storageTargetSelect" onchange="changeProductStorageTarget(this.value)">
                 <option value="supabase">Supabase (Cloud Database)</option>
-                <option value="phone_memory">Memori Telepon (File Lokal + Lokal Storage)</option>
+                <option value="phone_memory">Memori Telepon (File PDF Lokal + Lokal Storage)</option>
               </select>
             </div>
             <div class="stat-box" style="margin:6px 0 12px">
@@ -1362,7 +1362,7 @@ th{color:var(--muted);font-weight:700}
     const msg = document.getElementById('storageActionMsg');
     if (msg) {
       msg.textContent = target === 'phone_memory'
-        ? 'Penyimpanan produk dialihkan ke Memori Telepon (otomatis simpan file ke telepon + Lokal Storage).'
+        ? 'Penyimpanan produk dialihkan ke Memori Telepon (otomatis simpan file PDF ke telepon + Lokal Storage).'
         : 'Penyimpanan produk dialihkan ke Supabase (database cloud aktif).';
     }
     appendWorklogEntry('Hennessy', `Penyimpanan produk diubah ke ${target === 'phone_memory' ? 'Memori Telepon' : 'Supabase'}`, 'ok');
@@ -1410,7 +1410,7 @@ th{color:var(--muted);font-weight:700}
     a.remove();
   }
 
-  function autoSaveProductToPhoneMemory(product) {
+  async function autoSaveProductToPhoneMemory(product) {
     if (!product || !product.id) return;
     let archivedIds = [];
     try {
@@ -1424,33 +1424,12 @@ th{color:var(--muted);font-weight:700}
     archivedIds.push(String(product.id));
     localStorage.setItem(AUTO_ARCHIVED_IDS_KEY, JSON.stringify(archivedIds.slice(-300)));
 
-    const visuals = getProductVisuals(product);
-
-    const konten = [
-      `JOY CORPORATION - ARSIP OTOMATIS PENYIMPANAN TELEPON`,
-      `"Kami ada karena kamu Ade"`,
-      `----------------------------------------`,
-      `ID Produk  : ${product.id}`,
-      `Judul      : ${product.title || 'Tanpa Judul'}`,
-      `Status     : ${product.status || 'pending'}`,
-      `Harga      : $${Number(product.price_usd || 0).toFixed(2)} USD`,
-      `Cover      : ${visuals.cover_data_url ? 'Auto-Generated PNG (1280x720)' : '-'}`,
-      `Thumbnail  : ${visuals.thumbnail_data_url ? 'Auto-Generated PNG (600x600)' : '-'}`,
-      `PDF        : Siap diekspor di Arsip Owner (komplit & anti-terpotong)`,
-      ``,
-      `Deskripsi / Isi Produk:`,
-      product.description || '-'
-    ].join('\n');
-
-    const blob = new Blob([konten], { type: 'text/plain;charset=utf-8' });
-    const url = registerTrackedBlobUrl(blob);
-    const a = document.createElement('a');
-    const slug = String(product.title || 'arsip').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'arsip';
-    a.href = url;
-    a.download = `JOY-ARSIP-${slug}-${String(product.id).slice(0, 8)}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    const slug = String(product.title || 'produk')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'produk';
+    const sections = buildRichProductSections(product);
+    await renderSectionsToPaginatedPdf(sections, `JOY-PRODUK-${slug}.pdf`);
   }
 
   function getSupabaseConfig() {
@@ -1823,7 +1802,7 @@ th{color:var(--muted);font-weight:700}
             if (insErr) throw new Error(insErr.message);
 
             if (Array.isArray(insertedRows) && insertedRows[0]) {
-              autoSaveProductToPhoneMemory(insertedRows[0]);
+              await autoSaveProductToPhoneMemory(insertedRows[0]);
             }
           }
 
@@ -1836,7 +1815,7 @@ th{color:var(--muted);font-weight:700}
 
         await Promise.all([loadCatalog(), loadProduction()]);
         triggerLivePulse('production', 'Produk Komplit Masuk Pending', 'Absolut', 'ok');
-        if (!silent) alert('QC otomatis selesai: cover, thumbnail, dan produk siap PDF masuk ke Produk Pending.');
+        if (!silent) alert('QC otomatis selesai: cover, thumbnail, dan PDF produk komplit masuk ke Produk Pending.');
       } catch (err) {
         if (!silent) alert('Gagal proses QC otomatis: ' + err.message);
       }
@@ -1885,13 +1864,13 @@ th{color:var(--muted);font-weight:700}
           if (pErr) throw new Error(pErr.message);
 
           if (Array.isArray(pRows) && pRows[0]) {
-            autoSaveProductToPhoneMemory(pRows[0]);
+            await autoSaveProductToPhoneMemory(pRows[0]);
           }
         }
 
         await Promise.all([loadCatalog(), loadProduction()]);
         triggerLivePulse('production', `Selesai ${needed} Produk Komplit`, 'Hendrick\'s & Absolut', 'ok');
-        alert(`Otomatisasi selesai: ${needed} produk berbeda lengkap dengan cover, thumbnail & siap PDF masuk ke Produk Pending.`);
+        alert(`Otomatisasi selesai: ${needed} produk berbeda lengkap dengan cover, thumbnail & PDF komplit masuk ke Produk Pending.`);
       } catch (err) {
         alert('Gagal menjalankan otomatisasi batch: ' + err.message);
       }
@@ -1933,7 +1912,7 @@ th{color:var(--muted);font-weight:700}
           if (prodErr) throw new Error(prodErr.message);
 
           if (Array.isArray(pRows) && pRows[0]) {
-            autoSaveProductToPhoneMemory(pRows[0]);
+            await autoSaveProductToPhoneMemory(pRows[0]);
           }
 
           await sb.from('production_items').insert([{
@@ -2042,7 +2021,7 @@ th{color:var(--muted);font-weight:700}
         };
 
         if (publishedProd && publishedProd.id) {
-          autoSaveProductToPhoneMemory(publishedProd);
+          await autoSaveProductToPhoneMemory(publishedProd);
         }
 
         await loadCatalog();
@@ -2051,7 +2030,7 @@ th{color:var(--muted);font-weight:700}
         if (publishedProd) {
           const gumResult = await sendProductToGumroad(publishedProd);
           if (gumResult && gumResult.ok) {
-            alert(`Produk "${publishedProd.title}" sudah masuk ke Produk Public dan terkirim ke Gumroad (cover, thumbnail & PDF siap).`);
+            alert(`Produk "${publishedProd.title}" sudah masuk ke Produk Public dan terkirim ke Gumroad (cover, thumbnail & PDF komplit siap).`);
           } else if (gumResult && gumResult.skipped) {
             alert(`Produk "${publishedProd.title}" sudah masuk ke Produk Public. Atur Gumroad Endpoint URL di Owner Vault jika ingin otomatis kirim ke Gumroad.`);
           } else {
@@ -2125,7 +2104,7 @@ th{color:var(--muted);font-weight:700}
               status: 'pending'
             }]).select();
             if (Array.isArray(pRows) && pRows[0]) {
-              autoSaveProductToPhoneMemory(pRows[0]);
+              await autoSaveProductToPhoneMemory(pRows[0]);
             }
           }
         }
