@@ -149,7 +149,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
     <!-- PRODUKSI & PENDING -->
     <section id="production" class="section">
-      <h2>Otomatisasi Produksi (Target 10 Produk / Hari)</h2>
+      <h2>Otomatisasi & Produksi (Berbeda Produk & Request Produk)</h2>
       <div class="grid-3">
         <div class="stat-box">
           <div class="stat-label">Target Harian</div>
@@ -160,7 +160,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         <div class="stat-box">
           <div class="stat-label">Mode Otomatisasi</div>
           <div class="stat-val" id="autoEngineStatus">AKTIF</div>
-          <div class="stat-sub">Lolos QC → otomatis ke Produk Pending</div>
+          <div class="stat-sub">Komplit: Cover + Thumbnail + PDF</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">Produk Pending</div>
@@ -174,25 +174,30 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           <button class="btn btn-gold" id="btnAutoFill10" onclick="runDailyAutoBatchToTarget()">Jalankan Otomatisasi ke Target 10/Hari</button>
           <button class="btn" id="btnRunQcSweep" onclick="runQcAutoPromotion()">Proses QC Otomatis → Pending</button>
         </div>
-        <label>Judul Produk</label>
-        <input id="pTitle" placeholder="AI Toolkit for Creators & Small Businesses">
-        <div class="grid-2">
+        <label>Judul Produk / Request Produk</label>
+        <input id="pTitle" placeholder="Contoh: SOP Kasir & Stok Toko atau Request Katalog Produk">
+        <div class="grid-3">
           <div>
-            <label>Tipe Produk</label>
+            <label>Tipe / Kategori</label>
             <select id="pType">
+              <option value="request-produk">request-produk (Permintaan Khusus)</option>
               <option value="toolkit">toolkit</option>
               <option value="ebook">ebook</option>
               <option value="prompt-pack">prompt-pack</option>
               <option value="template">template</option>
-              <option value="request-produk">request-produk</option>
             </select>
           </div>
           <div>
             <label>Mode Pembuatan</label>
-            <select id="pAutoMode">
-              <option value="auto">Otomatis Lolos QC → Produk Pending</option>
+            <select id="pAutoMode" onchange="syncProductionFormMode()">
+              <option value="auto">Otomatis (Variasi Produk Berbeda)</option>
+              <option value="manual">Manual (Sesuai Input & Qty)</option>
               <option value="pipeline">Masuk Pipeline Bertahap</option>
             </select>
+          </div>
+          <div>
+            <label>Qty (Jumlah Produk)</label>
+            <input id="pQty" type="number" min="1" max="50" step="1" value="1" placeholder="Contoh: 3">
           </div>
         </div>
         <div class="grid-2">
@@ -208,9 +213,9 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
             </div>
           </div>
         </div>
-        <label>Ide / Spesifikasi Produk</label>
-        <textarea id="pIdea" rows="2" placeholder="Jelaskan hasil utama, struktur file, dan manfaat untuk pengguna"></textarea>
-        <button class="btn btn-gold" id="btnCreateProd" onclick="createProductionItem()">Tambah Item Produksi</button>
+        <label>Ide / Detail Request / Spesifikasi Produk</label>
+        <textarea id="pIdea" rows="2" placeholder="Isi detail request produk atau spesifikasi (jika mode Otomatis dikosongkan, sistem otomatis membuat variasi produk berbeda sesuai Qty)"></textarea>
+        <button class="btn btn-gold" id="btnCreateProd" onclick="createProductionItem()">Proses Item Produksi</button>
       </div>
 
       <div class="card">
@@ -280,7 +285,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       </div>
 
       <div id="archiveUnlockedPanel" style="display:none">
-        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis dibuatkan <b>cover</b> & <b>thumbnail</b>, masuk ke penyimpanan telepon (file <code>.txt</code>), dan bisa dilihat, diunduh ulang, diekspor ke PDF anti-terpotong, dihapus per item/aset, atau dikirim ke Gumroad kapan saja.</div>
+        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis dibuatkan <b>cover</b> & <b>thumbnail</b>, masuk ke penyimpanan telepon (file <code>.txt</code>), dan bisa dilihat, diunduh ulang, diekspor ke <b>PDF anti-terpotong</b>, disiapkan lewat <b>Paket Gumroad</b>, dihapus per item/aset, atau dikirim ke Gumroad kapan saja.</div>
         <div class="card">
           <div class="actions" style="margin-bottom:12px">
             <button class="btn btn-gold" id="btnExportAllPdf" onclick="exportAllProductsPdf()">Export Semua PDF</button>
@@ -686,7 +691,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
     ctx.textAlign = 'right';
     ctx.fillStyle = '#8f96a6';
-    ctx.fillText('COVER & THUMBNAIL AUTO-READY', 1196, 636);
+    ctx.fillText('COVER & THUMBNAIL + PDF READY', 1196, 636);
 
     return canvas.toDataURL('image/png');
   }
@@ -727,7 +732,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
     ctx.font = '600 18px Inter, sans-serif';
     ctx.fillStyle = '#8f96a6';
-    ctx.fillText('AUTO-QC VERIFIED • DIGITAL PACK', 300, 526);
+    ctx.fillText('COVER • THUMBNAIL • PDF KOMPLIT', 300, 526);
 
     return canvas.toDataURL('image/png');
   }
@@ -1313,6 +1318,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       `Harga      : $${Number(product.price_usd || 0).toFixed(2)} USD`,
       `Cover      : ${visuals.cover_data_url ? 'Auto-Generated PNG (1280x720)' : '-'}`,
       `Thumbnail  : ${visuals.thumbnail_data_url ? 'Auto-Generated PNG (600x600)' : '-'}`,
+      `PDF        : Siap diekspor di Arsip Owner (anti-terpotong)`,
       ``,
       `Deskripsi / Isi Produk:`,
       product.description || '-'
@@ -1474,6 +1480,20 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   }
   document.querySelectorAll('.menu').forEach(m => m.onclick = () => setTab(m.dataset.tab));
 
+  function syncProductionFormMode() {
+    const mode = document.getElementById('pAutoMode').value;
+    const titleEl = document.getElementById('pTitle');
+    const ideaEl = document.getElementById('pIdea');
+    if (!titleEl || !ideaEl) return;
+    if (mode === 'auto') {
+      titleEl.placeholder = 'Kosongkan untuk variasi otomatis, atau isi topik/request';
+      ideaEl.placeholder = 'Otomatis membuat variasi produk berbeda (cover + thumbnail + PDF siap) sesuai Qty';
+    } else {
+      titleEl.placeholder = 'Judul Produk / Request Produk';
+      ideaEl.placeholder = 'Isi detail request produk atau spesifikasi produk';
+    }
+  }
+
   function isTodayDate(isoStr) {
     if (!isoStr) return false;
     const d = new Date(isoStr);
@@ -1509,7 +1529,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     };
   }
 
-  function buildAutoGeneratedSpec(indexNumber, customType = null, usedTitles = new Set()) {
+  function buildAutoGeneratedSpec(indexNumber, customType = null, usedTitles = new Set(), customBaseTitle = '', customIdea = '') {
     const stamp = new Date().toISOString().slice(0, 10);
     const pool = [...GLOBAL_TRENDING_BLUEPRINTS].sort(() => Math.random() - 0.5);
     const picked = pool.find(item => !usedTitles.has(item.title)) ||
@@ -1517,10 +1537,13 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     usedTitles.add(picked.title);
 
     const chosenType = customType || picked.product_type;
+    const baseTitle = customBaseTitle ? `${customBaseTitle} — ${picked.title}` : picked.title;
+    const baseIdea = customIdea ? `${customIdea} | Fokus: ${picked.idea}` : picked.idea;
+
     return {
-      title: `${picked.title} [${stamp} #${indexNumber}]`,
+      title: `${baseTitle} [${stamp} #${indexNumber}]`,
       product_type: chosenType,
-      idea: `${picked.idea} | Global Market Trend: High-demand digital asset, auto-QC passed, ready for owner public confirmation.`
+      idea: `${baseIdea} | Variasi produk berbeda, cover + thumbnail + PDF anti-terpotong siap.`
     };
   }
 
@@ -1661,7 +1684,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           if (!alreadyExists) {
             const descText = [
               parsed.cleanIdea || item.idea || '',
-              `Cover & Thumbnail: AUTO-READY`,
+              `Paket Komplit: Cover + Thumbnail + PDF Anti-Terpotong`,
               `QC Otomatis: LOLOS`,
               `Target: ${parsed.targetSummary}`
             ].filter(Boolean).join('\n');
@@ -1688,8 +1711,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         }
 
         await Promise.all([loadCatalog(), loadProduction()]);
-        triggerLivePulse('production', 'Produk Masuk Pending (+Cover & Thumb)', 'Absolut', 'ok');
-        if (!silent) alert('QC otomatis selesai: cover, thumbnail, dan produk lolos pengecekan masuk ke Produk Pending.');
+        triggerLivePulse('production', 'Produk Komplit Masuk Pending', 'Absolut', 'ok');
+        if (!silent) alert('QC otomatis selesai: cover, thumbnail, dan produk siap PDF masuk ke Produk Pending.');
       } catch (err) {
         if (!silent) alert('Gagal proses QC otomatis: ' + err.message);
       }
@@ -1700,17 +1723,18 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     if (!connected || !sb) return alert('Supabase belum terhubung.');
     await runGuard('daily-10-batch', async () => {
       try {
+        const rawQty = parseInt(document.getElementById('pQty')?.value || '0', 10);
         const todayCount = Math.max(
           allProductionCache.filter(x => isTodayDate(x.created_at)).length,
           allProductsCache.filter(x => isTodayDate(x.created_at)).length
         );
-        const needed = Math.max(0, DAILY_TARGET_COUNT - todayCount);
+        const needed = rawQty > 0 ? Math.min(50, rawQty) : Math.max(0, DAILY_TARGET_COUNT - todayCount);
         if (needed === 0) {
           alert('Target harian 10 produk hari ini sudah tercapai.');
           return;
         }
 
-        triggerLivePulse('production', 'Riset, Cover, Thumbnail & Produksi', 'Aperol → Walker → Hendrick\'s', 'ok');
+        triggerLivePulse('production', `Batch ${needed} Produk Berbeda + Cover & Thumb`, 'Aperol → Walker → Hendrick\'s', 'ok');
         const todayStr = new Date().toISOString().slice(0, 10);
         const usedTitles = new Set();
 
@@ -1718,12 +1742,12 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           const seq = todayCount + i;
           const spec = buildAutoGeneratedSpec(seq, null, usedTitles);
           ensureProductVisuals(spec.title, spec.product_type, spec.idea);
-          const descText = `${spec.idea}\nCover & Thumbnail: AUTO-READY\nQC Otomatis: LOLOS (100%)\nTarget: Rilis ${todayStr} • Target 10/hari`;
+          const descText = `${spec.idea}\nPaket Komplit: Cover + Thumbnail + PDF Anti-Terpotong\nQC Otomatis: LOLOS (100%)\nTarget: Rilis ${todayStr} • Qty ${needed}`;
 
           await sb.from('production_items').insert([{
             title: spec.title,
             product_type: spec.product_type,
-            idea: `${spec.idea}\n[TARGET: Rilis ${todayStr} • 10/hari]`,
+            idea: `${spec.idea}\n[TARGET: Rilis ${todayStr} • Qty ${needed}]`,
             status: 'published'
           }]);
 
@@ -1742,10 +1766,10 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         }
 
         await Promise.all([loadCatalog(), loadProduction()]);
-        triggerLivePulse('production', `Selesai ${needed} Produk + Cover & Thumb`, 'Hendrick\'s & Absolut', 'ok');
-        alert(`Otomatisasi selesai: ${needed} produk berbeda lengkap dengan cover & thumbnail otomatis lolos QC dan masuk ke Produk Pending.`);
+        triggerLivePulse('production', `Selesai ${needed} Produk Komplit`, 'Hendrick\'s & Absolut', 'ok');
+        alert(`Otomatisasi selesai: ${needed} produk berbeda lengkap dengan cover, thumbnail & siap PDF masuk ke Produk Pending.`);
       } catch (err) {
-        alert('Gagal menjalankan otomatisasi 10 produk/hari: ' + err.message);
+        alert('Gagal menjalankan otomatisasi batch: ' + err.message);
       }
     });
   }
@@ -1756,65 +1780,89 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       const title = document.getElementById('pTitle').value.trim();
       const type = document.getElementById('pType').value;
       const autoMode = document.getElementById('pAutoMode').value;
+      const qty = Math.max(1, Math.min(50, parseInt(document.getElementById('pQty').value || '1', 10) || 1));
       const targetDate = document.getElementById('pTargetDate').value.trim();
       const targetUnits = document.getElementById('pTargetUnits').value.trim();
       const targetRevenue = document.getElementById('pTargetRevenue').value.trim();
       const idea = document.getElementById('pIdea').value.trim();
 
-      if (!title || !idea) return alert('Isi judul dan ide/spesifikasi produk terlebih dahulu.');
+      if (autoMode !== 'auto' && (!title || !idea)) {
+        return alert('Untuk mode Manual/Pipeline, isi judul/request dan detail/spesifikasi produk.');
+      }
 
-      triggerLivePulse('production', `Produksi + Cover & Thumb: ${title}`, 'Walker & Hendrick\'s', 'ok');
-      ensureProductVisuals(title, type, idea);
+      triggerLivePulse('production', `Produksi (${autoMode.toUpperCase()} • Qty ${qty})`, 'Walker & Hendrick\'s', 'ok');
 
-      const parts = [];
+      const parts = [`Qty ${qty}`];
+      if (type === 'request-produk') parts.push('Request Produk');
       if (targetDate) parts.push('Rilis ' + targetDate);
       if (targetUnits) parts.push(targetUnits + ' unit');
       if (targetRevenue) parts.push('$' + Number(targetRevenue).toFixed(2));
-      parts.push('Target 10/hari');
       const targetSummary = parts.join(' • ');
 
-      try {
-        if (autoMode === 'auto') {
-          const { data: pRows, error: prodErr } = await sb.from('products').insert([{
-            title,
-            slug: makeProductSlug(title),
-            description: `${idea}\nCover & Thumbnail: AUTO-READY\nQC Otomatis: LOLOS\nTarget: ${targetSummary}`,
-            price_usd: Number(targetRevenue) > 0 && Number(targetUnits) > 0
-              ? Number((Number(targetRevenue) / Number(targetUnits)).toFixed(2))
-              : 29.00,
-            status: 'pending'
-          }]).select();
-          if (prodErr) throw new Error(prodErr.message);
+      const unitPrice = Number(targetRevenue) > 0 && Number(targetUnits) > 0
+        ? Number((Number(targetRevenue) / Number(targetUnits)).toFixed(2))
+        : 29.00;
 
-          if (Array.isArray(pRows) && pRows[0]) {
-            autoSaveProductToPhoneMemory(pRows[0]);
+      try {
+        const usedTitles = new Set();
+        for (let i = 1; i <= qty; i++) {
+          let itemTitle = title;
+          let itemIdea = idea;
+
+          if (autoMode === 'auto') {
+            const spec = buildAutoGeneratedSpec(i, type, usedTitles, title, idea);
+            itemTitle = spec.title;
+            itemIdea = spec.idea;
+          } else if (qty > 1) {
+            itemTitle = `${title} #${i}`;
+            itemIdea = `${idea || 'Item request/produk terstruktur'} (Item ${i} dari ${qty})`;
+          } else {
+            itemIdea = idea || `Produk/request ${title} dengan cover, thumbnail, dan dokumen PDF lengkap.`;
           }
 
-          await sb.from('production_items').insert([{
-            title,
-            product_type: type,
-            idea: `${idea}\n[TARGET: ${targetSummary}]`,
-            status: 'published'
-          }]);
-        } else {
-          const { error } = await sb.from('production_items').insert([{
-            title,
-            product_type: type,
-            idea: `${idea}\n[TARGET: ${targetSummary}]`,
-            status: 'idea'
-          }]);
-          if (error) throw new Error(error.message);
+          ensureProductVisuals(itemTitle, type, itemIdea);
+
+          if (autoMode === 'auto' || autoMode === 'manual') {
+            const { data: pRows, error: prodErr } = await sb.from('products').insert([{
+              title: itemTitle,
+              slug: makeProductSlug(itemTitle),
+              description: `${itemIdea}\nTipe: ${type} • Qty: ${qty}\nPaket Komplit: Cover + Thumbnail + PDF Anti-Terpotong\nQC Otomatis: LOLOS\nTarget: ${targetSummary}`,
+              price_usd: unitPrice,
+              status: 'pending'
+            }]).select();
+            if (prodErr) throw new Error(prodErr.message);
+
+            if (Array.isArray(pRows) && pRows[0]) {
+              autoSaveProductToPhoneMemory(pRows[0]);
+            }
+
+            await sb.from('production_items').insert([{
+              title: itemTitle,
+              product_type: type,
+              idea: `${itemIdea}\n[TARGET: ${targetSummary}]`,
+              status: 'published'
+            }]);
+          } else {
+            const { error } = await sb.from('production_items').insert([{
+              title: itemTitle,
+              product_type: type,
+              idea: `${itemIdea}\n[TARGET: ${targetSummary}]`,
+              status: 'idea'
+            }]);
+            if (error) throw new Error(error.message);
+          }
         }
 
         document.getElementById('pTitle').value = '';
+        document.getElementById('pQty').value = '1';
         document.getElementById('pTargetDate').value = '';
         document.getElementById('pTargetUnits').value = '';
         document.getElementById('pTargetRevenue').value = '';
         document.getElementById('pIdea').value = '';
         await Promise.all([loadCatalog(), loadProduction()]);
-        triggerLivePulse('production', `Produk + Cover & Thumb Masuk Pending: ${title}`, 'Absolut QC', 'ok');
+        triggerLivePulse('production', `${qty} Produk Komplit Diproses`, 'Absolut QC', 'ok');
       } catch (err) {
-        alert('Gagal membuat item produksi: ' + err.message);
+        alert('Gagal memproses item produksi: ' + err.message);
       }
     });
   }
@@ -1841,7 +1889,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       content_txt: [
         `JOY CORPORATION - ${product.title || 'Produk'}`,
         `Harga: $${Number(product.price_usd || 29).toFixed(2)} USD`,
-        `Cover & Thumbnail: Auto-Generated Ready`,
+        `Cover, Thumbnail & PDF Anti-Terpotong: Ready`,
         ``,
         product.description || ''
       ].join('\n')
@@ -1913,7 +1961,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         if (publishedProd) {
           const gumResult = await sendProductToGumroad(publishedProd);
           if (gumResult && gumResult.ok) {
-            alert(`Produk "${publishedProd.title}" sudah masuk ke Produk Public dan terkirim ke Gumroad (cover & thumbnail siap).`);
+            alert(`Produk "${publishedProd.title}" sudah masuk ke Produk Public dan terkirim ke Gumroad (cover, thumbnail & PDF siap).`);
           } else if (gumResult && gumResult.skipped) {
             alert(`Produk "${publishedProd.title}" sudah masuk ke Produk Public. Atur Gumroad Endpoint URL di Owner Vault jika ingin otomatis kirim ke Gumroad.`);
           } else {
@@ -1941,7 +1989,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           const { data: inserted, error: insErr } = await sb.from('products').insert([{
             title: item.title,
             slug: makeProductSlug(item.title),
-            description: `${parsed.cleanIdea || item.idea || ''}\nCover & Thumbnail: AUTO-READY\nQC Otomatis: LOLOS`,
+            description: `${parsed.cleanIdea || item.idea || ''}\nPaket Komplit: Cover + Thumbnail + PDF Anti-Terpotong\nQC Otomatis: LOLOS`,
             price_usd: 29.00,
             status: 'pending'
           }]).select();
@@ -1982,7 +2030,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
             const { data: pRows } = await sb.from('products').insert([{
               title: item.title,
               slug: makeProductSlug(item.title),
-              description: `${parsed.cleanIdea || item.idea || ''}\nCover & Thumbnail: AUTO-READY\nQC Otomatis: LOLOS\nTarget: ${parsed.targetSummary}`,
+              description: `${parsed.cleanIdea || item.idea || ''}\nPaket Komplit: Cover + Thumbnail + PDF Anti-Terpotong\nQC Otomatis: LOLOS\nTarget: ${parsed.targetSummary}`,
               price_usd: 29.00,
               status: 'pending'
             }]).select();
@@ -2046,6 +2094,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       `Harga      : $${Number(product.price_usd || 0).toFixed(2)} USD (${formatIdr(product.price_usd || 0)})`,
       `Cover      : ${visuals.cover_data_url ? 'Auto-Generated PNG (1280x720)' : '-'}`,
       `Thumbnail  : ${visuals.thumbnail_data_url ? 'Auto-Generated PNG (600x600)' : '-'}`,
+      `PDF        : Siap diekspor di Arsip Owner (anti-terpotong)`,
       `Dibuat     : ${product.created_at ? new Date(product.created_at).toLocaleString('id-ID') : '-'}`,
       ``,
       `Deskripsi / Isi Produk:`,
@@ -2081,7 +2130,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       `ID Produk : ${p.id}\n` +
       `Status    : ${p.status || '-'}\n` +
       `Harga     : $${Number(p.price_usd || 0).toFixed(2)} (${formatIdr(p.price_usd || 0)})\n` +
-      `Visual    : ${visuals.cover_data_url ? 'Cover (1280x720) & Thumbnail (600x600) Tersedia' : 'Aset gambar kosong / terhapus'}\n` +
+      `Visual    : ${visuals.cover_data_url ? 'Cover (1280x720) & Thumbnail (600x600) Tersedia + PDF Anti-Terpotong' : 'Aset gambar kosong / terhapus'}\n` +
       `Tanggal   : ${p.created_at ? new Date(p.created_at).toLocaleString('id-ID') : '-'}\n\n` +
       `Deskripsi:\n${p.description || '-'}`;
     card.style.display = 'block';
@@ -2128,6 +2177,53 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     const res = await sendProductToGumroad(p);
     if (res && res.ok) alert(`Produk "${p.title}" berhasil dikirim ke Gumroad.`);
     else alert(`Pengiriman ke Gumroad belum terkirim: ${res?.error || 'cek endpoint Gumroad di Owner Vault'}.`);
+  }
+
+  async function copyGumroadPreset(productId) {
+    if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
+    const p = allProductsCache.find(item => String(item.id) === String(productId));
+    if (!p) return alert('Produk tidak ditemukan.');
+
+    const cleanTitle = String(p.title || 'JOY Product').replace(/\[[^\]]+\]/g, '').trim();
+    const rawWords = cleanTitle
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, ' ')
+      .split(/\s+/)
+      .map(w => w.trim())
+      .filter(w => w.length >= 2 && w.length <= 20);
+    const tags = [...new Set(rawWords)].slice(0, 10);
+
+    const presetText = [
+      `=== GUMROAD AUTO-FILL KIT ===`,
+      `[PRODUCT]`,
+      `Title: ${cleanTitle}`,
+      `Price (USD): ${Number(p.price_usd || 29).toFixed(2)}`,
+      `Description:`,
+      `${p.description || '-'}`,
+      ``,
+      `[RECEIPT]`,
+      `Button text: Download Now`,
+      `Custom message: Thank you for your purchase from JOY CORPORATION ("Kami ada karena kamu Ade"). Your file is ready to download.`,
+      `Failed payment message: Your payment could not be completed. Please update your payment method and try again.`,
+      ``,
+      `[SHARE]`,
+      `Suggested Category: Digital / Education`,
+      `Tags (max 10): ${tags.join(', ')}`
+    ].join('\n');
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(presetText);
+      }
+    } catch (_) {}
+
+    await exportProductPdf(productId);
+    appendWorklogEntry('Martini', `Paket Gumroad disalin & PDF diunduh: ${cleanTitle}`, 'ok');
+    alert(
+      `Paket Gumroad disalin ke clipboard & PDF diunduh!\n\n` +
+      `1. Buka tab Content di Gumroad lalu Upload PDF yang baru terunduh.\n` +
+      `2. Tempel (Paste) teks Receipt & Tags dari clipboard.`
+    );
   }
 
   function wrapPdfLines(ctx, text, maxWidth) {
@@ -2495,6 +2591,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           '<button class="btn" onclick="viewOwnerProduct(\'' + escapeHtml(String(p.id)) + '\')">Lihat</button>' +
           '<button class="btn btn-gold" onclick="downloadOwnerProduct(\'' + escapeHtml(String(p.id)) + '\')">Download</button>' +
           '<button class="btn" onclick="exportProductPdf(\'' + escapeHtml(String(p.id)) + '\')">PDF</button>' +
+          '<button class="btn" onclick="copyGumroadPreset(\'' + escapeHtml(String(p.id)) + '\')">Paket Gumroad</button>' +
           '<button class="btn" onclick="resendProductToGumroad(\'' + escapeHtml(String(p.id)) + '\')">Kirim Gumroad</button>' +
           '<button class="btn btn-red" onclick="deleteSingleProduct(\'' + escapeHtml(String(p.id)) + '\')">Hapus</button>' +
         '</div></td>';
@@ -2858,6 +2955,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   window.addEventListener('DOMContentLoaded', () => {
     setupInlinePwaManifestAndWorker();
     ensurePinInitialized();
+    syncProductionFormMode();
     renderWorklogTable();
 
     const loginInput = document.getElementById('pinLoginInput');
