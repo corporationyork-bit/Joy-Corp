@@ -35,8 +35,17 @@ header{display:flex;justify-content:space-between;align-items:center;padding:14p
 h2{color:var(--gold);margin-bottom:14px;font-size:1.15rem;letter-spacing:.3px}
 h3.subhead{color:var(--gold);font-size:.98rem;margin:12px 0 8px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
-.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.box-4{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:border-color .2s,transform .15s;min-height:96px;display:flex;flex-direction:column;justify-content:space-between}
+.box-4:hover{border-color:var(--gold)}
+.box-4.selected{border-color:var(--gold);box-shadow:0 0 0 1px rgba(197,160,89,.35);background:#202530}
+.box-num{font-size:.72rem;font-weight:800;color:var(--gold);letter-spacing:.5px}
+.box-title{font-size:.92rem;font-weight:700;color:#fff;margin-top:4px}
+.box-meta{font-size:.76rem;color:var(--muted);margin-top:4px}
+.prog-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:12px;margin-bottom:14px}
+.prog-head{display:flex;justify-content:space-between;align-items:center;font-size:.82rem;font-weight:700}
+.prog-pct{color:var(--gold)}
 .stat-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px}
 .stat-label{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 .stat-val{font-size:1.2rem;font-weight:800;color:var(--gold);margin-top:6px}
@@ -147,87 +156,85 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       <div class="catalog-grid" id="catalogGrid"></div>
     </section>
 
-    <!-- PRODUKSI & PENDING -->
+    <!-- PRODUKSI & PENDING (RINGKAS 4 KOTAK + % PROGRESS) -->
     <section id="production" class="section">
-      <h2>Otomatisasi & Produksi (Berbeda Produk & Request Produk)</h2>
-      <div class="grid-3">
-        <div class="stat-box">
-          <div class="stat-label">Target Harian</div>
+      <h2>Pusat Produksi Ringkas</h2>
+
+      <div class="grid-2">
+        <div class="box-4 selected" id="boxTrigger1" onclick="toggleProdBox(1)">
+          <div>
+            <div class="box-num">KOTAK 1</div>
+            <div class="box-title">Target & QC</div>
+          </div>
+          <div class="box-meta" id="box1Summary">0/10 • Klik buka</div>
+        </div>
+
+        <div class="box-4" id="boxTrigger2" onclick="toggleProdBox(2)">
+          <div>
+            <div class="box-num">KOTAK 2</div>
+            <div class="box-title">Produk Pending</div>
+          </div>
+          <div class="box-meta" id="box2Summary">0 item • Klik buka</div>
+        </div>
+
+        <div class="box-4" id="boxTrigger3" onclick="toggleProdBox(3)">
+          <div>
+            <div class="box-num">KOTAK 3</div>
+            <div class="box-title">Pipeline</div>
+          </div>
+          <div class="box-meta" id="box3Summary">0 item • Klik buka</div>
+        </div>
+
+        <div class="box-4" id="boxTrigger4" onclick="toggleProdBox(4)">
+          <div>
+            <div class="box-num">KOTAK 4</div>
+            <div class="box-title">Auto & Request</div>
+          </div>
+          <div class="box-meta" id="box4Summary">Riset global & request • Klik buka</div>
+        </div>
+      </div>
+
+      <div class="prog-wrap">
+        <div class="prog-head">
+          <span id="prodProgressLabel">Persentase Progress Produksi</span>
+          <span class="prog-pct" id="prodProgressPct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="prodProgressBar"></div>
+        </div>
+      </div>
+
+      <!-- PANEL KOTAK 1 -->
+      <div class="card" id="panelBox1">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
+          <h3 class="subhead" style="margin:0">Kotak 1 — Target Harian & QC</h3>
+          <button class="btn" onclick="toggleProdBox(1)" style="padding:4px 9px;font-size:.72rem">Tutup</button>
+        </div>
+        <div class="stat-box" style="margin-bottom:12px">
+          <div class="stat-label">Capaian Target Hari Ini</div>
           <div class="stat-val" id="dailyTargetVal">0 / 10</div>
-          <div class="stat-sub">Produk diproses hari ini</div>
-          <div class="progress-track"><div class="progress-fill" id="dailyTargetBar"></div></div>
+          <div class="stat-sub">Komplit: Cover + Thumbnail + PDF Anti-Terpotong</div>
         </div>
-        <div class="stat-box">
-          <div class="stat-label">Mode Otomatisasi</div>
-          <div class="stat-val" id="autoEngineStatus">AKTIF</div>
-          <div class="stat-sub">Komplit: Cover + Thumbnail + PDF</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Produk Pending</div>
-          <div class="stat-val" id="pendingCountVal">0</div>
-          <div class="stat-sub">Siap dicek & di-Public oleh Owner</div>
+        <div class="actions">
+          <button class="btn btn-gold" id="btnAutoFill10" onclick="runDailyAutoBatchToTarget()">Jalankan Target 10/Hari</button>
+          <button class="btn" id="btnRunQcSweep" onclick="runQcAutoPromotion()">QC Otomatis → Pending</button>
         </div>
       </div>
 
-      <div class="card" style="margin-top:14px">
-        <div class="actions" style="margin-bottom:12px">
-          <button class="btn btn-gold" id="btnAutoFill10" onclick="runDailyAutoBatchToTarget()">Jalankan Otomatisasi ke Target 10/Hari</button>
-          <button class="btn" id="btnRunQcSweep" onclick="runQcAutoPromotion()">Proses QC Otomatis → Pending</button>
+      <!-- PANEL KOTAK 2 -->
+      <div class="card" id="panelBox2" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
+          <h3 class="subhead" style="margin:0">Kotak 2 — Produk Pending</h3>
+          <button class="btn" onclick="toggleProdBox(2)" style="padding:4px 9px;font-size:.72rem">Tutup</button>
         </div>
-        <label>Judul Produk / Request Produk</label>
-        <input id="pTitle" placeholder="Contoh: SOP Kasir & Stok Toko atau Request Katalog Produk">
-        <div class="grid-3">
-          <div>
-            <label>Tipe / Kategori</label>
-            <select id="pType">
-              <option value="request-produk">request-produk (Permintaan Khusus)</option>
-              <option value="toolkit">toolkit</option>
-              <option value="ebook">ebook</option>
-              <option value="prompt-pack">prompt-pack</option>
-              <option value="template">template</option>
-            </select>
-          </div>
-          <div>
-            <label>Mode Pembuatan</label>
-            <select id="pAutoMode" onchange="syncProductionFormMode()">
-              <option value="auto">Otomatis (Variasi Produk Berbeda)</option>
-              <option value="manual">Manual (Sesuai Input & Qty)</option>
-              <option value="pipeline">Masuk Pipeline Bertahap</option>
-            </select>
-          </div>
-          <div>
-            <label>Qty (Jumlah Produk)</label>
-            <input id="pQty" type="number" min="1" max="50" step="1" value="1" placeholder="Contoh: 3">
-          </div>
-        </div>
-        <div class="grid-2">
-          <div>
-            <label>Target Tanggal Selesai / Rilis</label>
-            <input id="pTargetDate" type="date">
-          </div>
-          <div>
-            <label>Target Penjualan (Unit) & Estimasi (USD)</label>
-            <div class="grid-2" style="gap:8px;margin:0">
-              <input id="pTargetUnits" type="number" min="1" step="1" placeholder="Unit (100)" style="margin:6px 0 12px">
-              <input id="pTargetRevenue" type="number" min="0" step="0.01" placeholder="USD (290.00)" style="margin:6px 0 12px">
-            </div>
-          </div>
-        </div>
-        <label>Ide / Detail Request / Spesifikasi Produk</label>
-        <textarea id="pIdea" rows="2" placeholder="Isi detail request produk atau spesifikasi (jika mode Otomatis dikosongkan, sistem otomatis membuat variasi produk berbeda sesuai Qty)"></textarea>
-        <button class="btn btn-gold" id="btnCreateProd" onclick="createProductionItem()">Proses Item Produksi</button>
-      </div>
-
-      <div class="card">
-        <h3 class="subhead" style="margin-top:0">Produk Pending (Menunggu Persetujuan Public Owner)</h3>
         <div style="overflow-x:auto">
           <table>
             <thead>
               <tr>
                 <th>Produk</th>
-                <th>Tipe</th>
-                <th>QC & Target</th>
-                <th>Aksi Owner</th>
+                <th>Status</th>
+                <th>Harga</th>
+                <th>Aksi</th>
               </tr>
             </thead>
             <tbody id="pendingProductsBody"></tbody>
@@ -235,20 +242,64 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         </div>
       </div>
 
-      <div class="card" style="overflow-x:auto">
-        <h3 class="subhead" style="margin-top:0">Antrean Pipeline Produksi</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Judul</th>
-              <th>Tipe</th>
-              <th>Target Produksi</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="productionBody"></tbody>
-        </table>
+      <!-- PANEL KOTAK 3 -->
+      <div class="card" id="panelBox3" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
+          <h3 class="subhead" style="margin:0">Kotak 3 — Antrean Pipeline</h3>
+          <button class="btn" onclick="toggleProdBox(3)" style="padding:4px 9px;font-size:.72rem">Tutup</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Judul</th>
+                <th>Tipe</th>
+                <th>Target</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="productionBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PANEL KOTAK 4 -->
+      <div class="card" id="panelBox4" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">
+          <h3 class="subhead" style="margin:0">Kotak 4 — Otomatis Produksi Berbeda & Request Produk</h3>
+          <button class="btn" onclick="toggleProdBox(4)" style="padding:4px 9px;font-size:.72rem">Tutup</button>
+        </div>
+        <p class="hint" style="margin-bottom:10px">Otomatis produksi dengan jenis yang berbeda (riset pasar global) & request produk.</p>
+
+        <div class="grid-2">
+          <div>
+            <label>Jenis / Mode</label>
+            <select id="pType" onchange="syncBox4Defaults()">
+              <option value="auto-global">Otomatis Produksi Jenis Berbeda (Riset Pasar Global)</option>
+              <option value="request-produk">Request Produk</option>
+              <option value="toolkit">Toolkit</option>
+              <option value="ebook">Ebook</option>
+              <option value="prompt-pack">Prompt Pack</option>
+              <option value="template">Template</option>
+            </select>
+          </div>
+          <div>
+            <label>Qty</label>
+            <input id="pQty" type="number" min="1" max="50" step="1" value="1">
+          </div>
+        </div>
+
+        <label>Permintaan / Request Produk</label>
+        <textarea id="pRequestInput" rows="2" placeholder="Tulis permintaan request produk atau biarkan kosong untuk riset pasar global otomatis"></textarea>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <div class="badge" id="box4WorkingBadge">
+            <span class="pulse-dot" id="box4WorkingDot"></span>
+            <span id="box4WorkingText">Working: Standby</span>
+          </div>
+          <button class="btn btn-gold" id="btnBox4Run" onclick="runBox4Production()">Produksi Otomatis Berbeda Produk</button>
+        </div>
       </div>
     </section>
 
@@ -547,52 +598,52 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     {
       title: 'AI Workflow Automation Pack for Solopreneurs',
       product_type: 'toolkit',
-      idea: 'Step-by-step AI automation SOPs, task routing workflows, and weekly execution checklists to cut repetitive manual work.'
+      idea: 'Riset pasar global: otomatisasi alur kerja harian, routing tugas, dan SOP eksekusi cepat.'
     },
     {
       title: 'Digital Product Launch & Validation Playbook',
       product_type: 'ebook',
-      idea: 'Structured playbook covering audience pain-point validation, high-converting offers, pricing tiers, and launch sequence.'
+      idea: 'Riset pasar global: validasi permintaan pembeli, penyusunan penawaran, dan alur rilis produk digital.'
     },
     {
       title: 'High-Conversion Sales & Outreach Prompt Vault',
       product_type: 'prompt-pack',
-      idea: 'Curated prompt library for cold outreach, follow-up sequences, objection handling, and positioning angles.'
+      idea: 'Riset pasar global: koleksi prompt terstruktur untuk prospek, tindak lanjut, dan skrip penawaran.'
     },
     {
       title: 'Startup Cashflow & Runway Tracker System',
       product_type: 'template',
-      idea: 'Ready-to-use structure for tracking monthly revenue streams, burn rate, margins, and cash runway forecast.'
+      idea: 'Riset pasar global: struktur pencatatan arus kas, margin, dan proyeksi ketahanan kas.'
     },
     {
       title: 'Short-Form Video Hook & Script System',
       product_type: 'prompt-pack',
-      idea: 'Framework and prompts for generating scroll-stopping hooks, retention outlines, and clear call-to-action scripts.'
+      idea: 'Riset pasar global: pola hook pembuka, alur retensi, dan naskah video pendek siap pakai.'
     },
     {
       title: 'Client Onboarding & Scope Control Kit',
       product_type: 'toolkit',
-      idea: 'Standardized client intake checklist, milestone tracker, and scope boundary templates for freelancers & agencies.'
+      idea: 'Riset pasar global: formulir masuk klien, kontrol ruang lingkup kerja, dan jadwal serah terima.'
     },
     {
       title: 'Personal Knowledge & Second Brain Blueprint',
       product_type: 'template',
-      idea: 'Organized system layout for capturing notes, linking project references, and turning ideas into shipped assets.'
+      idea: 'Riset pasar global: sistem pengelolaan catatan, referensi proyek, dan arsip ide menjadi aset.'
     },
     {
       title: 'E-Commerce Conversion & Retention Audit Guide',
       product_type: 'ebook',
-      idea: 'Practical audit guide for product page clarity, checkout conversion, bundle offers, and repeat buyer retention.'
+      idea: 'Riset pasar global: panduan audit halaman produk, alur checkout, dan retensi pembeli berulang.'
     },
     {
       title: 'Weekly Executive Review & KPI Dashboard Template',
       product_type: 'template',
-      idea: 'Structured weekly review format tracking core metrics, bottlenecks, completed deliverables, and next priorities.'
+      idea: 'Riset pasar global: format evaluasi mingguan indikator utama, hambatan, dan prioritas kerja.'
     },
     {
       title: 'Niche Demand Research & Offer Scoping Kit',
       product_type: 'request-produk',
-      idea: 'Actionable research kit to identify active buyer demand, test product angles, and scope minimum viable digital products.'
+      idea: 'Riset pasar global: pemetaan permintaan niche, pengujian sudut penawaran, dan spesifikasi produk.'
     }
   ];
 
@@ -611,7 +662,61 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   let deferredInstallPrompt = null;
   let manifestBlobUrl = null;
   let activePreviewProduct = null;
+  let activeProdBox = 1;
+  let showAllPending = false;
+  let showAllPipeline = false;
   const busyLocks = new Set();
+
+  function setBox4WorkingState(isWorking, labelText = 'Working: Standby') {
+    const dot = document.getElementById('box4WorkingDot');
+    const txt = document.getElementById('box4WorkingText');
+    const btn = document.getElementById('btnBox4Run');
+    if (dot) dot.classList.toggle('active', Boolean(isWorking));
+    if (txt) txt.textContent = labelText;
+    if (btn) btn.disabled = Boolean(isWorking);
+  }
+
+  function syncBox4Defaults() {
+    const typeEl = document.getElementById('pType');
+    const reqEl = document.getElementById('pRequestInput');
+    if (!typeEl || !reqEl) return;
+    if (typeEl.value === 'request-produk') {
+      reqEl.placeholder = 'Tulis detail request produk (contoh: Paket SOP kasir & laporan stok harian)';
+    } else if (typeEl.value === 'auto-global') {
+      reqEl.placeholder = 'Opsional: isi topik tambahan atau biarkan kosong untuk riset pasar global otomatis';
+    } else {
+      reqEl.placeholder = `Opsional: detail khusus untuk jenis ${typeEl.value}`;
+    }
+  }
+
+  function toggleProdBox(num) {
+    if (activeProdBox === num) {
+      activeProdBox = 0;
+    } else {
+      activeProdBox = num;
+    }
+
+    for (let i = 1; i <= 4; i++) {
+      const trig = document.getElementById(`boxTrigger${i}`);
+      const panel = document.getElementById(`panelBox${i}`);
+      if (trig) trig.classList.toggle('selected', activeProdBox === i);
+      if (panel) panel.style.display = activeProdBox === i ? 'block' : 'none';
+    }
+
+    if (activeProdBox === 2) renderPendingProductsTable();
+    if (activeProdBox === 3) loadProduction();
+    if (activeProdBox === 4) syncBox4Defaults();
+  }
+
+  function togglePendingView() {
+    showAllPending = !showAllPending;
+    renderPendingProductsTable();
+  }
+
+  function togglePipelineView() {
+    showAllPipeline = !showAllPipeline;
+    loadProduction();
+  }
 
   function makeProductSlug(title) {
     const base = String(title || 'produk')
@@ -1480,20 +1585,6 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   }
   document.querySelectorAll('.menu').forEach(m => m.onclick = () => setTab(m.dataset.tab));
 
-  function syncProductionFormMode() {
-    const mode = document.getElementById('pAutoMode').value;
-    const titleEl = document.getElementById('pTitle');
-    const ideaEl = document.getElementById('pIdea');
-    if (!titleEl || !ideaEl) return;
-    if (mode === 'auto') {
-      titleEl.placeholder = 'Kosongkan untuk variasi otomatis, atau isi topik/request';
-      ideaEl.placeholder = 'Otomatis membuat variasi produk berbeda (cover + thumbnail + PDF siap) sesuai Qty';
-    } else {
-      titleEl.placeholder = 'Judul Produk / Request Produk';
-      ideaEl.placeholder = 'Isi detail request produk atau spesifikasi produk';
-    }
-  }
-
   function isTodayDate(isoStr) {
     if (!isoStr) return false;
     const d = new Date(isoStr);
@@ -1510,13 +1601,22 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     const pct = Math.min(100, Math.round((countToday / DAILY_TARGET_COUNT) * 100));
 
     const targetVal = document.getElementById('dailyTargetVal');
-    const targetBar = document.getElementById('dailyTargetBar');
-    const pendingVal = document.getElementById('pendingCountVal');
     if (targetVal) targetVal.textContent = `${countToday} / ${DAILY_TARGET_COUNT}`;
-    if (targetBar) targetBar.style.width = `${pct}%`;
+
+    const progPct = document.getElementById('prodProgressPct');
+    const progBar = document.getElementById('prodProgressBar');
+    const progLabel = document.getElementById('prodProgressLabel');
+    if (progPct) progPct.textContent = `${pct}%`;
+    if (progBar) progBar.style.width = `${pct}%`;
+    if (progLabel) progLabel.textContent = `Persentase Progress Produksi (${countToday}/${DAILY_TARGET_COUNT})`;
 
     const pendingList = allProductsCache.filter(p => String(p.status || '').toLowerCase() === 'pending');
-    if (pendingVal) pendingVal.textContent = String(pendingList.length);
+    const b1 = document.getElementById('box1Summary');
+    const b2 = document.getElementById('box2Summary');
+    const b3 = document.getElementById('box3Summary');
+    if (b1) b1.textContent = `${countToday}/${DAILY_TARGET_COUNT} (${pct}%) • Klik buka`;
+    if (b2) b2.textContent = `${pendingList.length} pending • Klik buka`;
+    if (b3) b3.textContent = `${allProductionCache.length} antrean • Klik buka`;
   }
 
   function parseTargetMeta(rawIdea) {
@@ -1529,21 +1629,32 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     };
   }
 
-  function buildAutoGeneratedSpec(indexNumber, customType = null, usedTitles = new Set(), customBaseTitle = '', customIdea = '') {
+  function buildAutoGeneratedSpec(indexNumber, customType = null, usedTitles = new Set(), customRequestText = '') {
     const stamp = new Date().toISOString().slice(0, 10);
     const pool = [...GLOBAL_TRENDING_BLUEPRINTS].sort(() => Math.random() - 0.5);
     const picked = pool.find(item => !usedTitles.has(item.title)) ||
       GLOBAL_TRENDING_BLUEPRINTS[(indexNumber - 1) % GLOBAL_TRENDING_BLUEPRINTS.length];
     usedTitles.add(picked.title);
 
-    const chosenType = customType || picked.product_type;
-    const baseTitle = customBaseTitle ? `${customBaseTitle} — ${picked.title}` : picked.title;
-    const baseIdea = customIdea ? `${customIdea} | Fokus: ${picked.idea}` : picked.idea;
+    const isAutoGlobal = !customType || customType === 'auto-global';
+    const chosenType = isAutoGlobal ? picked.product_type : customType;
+
+    let itemTitle = picked.title;
+    let itemIdea = picked.idea;
+
+    if (customType === 'request-produk') {
+      const reqLabel = customRequestText || `Request Produk #${indexNumber}`;
+      itemTitle = `${reqLabel} — ${picked.title}`;
+      itemIdea = `Request produk: ${customRequestText || reqLabel} | Acuan riset pasar global: ${picked.idea}`;
+    } else if (customRequestText) {
+      itemTitle = `${customRequestText} — ${picked.title}`;
+      itemIdea = `${customRequestText} | Riset pasar global: ${picked.idea}`;
+    }
 
     return {
-      title: `${baseTitle} [${stamp} #${indexNumber}]`,
+      title: `${itemTitle} [${stamp} #${indexNumber}]`,
       product_type: chosenType,
-      idea: `${baseIdea} | Variasi produk berbeda, cover + thumbnail + PDF anti-terpotong siap.`
+      idea: `${itemIdea} | Cover + Thumbnail + PDF anti-terpotong siap.`
     };
   }
 
@@ -1740,7 +1851,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
         for (let i = 1; i <= needed; i++) {
           const seq = todayCount + i;
-          const spec = buildAutoGeneratedSpec(seq, null, usedTitles);
+          const spec = buildAutoGeneratedSpec(seq, 'auto-global', usedTitles, '');
           ensureProductVisuals(spec.title, spec.product_type, spec.idea);
           const descText = `${spec.idea}\nPaket Komplit: Cover + Thumbnail + PDF Anti-Terpotong\nQC Otomatis: LOLOS (100%)\nTarget: Rilis ${todayStr} • Qty ${needed}`;
 
@@ -1774,95 +1885,61 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     });
   }
 
-  async function createProductionItem() {
+  async function runBox4Production() {
     if (!connected || !sb) return alert('Supabase belum terhubung.');
-    await runGuard('create-prod', async () => {
-      const title = document.getElementById('pTitle').value.trim();
-      const type = document.getElementById('pType').value;
-      const autoMode = document.getElementById('pAutoMode').value;
-      const qty = Math.max(1, Math.min(50, parseInt(document.getElementById('pQty').value || '1', 10) || 1));
-      const targetDate = document.getElementById('pTargetDate').value.trim();
-      const targetUnits = document.getElementById('pTargetUnits').value.trim();
-      const targetRevenue = document.getElementById('pTargetRevenue').value.trim();
-      const idea = document.getElementById('pIdea').value.trim();
+    const type = document.getElementById('pType').value;
+    const qty = Math.max(1, Math.min(50, parseInt(document.getElementById('pQty').value || '1', 10) || 1));
+    const reqText = (document.getElementById('pRequestInput').value || '').trim();
 
-      if (autoMode !== 'auto' && (!title || !idea)) {
-        return alert('Untuk mode Manual/Pipeline, isi judul/request dan detail/spesifikasi produk.');
-      }
+    if (type === 'request-produk' && !reqText) {
+      return alert('Isi kolom Permintaan / Request Produk terlebih dahulu.');
+    }
 
-      triggerLivePulse('production', `Produksi (${autoMode.toUpperCase()} • Qty ${qty})`, 'Walker & Hendrick\'s', 'ok');
-
-      const parts = [`Qty ${qty}`];
-      if (type === 'request-produk') parts.push('Request Produk');
-      if (targetDate) parts.push('Rilis ' + targetDate);
-      if (targetUnits) parts.push(targetUnits + ' unit');
-      if (targetRevenue) parts.push('$' + Number(targetRevenue).toFixed(2));
-      const targetSummary = parts.join(' • ');
-
-      const unitPrice = Number(targetRevenue) > 0 && Number(targetUnits) > 0
-        ? Number((Number(targetRevenue) / Number(targetUnits)).toFixed(2))
-        : 29.00;
-
+    setBox4WorkingState(true, `Working: Memproses ${qty} item…`);
+    await runGuard('box4-prod', async () => {
       try {
+        triggerLivePulse('production', `Kotak 4 Working (${type} • Qty ${qty})`, 'Aperol → Hendrick\'s', 'ok');
+        const todayStr = new Date().toISOString().slice(0, 10);
         const usedTitles = new Set();
+
         for (let i = 1; i <= qty; i++) {
-          let itemTitle = title;
-          let itemIdea = idea;
+          const spec = buildAutoGeneratedSpec(i, type, usedTitles, reqText);
+          const finalTitle = qty > 1 && reqText ? `${reqText} #${i} — ${spec.title}` : spec.title;
+          ensureProductVisuals(finalTitle, spec.product_type, spec.idea);
 
-          if (autoMode === 'auto') {
-            const spec = buildAutoGeneratedSpec(i, type, usedTitles, title, idea);
-            itemTitle = spec.title;
-            itemIdea = spec.idea;
-          } else if (qty > 1) {
-            itemTitle = `${title} #${i}`;
-            itemIdea = `${idea || 'Item request/produk terstruktur'} (Item ${i} dari ${qty})`;
-          } else {
-            itemIdea = idea || `Produk/request ${title} dengan cover, thumbnail, dan dokumen PDF lengkap.`;
+          const targetSummary = `Qty ${qty} • ${type === 'request-produk' ? 'Request Produk' : 'Riset Pasar Global'} • Rilis ${todayStr}`;
+          const descText = `${spec.idea}\nTipe: ${spec.product_type} • Qty: ${qty}\nPaket Komplit: Cover + Thumbnail + PDF Anti-Terpotong\nQC Otomatis: LOLOS\nTarget: ${targetSummary}`;
+
+          const { data: pRows, error: prodErr } = await sb.from('products').insert([{
+            title: finalTitle,
+            slug: makeProductSlug(finalTitle),
+            description: descText,
+            price_usd: 29.00,
+            status: 'pending'
+          }]).select();
+          if (prodErr) throw new Error(prodErr.message);
+
+          if (Array.isArray(pRows) && pRows[0]) {
+            autoSaveProductToPhoneMemory(pRows[0]);
           }
 
-          ensureProductVisuals(itemTitle, type, itemIdea);
-
-          if (autoMode === 'auto' || autoMode === 'manual') {
-            const { data: pRows, error: prodErr } = await sb.from('products').insert([{
-              title: itemTitle,
-              slug: makeProductSlug(itemTitle),
-              description: `${itemIdea}\nTipe: ${type} • Qty: ${qty}\nPaket Komplit: Cover + Thumbnail + PDF Anti-Terpotong\nQC Otomatis: LOLOS\nTarget: ${targetSummary}`,
-              price_usd: unitPrice,
-              status: 'pending'
-            }]).select();
-            if (prodErr) throw new Error(prodErr.message);
-
-            if (Array.isArray(pRows) && pRows[0]) {
-              autoSaveProductToPhoneMemory(pRows[0]);
-            }
-
-            await sb.from('production_items').insert([{
-              title: itemTitle,
-              product_type: type,
-              idea: `${itemIdea}\n[TARGET: ${targetSummary}]`,
-              status: 'published'
-            }]);
-          } else {
-            const { error } = await sb.from('production_items').insert([{
-              title: itemTitle,
-              product_type: type,
-              idea: `${itemIdea}\n[TARGET: ${targetSummary}]`,
-              status: 'idea'
-            }]);
-            if (error) throw new Error(error.message);
-          }
+          await sb.from('production_items').insert([{
+            title: finalTitle,
+            product_type: spec.product_type,
+            idea: `${spec.idea}\n[TARGET: ${targetSummary}]`,
+            status: 'published'
+          }]);
         }
 
-        document.getElementById('pTitle').value = '';
+        document.getElementById('pRequestInput').value = '';
         document.getElementById('pQty').value = '1';
-        document.getElementById('pTargetDate').value = '';
-        document.getElementById('pTargetUnits').value = '';
-        document.getElementById('pTargetRevenue').value = '';
-        document.getElementById('pIdea').value = '';
         await Promise.all([loadCatalog(), loadProduction()]);
-        triggerLivePulse('production', `${qty} Produk Komplit Diproses`, 'Absolut QC', 'ok');
+        triggerLivePulse('production', `Selesai ${qty} Produk (${type})`, 'Absolut QC', 'ok');
+        alert(`Selesai memproses ${qty} produk berbeda ke Produk Pending.`);
       } catch (err) {
-        alert('Gagal memproses item produksi: ' + err.message);
+        alert('Gagal memproses produksi Kotak 4: ' + err.message);
+      } finally {
+        setBox4WorkingState(false, 'Working: Standby');
       }
     });
   }
@@ -2059,13 +2136,17 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       return;
     }
 
-    pendingItems.forEach(p => {
+    const limit = 5;
+    const visibleItems = showAllPending ? pendingItems : pendingItems.slice(0, limit);
+
+    visibleItems.forEach(p => {
       const tr = document.createElement('tr');
+      const shortDesc = String(p.description || '').split('\n')[0].slice(0, 75);
       tr.innerHTML =
         '<td><strong>' + escapeHtml(p.title || 'Tanpa Judul') + '</strong>' +
-          (p.description ? '<div style="font-size:.75rem;color:var(--muted);margin-top:3px">' + escapeHtml(p.description.slice(0, 130)) + '</div>' : '') +
+          (shortDesc ? '<div style="font-size:.73rem;color:var(--muted);margin-top:2px">' + escapeHtml(shortDesc) + '</div>' : '') +
         '</td>' +
-        '<td><span class="status pending">pending (lolos qc)</span></td>' +
+        '<td><span class="status pending">pending</span></td>' +
         '<td>$' + Number(p.price_usd || 0).toFixed(2) + '</td>' +
         '<td><div class="actions">' +
           '<button class="btn btn-gold" onclick="publishPendingProduct(\'' + escapeHtml(String(p.id)) + '\')">Public</button>' +
@@ -2074,6 +2155,17 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         '</div></td>';
       body.appendChild(tr);
     });
+
+    if (pendingItems.length > limit) {
+      const moreTr = document.createElement('tr');
+      moreTr.innerHTML =
+        '<td colspan="4" style="text-align:center">' +
+          '<button class="btn" onclick="togglePendingView()">' +
+            (showAllPending ? 'Ringkas (5)' : `Lihat Semua (${pendingItems.length})`) +
+          '</button>' +
+        '</td>';
+      body.appendChild(moreTr);
+    }
   }
 
   function registerTrackedBlobUrl(blob) {
@@ -2504,30 +2596,115 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     a.remove();
   }
 
+  function detectProductCategory(title, rawDesc) {
+    const text = `${title} ${rawDesc}`.toLowerCase();
+    if (text.includes('prompt')) return 'prompt-pack';
+    if (text.includes('template') || text.includes('tracker') || text.includes('dashboard') || text.includes('cashflow') || text.includes('kpi')) return 'template';
+    if (text.includes('playbook') || text.includes('guide') || text.includes('ebook') || text.includes('audit')) return 'ebook';
+    return 'toolkit';
+  }
+
+  function buildRichProductSections(product) {
+    const visuals = getProductVisuals(product);
+    const title = String(product.title || 'Produk Digital').trim();
+    const cleanTitle = title.replace(/\[[^\]]+\]/g, '').trim() || title;
+    const rawDesc = String(product.description || '').trim();
+    const category = detectProductCategory(cleanTitle, rawDesc);
+
+    const sections = [
+      {
+        type: 'header',
+        title: cleanTitle,
+        subtitle: `JOY CORPORATION • ${category.toUpperCase()} • $${Number(product.price_usd || 0).toFixed(2)} (${formatIdr(product.price_usd || 0)})`
+      },
+      {
+        type: 'meta',
+        text:
+          `ID Produk : ${product.id}\n` +
+          `Tanggal   : ${product.created_at ? new Date(product.created_at).toLocaleString('id-ID') : '-'}\n` +
+          `Ringkasan : ${rawDesc.split('\n')[0] || cleanTitle}`
+      }
+    ];
+
+    if (visuals.cover_data_url) {
+      sections.push({ type: 'image', dataUrl: visuals.cover_data_url });
+    }
+
+    if (category === 'prompt-pack') {
+      sections.push(
+        { type: 'divider' },
+        { type: 'header', title: '1. Pola Prompt untuk ' + cleanTitle, subtitle: 'Prompt Pack' },
+        {
+          type: 'body',
+          text:
+            `Formula: [Peran Ahli] + [Konteks "${cleanTitle}"] + [Aturan / Batasan] + [Format Output]\n\n` +
+            `[PROMPT RISET]\n` +
+            `"Bertindaklah sebagai spesialis ${cleanTitle}. Susun 5 poin masalah utama, peluang cepat, dan langkah awal praktis."\n\n` +
+            `[PROMPT EKSEKUSI]\n` +
+            `"Berdasarkan topik ${cleanTitle}, buat draf kerja siap pakai dengan urutan langkah jelas dan contoh nyata."\n\n` +
+            `[PROMPT AUDIT]\n` +
+            `"Audit hasil berikut untuk ${cleanTitle}. Perbaiki bagian yang kurang jelas atau berulang."`
+        }
+      );
+    } else if (category === 'template') {
+      sections.push(
+        { type: 'divider' },
+        { type: 'header', title: '1. Struktur Kolom & Aturan Catat', subtitle: 'Template' },
+        {
+          type: 'body',
+          text:
+            `Kolom utama: Tanggal | Nama / Item | Kategori | Target | Realisasi | Status | Catatan.\n` +
+            `Aturan: gunakan format tanggal seragam, pisahkan target vs realisasi, dan perbarui status secara rutin.\n` +
+            `Contoh baris: [${new Date().toISOString().slice(0, 10)}] | ${cleanTitle} | Target: Terukur | Realisasi: Tercatat | Status: Aktif`
+        }
+      );
+    } else if (category === 'ebook') {
+      sections.push(
+        { type: 'divider' },
+        { type: 'header', title: '1. Panduan & Langkah Eksekusi', subtitle: 'Playbook / Guide' },
+        {
+          type: 'body',
+          text:
+            `1. Validasi kebutuhan nyata pada topik "${cleanTitle}".\n` +
+            `2. Susun langkah eksekusi paling berdampak terlebih dahulu.\n` +
+            `3. Jalankan uji coba, ukur hasil, lalu rapikan alur yang sudah terbukti efektif.\n` +
+            `Detail: ${rawDesc || cleanTitle}`
+        }
+      );
+    } else {
+      sections.push(
+        { type: 'divider' },
+        { type: 'header', title: '1. Komponen & SOP Penggunaan', subtitle: 'Toolkit' },
+        {
+          type: 'body',
+          text:
+            `1. Siapkan bahan/data sesuai kebutuhan "${cleanTitle}".\n` +
+            `2. Jalankan alur kerja langkah demi langkah dan cek kelengkapan hasil (QC).\n` +
+            `3. Simpan hasil akhir ke arsip dan gunakan kembali untuk batch berikutnya.\n` +
+            `Detail: ${rawDesc || cleanTitle}`
+        }
+      );
+    }
+
+    if (visuals.thumbnail_data_url) {
+      sections.push(
+        { type: 'divider' },
+        { type: 'header', title: 'Thumbnail & Penutup', subtitle: 'JOY CORPORATION — "Kami ada karena kamu Ade"' },
+        { type: 'image', dataUrl: visuals.thumbnail_data_url }
+      );
+    }
+
+    return sections;
+  }
+
   async function exportProductPdf(productId) {
     if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
     const p = allProductsCache.find(item => String(item.id) === String(productId));
     if (!p) return alert('Produk tidak ditemukan.');
 
-    const visuals = getProductVisuals(p);
     const slug = String(p.title || 'produk').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'produk';
-
-    await renderSectionsToPaginatedPdf([
-      {
-        type: 'header',
-        title: p.title || 'Produk Digital',
-        subtitle: `Status: ${p.status || '-'} • Harga: $${Number(p.price_usd || 0).toFixed(2)} (${formatIdr(p.price_usd || 0)})`
-      },
-      {
-        type: 'meta',
-        text: `ID Produk: ${p.id}\nTanggal: ${p.created_at ? new Date(p.created_at).toLocaleString('id-ID') : '-'}`
-      },
-      ...(visuals.cover_data_url ? [{ type: 'image', dataUrl: visuals.cover_data_url }] : []),
-      {
-        type: 'body',
-        text: p.description || 'Tidak ada deskripsi produk.'
-      }
-    ], `JOY-PRODUK-${slug}.pdf`);
+    const sections = buildRichProductSections(p);
+    await renderSectionsToPaginatedPdf(sections, `JOY-PRODUK-${slug}.pdf`);
   }
 
   async function exportAllProductsPdf() {
@@ -2751,19 +2928,21 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         return;
       }
 
-      allProductionCache.forEach(item => {
+      const limit = 5;
+      const visiblePipe = showAllPipeline ? allProductionCache : allProductionCache.slice(0, limit);
+
+      visiblePipe.forEach(item => {
         const parsed = parseTargetMeta(item.idea);
         const tr = document.createElement('tr');
 
         const c1 = document.createElement('td');
-        c1.innerHTML = '<strong>' + escapeHtml(item.title) + '</strong>' +
-          (parsed.cleanIdea ? '<div style="font-size:.75rem;color:var(--muted);margin-top:3px">' + escapeHtml(parsed.cleanIdea) + '</div>' : '');
+        c1.innerHTML = '<strong>' + escapeHtml(item.title) + '</strong>';
 
         const c2 = document.createElement('td');
         c2.textContent = item.product_type || '-';
 
         const c3 = document.createElement('td');
-        c3.innerHTML = '<span style="font-size:.78rem;color:var(--gold)">' + escapeHtml(parsed.targetSummary) + '</span>';
+        c3.innerHTML = '<span style="font-size:.76rem;color:var(--gold)">' + escapeHtml(parsed.targetSummary) + '</span>';
 
         const c4 = document.createElement('td');
         const sp = document.createElement('span');
@@ -2775,13 +2954,13 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         if (item.status !== 'published') {
           const btn = document.createElement('button');
           btn.className = 'btn';
-          btn.textContent = item.status === 'qc' || item.status === 'ready' ? 'Kirim ke Pending' : 'Majukan';
+          btn.textContent = item.status === 'qc' || item.status === 'ready' ? 'Pending' : 'Majukan';
           btn.addEventListener('click', () => advanceStatus(item));
           c5.appendChild(btn);
         } else {
           const btnGum = document.createElement('button');
           btnGum.className = 'btn btn-gold';
-          btnGum.textContent = 'Public / Gumroad';
+          btnGum.textContent = 'Gumroad';
           btnGum.addEventListener('click', () => publishFromPipeline(item));
           c5.appendChild(btnGum);
         }
@@ -2789,6 +2968,17 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         tr.append(c1, c2, c3, c4, c5);
         body.appendChild(tr);
       });
+
+      if (allProductionCache.length > limit) {
+        const morePipeTr = document.createElement('tr');
+        morePipeTr.innerHTML =
+          '<td colspan="5" style="text-align:center">' +
+            '<button class="btn" onclick="togglePipelineView()">' +
+              (showAllPipeline ? 'Ringkas (5)' : `Lihat Semua (${allProductionCache.length})`) +
+            '</button>' +
+          '</td>';
+        body.appendChild(morePipeTr);
+      }
     } catch (err) {
       body.innerHTML = '<tr><td colspan="5" style="color:var(--red)">Error: ' + escapeHtml(err.message) + '</td></tr>';
     }
@@ -2955,7 +3145,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   window.addEventListener('DOMContentLoaded', () => {
     setupInlinePwaManifestAndWorker();
     ensurePinInitialized();
-    syncProductionFormMode();
+    syncBox4Defaults();
     renderWorklogTable();
 
     const loginInput = document.getElementById('pinLoginInput');
