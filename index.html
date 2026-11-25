@@ -3,91 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0d0f12">
+<meta name="theme-color" content="#f4f6f5">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="JOY CORP">
 <link id="dynamicManifestLink" rel="manifest">
 <title>JOY CORPORATION - Command & Production Center</title>
 <style>
-:root{--bg:#0d0f12;--panel:#14171d;--card:#1a1e26;--border:#2a303c;--text:#e6e8ec;--muted:#8f96a6;--gold:#c5a059;--green:#4caf50;--red:#ef4444}
+:root{
+  --bg:#f4f6f5;
+  --panel:#ffffff;
+  --card:#ffffff;
+  --soft:#eef2f0;
+  --border:#dce2df;
+  --text:#1e293b;
+  --muted:#64748b;
+  --gold:#9a7228;
+  --accent:#2f6f62;
+  --green:#2e7d5b;
+  --red:#c94a4a;
+}
 *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,-apple-system,sans-serif}
 body{background:var(--bg);color:var(--text);min-height:100vh}
 header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--panel);border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap}
-.brand{font-weight:800;letter-spacing:1.2px;font-size:1rem}
-.brand span{color:var(--gold)}
+.brand{font-weight:800;letter-spacing:1.1px;font-size:1rem;color:var(--text)}
+.brand span{color:var(--accent)}
 .tagline{font-size:.74rem;color:var(--gold);font-style:italic;margin-top:2px}
 .header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.badge{font-size:.72rem;color:var(--muted);padding:5px 9px;border:1px solid var(--border);border-radius:6px;background:var(--card);display:inline-flex;align-items:center;gap:6px}
-.pulse-dot{width:8px;height:8px;border-radius:50%;background:#3b4252;display:inline-block;transition:background .2s}
-.pulse-dot.active{background:var(--green);box-shadow:0 0 8px var(--green);animation:joyPulse .9s infinite alternate}
-@keyframes joyPulse{from{opacity:.35;transform:scale(.85)}to{opacity:1;transform:scale(1.2)}}
+.badge{font-size:.72rem;color:var(--muted);padding:5px 9px;border:1px solid var(--border);border-radius:6px;background:var(--soft);display:inline-flex;align-items:center;gap:6px}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:#b8c2be;display:inline-block;transition:background .2s}
+.pulse-dot.active{background:var(--green);box-shadow:0 0 6px rgba(46,125,91,.55);animation:joyPulse .9s infinite alternate}
+@keyframes joyPulse{from{opacity:.4;transform:scale(.85)}to{opacity:1;transform:scale(1.18)}}
 .container{display:flex;min-height:calc(100vh - 67px)}
-.sidebar{width:240px;background:var(--panel);border-right:1px solid var(--border);padding:12px 0;flex-shrink:0}
+.sidebar{width:235px;background:var(--panel);border-right:1px solid var(--border);padding:12px 0;flex-shrink:0}
 .menu{padding:12px 18px;color:var(--muted);cursor:pointer;border-left:3px solid transparent;font-size:.88rem;display:flex;justify-content:space-between;align-items:center;gap:6px}
-.menu:hover,.menu.active{background:var(--card);color:var(--gold);border-left-color:var(--gold)}
-.notif-pip{width:7px;height:7px;border-radius:50%;background:var(--green);display:none;box-shadow:0 0 6px var(--green);animation:joyPulse .9s infinite alternate}
+.menu:hover,.menu.active{background:var(--soft);color:var(--accent);border-left-color:var(--accent);font-weight:600}
+.notif-pip{width:7px;height:7px;border-radius:50%;background:var(--green);display:none;animation:joyPulse .9s infinite alternate}
 .notif-pip.on{display:inline-block}
 .content{flex:1;padding:22px;overflow:auto}
 .section{display:none}
 .section.active{display:block}
-h2{color:var(--gold);margin-bottom:14px;font-size:1.15rem;letter-spacing:.3px}
-h3.subhead{color:var(--gold);font-size:.98rem;margin:12px 0 8px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+h2{color:var(--text);margin-bottom:14px;font-size:1.15rem;letter-spacing:.2px}
+h3.subhead{color:var(--accent);font-size:.96rem;margin:12px 0 8px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(15,23,42,.03)}
 .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
-.box-4{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:border-color .2s,transform .15s;min-height:96px;display:flex;flex-direction:column;justify-content:space-between}
-.box-4:hover{border-color:var(--gold)}
-.box-4.selected{border-color:var(--gold);box-shadow:0 0 0 1px rgba(197,160,89,.35);background:#202530}
+.box-4{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:border-color .2s,background .2s;min-height:96px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 1px 2px rgba(15,23,42,.03)}
+.box-4:hover{border-color:var(--accent);background:#fafcfb}
+.box-4.selected{border-color:var(--accent);box-shadow:0 0 0 1px rgba(47,111,98,.25);background:#f1f7f5}
 .box-num{font-size:.72rem;font-weight:800;color:var(--gold);letter-spacing:.5px}
-.box-title{font-size:.92rem;font-weight:700;color:#fff;margin-top:4px}
+.box-title{font-size:.92rem;font-weight:700;color:var(--text);margin-top:4px}
 .box-meta{font-size:.76rem;color:var(--muted);margin-top:4px}
 .prog-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:12px;margin-bottom:14px}
-.prog-head{display:flex;justify-content:space-between;align-items:center;font-size:.82rem;font-weight:700}
-.prog-pct{color:var(--gold)}
-.stat-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px}
-.stat-label{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.stat-val{font-size:1.2rem;font-weight:800;color:var(--gold);margin-top:6px}
+.prog-head{display:flex;justify-content:space-between;align-items:center;font-size:.82rem;font-weight:700;color:var(--text)}
+.prog-pct{color:var(--accent)}
+.stat-box{background:var(--soft);border:1px solid var(--border);border-radius:8px;padding:14px}
+.stat-label{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.stat-val{font-size:1.2rem;font-weight:800;color:var(--accent);margin-top:6px}
 .stat-sub{font-size:.74rem;color:var(--muted);margin-top:4px}
-.btn{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:.8rem;display:inline-block;text-decoration:none}
-.btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+.btn{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:.8rem;display:inline-block;text-decoration:none}
+.btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);background:var(--soft)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
-.btn-gold{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
-.btn-gold:hover:not(:disabled){opacity:.92;color:#000}
-.btn-green{background:rgba(76,175,80,.18);border-color:var(--green);color:var(--green);font-weight:700}
-.btn-red{background:rgba(239,68,68,.15);border-color:var(--red);color:#fca5a5;font-weight:700}
-.btn-red:hover:not(:disabled){background:rgba(239,68,68,.28);color:#fff}
-input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:#fff;padding:10px;border-radius:6px;margin:6px 0 12px;font-size:.85rem}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+.btn-gold{background:var(--accent);border-color:var(--accent);color:#ffffff;font-weight:700}
+.btn-gold:hover:not(:disabled){opacity:.92;color:#ffffff}
+.btn-green{background:rgba(46,125,91,.12);border-color:var(--green);color:var(--green);font-weight:700}
+.btn-red{background:rgba(201,74,74,.1);border-color:var(--red);color:var(--red);font-weight:700}
+.btn-red:hover:not(:disabled){background:rgba(201,74,74,.18);color:#991b1b}
+input,select,textarea{width:100%;background:#ffffff;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:6px;margin:6px 0 12px;font-size:.85rem}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
 label{font-size:.78rem;color:var(--muted);display:block}
 table{width:100%;border-collapse:collapse;font-size:.82rem}
 th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical-align:top}
+th{color:var(--muted);font-weight:700}
 .status{padding:3px 8px;border-radius:4px;font-size:.7rem;font-weight:700;text-transform:uppercase;display:inline-block}
-.published,.paid,.ok{background:rgba(76,175,80,.2);color:var(--green)}
-.idea,.drafting,.owner_review,.qc,.ready,.pending,.draft{background:rgba(197,160,89,.2);color:var(--gold)}
+.published,.paid,.ok{background:rgba(46,125,91,.14);color:var(--green)}
+.idea,.drafting,.owner_review,.qc,.ready,.pending,.draft{background:rgba(154,114,40,.14);color:var(--gold)}
 .catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
-.product{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
-.product h3{color:#fff;font-size:.95rem;margin-bottom:6px}
-.prod-thumb{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;background:var(--bg)}
-.prod-cover-preview{width:100%;max-width:560px;aspect-ratio:16/9;object-fit:cover;border-radius:8px;border:1px solid var(--gold);margin-top:10px;background:var(--bg);display:block}
+.product{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(15,23,42,.03)}
+.product h3{color:var(--text);font-size:.95rem;margin-bottom:6px}
+.prod-thumb{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;background:var(--soft)}
+.prod-cover-preview{width:100%;max-width:560px;aspect-ratio:16/9;object-fit:cover;border-radius:8px;border:1px solid var(--border);margin-top:10px;background:var(--soft);display:block}
 .price{color:var(--gold);font-weight:800;margin:8px 0}
-.notice{background:rgba(197,160,89,.12);border:1px solid var(--gold);padding:12px;border-radius:8px;font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.5}
-.detail-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:12px;font-size:.82rem;line-height:1.55;white-space:pre-wrap}
+.notice{background:#f7f5ee;border:1px solid #e3d6b8;padding:12px;border-radius:8px;font-size:.8rem;color:#475569;margin-bottom:16px;line-height:1.5}
+.detail-box{background:var(--soft);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:12px;font-size:.82rem;line-height:1.55;white-space:pre-wrap;color:var(--text)}
 .hint{font-size:.75rem;color:var(--muted);margin-top:-6px;margin-bottom:12px;line-height:1.45}
 .actions{display:flex;gap:6px;flex-wrap:wrap}
-.progress-track{width:100%;height:9px;background:var(--bg);border:1px solid var(--border);border-radius:999px;overflow:hidden;margin-top:8px}
-.progress-fill{height:100%;background:var(--gold);width:0%;transition:width .25s ease}
-.lock-overlay{position:fixed;inset:0;background:rgba(10,12,15,.96);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
-.lock-card{width:100%;max-width:410px;background:var(--card);border:1px solid var(--gold);border-radius:12px;padding:22px}
+.progress-track{width:100%;height:9px;background:var(--soft);border:1px solid var(--border);border-radius:999px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:var(--accent);width:0%;transition:width .25s ease}
+.lock-overlay{position:fixed;inset:0;background:rgba(244,246,245,.94);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
+.lock-card{width:100%;max-width:410px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;box-shadow:0 10px 25px rgba(15,23,42,.08)}
 .err-msg{color:var(--red);font-size:.78rem;margin-bottom:10px;min-height:18px}
 .ok-msg{color:var(--green);font-size:.78rem;margin-bottom:10px;min-height:18px}
-.manifesto{border-left:3px solid var(--gold);padding-left:12px;margin:10px 0;color:var(--text);font-size:.86rem;line-height:1.6}
+.manifesto{border-left:3px solid var(--accent);padding-left:12px;margin:10px 0;color:var(--text);font-size:.86rem;line-height:1.6}
 @media(max-width:768px){
   .container{flex-direction:column}
   .sidebar{width:100%;display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--border)}
   .menu{white-space:nowrap;border-left:0;border-bottom:3px solid transparent;gap:6px}
-  .menu.active{border-bottom-color:var(--gold)}
+  .menu.active{border-bottom-color:var(--accent)}
   .content{padding:14px}
 }
 </style>
@@ -336,7 +349,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       </div>
 
       <div id="archiveUnlockedPanel" style="display:none">
-        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis dibuatkan <b>cover</b> & <b>thumbnail</b>, masuk ke penyimpanan telepon (file <code>.txt</code>), dan bisa dilihat, diunduh ulang, diekspor ke <b>PDF anti-terpotong</b>, disiapkan lewat <b>Paket Gumroad</b>, dihapus per item/aset, atau dikirim ke Gumroad kapan saja.</div>
+        <div class="notice">Akses Owner aktif: setiap produk yang diproses otomatis dibuatkan <b>cover</b> & <b>thumbnail</b> terang yang nyaman di mata, masuk ke penyimpanan telepon (file <code>.txt</code>), dan bisa dilihat, diunduh ulang, diekspor ke <b>PDF anti-terpotong</b>, disiapkan lewat <b>Paket Gumroad</b>, dihapus per item/aset, atau dikirim ke Gumroad kapan saja.</div>
         <div class="card">
           <div class="actions" style="margin-bottom:12px">
             <button class="btn btn-gold" id="btnExportAllPdf" onclick="exportAllProductsPdf()">Export Semua PDF</button>
@@ -424,7 +437,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
       <div class="card">
         <h3 class="subhead" style="margin-top:0">Founder</h3>
-        <div style="font-size:.98rem;font-weight:800;color:#fff">Ade Kurnia Sandy</div>
+        <div style="font-size:.98rem;font-weight:800;color:var(--text)">Ade Kurnia Sandy</div>
         <div style="font-size:.8rem;color:var(--gold);margin:4px 0 8px">Founder & Owner — JOY CORPORATION</div>
         <p style="font-size:.83rem;line-height:1.55;color:var(--muted)">
           Pemegang kendali penuh arah strategis, persetujuan rilis publik, keamanan sistem, dan tata kelola keuangan JOY CORPORATION. Tegas pada kualitas, disiplin pada target, dan berorientasi pada sistem yang benar-benar bekerja di lapangan.
@@ -579,7 +592,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   const GUMROAD_ENDPOINT_KEY = 'joy_gumroad_endpoint';
   const STORAGE_TARGET_KEY = 'joy_product_storage_target';
   const LOCAL_PRODUCTS_EXPORT_KEY = 'joy_local_products_memory';
-  const PRODUCT_VISUALS_KEY = 'joy_product_visuals_v1';
+  const PRODUCT_VISUALS_KEY = 'joy_product_visuals_v2';
   const DELETED_VISUAL_KEYS = 'joy_deleted_visual_keys_v1';
   const DELETED_PRODUCT_IDS_KEY = 'joy_deleted_product_ids_v1';
   const WORKLOG_STORAGE_KEY = 'joy_agency_worklog';
@@ -690,11 +703,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   }
 
   function toggleProdBox(num) {
-    if (activeProdBox === num) {
-      activeProdBox = 0;
-    } else {
-      activeProdBox = num;
-    }
+    activeProdBox = (activeProdBox === num) ? 0 : num;
 
     for (let i = 1; i <= 4; i++) {
       const trig = document.getElementById(`boxTrigger${i}`);
@@ -753,35 +762,35 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     if (!ctx) return '';
 
     const grad = ctx.createLinearGradient(0, 0, 1280, 720);
-    grad.addColorStop(0, '#0d0f12');
-    grad.addColorStop(0.55, '#171b24');
-    grad.addColorStop(1, '#231d14');
+    grad.addColorStop(0, '#f8faf8');
+    grad.addColorStop(0.55, '#eef4f1');
+    grad.addColorStop(1, '#f7f1e3');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 1280, 720);
 
-    ctx.strokeStyle = 'rgba(197, 160, 89, 0.45)';
-    ctx.lineWidth = 4;
+    ctx.strokeStyle = 'rgba(47, 111, 98, 0.35)';
+    ctx.lineWidth = 3;
     ctx.strokeRect(36, 36, 1208, 648);
 
-    ctx.fillStyle = '#c5a059';
-    ctx.fillRect(84, 88, 180, 6);
+    ctx.fillStyle = '#2f6f62';
+    ctx.fillRect(84, 88, 160, 6);
 
-    ctx.font = '700 24px Inter, sans-serif';
-    ctx.fillStyle = '#c5a059';
+    ctx.font = '700 23px Inter, sans-serif';
+    ctx.fillStyle = '#2f6f62';
     ctx.textAlign = 'left';
     ctx.fillText(`JOY CORPORATION • ${String(productType || 'DIGITAL ASSET').toUpperCase()}`, 84, 134);
 
-    ctx.font = '800 54px Inter, sans-serif';
-    ctx.fillStyle = '#f3f4f6';
+    ctx.font = '800 52px Inter, sans-serif';
+    ctx.fillStyle = '#1e293b';
     const titleLines = wrapCanvasText(ctx, title || 'Digital Product', 1080).slice(0, 3);
     let y = 225;
     for (const line of titleLines) {
       ctx.fillText(line, 84, y);
-      y += 68;
+      y += 66;
     }
 
-    ctx.font = '400 26px Inter, sans-serif';
-    ctx.fillStyle = '#a3aab8';
+    ctx.font = '400 25px Inter, sans-serif';
+    ctx.fillStyle = '#475569';
     const cleanDesc = String(ideaText || '').replace(/\[TARGET\s*:\s*[^\]]+\]/gi, '').trim();
     const descLines = wrapCanvasText(ctx, cleanDesc || 'Structured digital asset with auto-QC verification.', 1060).slice(0, 3);
     y = Math.max(430, y + 20);
@@ -790,12 +799,12 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       y += 38;
     }
 
-    ctx.font = '600 22px Inter, sans-serif';
-    ctx.fillStyle = '#c5a059';
+    ctx.font = '600 21px Inter, sans-serif';
+    ctx.fillStyle = '#9a7228';
     ctx.fillText('"Kami ada karena kamu Ade"', 84, 636);
 
     ctx.textAlign = 'right';
-    ctx.fillStyle = '#8f96a6';
+    ctx.fillStyle = '#64748b';
     ctx.fillText('COVER & THUMBNAIL + PDF READY', 1196, 636);
 
     return canvas.toDataURL('image/png');
@@ -809,25 +818,25 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     if (!ctx) return '';
 
     const grad = ctx.createLinearGradient(0, 0, 600, 600);
-    grad.addColorStop(0, '#101318');
-    grad.addColorStop(1, '#1f1b13');
+    grad.addColorStop(0, '#f7faf8');
+    grad.addColorStop(1, '#f5efe2');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 600, 600);
 
-    ctx.strokeStyle = '#c5a059';
-    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(47, 111, 98, 0.4)';
+    ctx.lineWidth = 4;
     ctx.strokeRect(28, 28, 544, 544);
 
-    ctx.fillStyle = 'rgba(197, 160, 89, 0.16)';
+    ctx.fillStyle = 'rgba(47, 111, 98, 0.12)';
     ctx.fillRect(64, 64, 472, 46);
 
-    ctx.font = '700 20px Inter, sans-serif';
-    ctx.fillStyle = '#c5a059';
+    ctx.font = '700 19px Inter, sans-serif';
+    ctx.fillStyle = '#2f6f62';
     ctx.textAlign = 'center';
     ctx.fillText(`JOY CORP • ${String(productType || 'ASSET').toUpperCase()}`, 300, 94);
 
-    ctx.font = '800 36px Inter, sans-serif';
-    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 35px Inter, sans-serif';
+    ctx.fillStyle = '#1e293b';
     const lines = wrapCanvasText(ctx, title || 'Digital Product', 480).slice(0, 4);
     let y = 185;
     for (const line of lines) {
@@ -835,8 +844,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       y += 48;
     }
 
-    ctx.font = '600 18px Inter, sans-serif';
-    ctx.fillStyle = '#8f96a6';
+    ctx.font = '600 17px Inter, sans-serif';
+    ctx.fillStyle = '#64748b';
     ctx.fillText('COVER • THUMBNAIL • PDF KOMPLIT', 300, 526);
 
     return canvas.toDataURL('image/png');
@@ -987,12 +996,12 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     canvas.height = size;
     const ctx = canvas.getContext('2d');
     if (!ctx) return '';
-    ctx.fillStyle = '#0d0f12';
+    ctx.fillStyle = '#f4f6f5';
     ctx.fillRect(0, 0, size, size);
-    ctx.strokeStyle = '#c5a059';
+    ctx.strokeStyle = '#2f6f62';
     ctx.lineWidth = Math.max(4, Math.round(size * 0.04));
     ctx.strokeRect(ctx.lineWidth, ctx.lineWidth, size - ctx.lineWidth * 2, size - ctx.lineWidth * 2);
-    ctx.fillStyle = '#c5a059';
+    ctx.fillStyle = '#2f6f62';
     ctx.font = `bold ${Math.round(size * 0.24)}px Inter, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -1012,8 +1021,8 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         start_url: startUrl,
         scope: startUrl.replace(/[^/]*$/, ''),
         display: 'standalone',
-        background_color: '#0d0f12',
-        theme_color: '#0d0f12',
+        background_color: '#f4f6f5',
+        theme_color: '#f4f6f5',
         icons: [
           { src: icon192, sizes: '192x192', type: 'image/png' },
           { src: icon512, sizes: '512x512', type: 'image/png' }
@@ -2476,17 +2485,17 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       canvas.width = PAGE_W;
       canvas.height = PAGE_H;
       const c = canvas.getContext('2d');
-      c.fillStyle = '#ffffff';
+      c.fillStyle = '#fdfefd';
       c.fillRect(0, 0, PAGE_W, PAGE_H);
 
-      c.fillStyle = '#14171d';
+      c.fillStyle = '#eef3f0';
       c.fillRect(0, 0, PAGE_W, 56);
-      c.fillStyle = '#c5a059';
+      c.fillStyle = '#2f6f62';
       c.font = '700 18px Inter, sans-serif';
       c.textAlign = 'left';
       c.fillText('JOY CORPORATION • "Kami ada karena kamu Ade"', MARGIN_X, 35);
       c.textAlign = 'right';
-      c.fillStyle = '#e6e8ec';
+      c.fillStyle = '#475569';
       c.fillText(`Halaman ${pageNum}`, PAGE_W - MARGIN_X, 35);
 
       ctx = c;
@@ -2506,9 +2515,9 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     for (const sec of sections) {
       if (sec.type === 'header') {
         ensureVerticalSpace(110);
-        ctx.fillStyle = '#c5a059';
+        ctx.fillStyle = '#2f6f62';
         ctx.fillRect(MARGIN_X, cursorY, 8, 52);
-        ctx.fillStyle = '#111318';
+        ctx.fillStyle = '#1e293b';
         ctx.font = '800 32px Inter, sans-serif';
         ctx.textAlign = 'left';
         const hLines = wrapPdfLines(ctx, sec.title || 'Dokumen Produk', CONTENT_W - 24);
@@ -2518,7 +2527,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
           cursorY += 40;
         }
         if (sec.subtitle) {
-          ctx.fillStyle = '#4b5563';
+          ctx.fillStyle = '#475569';
           ctx.font = '500 20px Inter, sans-serif';
           const sLines = wrapPdfLines(ctx, sec.subtitle, CONTENT_W - 24);
           for (const sl of sLines) {
@@ -2534,13 +2543,13 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         const boxH = Math.max(54, lines.length * 30 + 24);
         ensureVerticalSpace(boxH + 14);
 
-        ctx.fillStyle = '#f8f9fb';
+        ctx.fillStyle = '#f4f7f5';
         ctx.fillRect(MARGIN_X, cursorY, CONTENT_W, boxH);
-        ctx.strokeStyle = '#d1d5db';
+        ctx.strokeStyle = '#cbd5e1';
         ctx.lineWidth = 2;
         ctx.strokeRect(MARGIN_X, cursorY, CONTENT_W, boxH);
 
-        ctx.fillStyle = '#1f2937';
+        ctx.fillStyle = '#1e293b';
         ctx.textAlign = 'left';
         let ty = cursorY + 30;
         for (const l of lines) {
@@ -2562,7 +2571,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         ctx.font = '400 21px Inter, sans-serif';
         const lines = wrapPdfLines(ctx, sec.text || '-', CONTENT_W);
         const lineH = 32;
-        ctx.fillStyle = '#111827';
+        ctx.fillStyle = '#1e293b';
         ctx.textAlign = 'left';
 
         for (const line of lines) {
@@ -2575,7 +2584,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
         cursorY += 16;
       } else if (sec.type === 'divider') {
         ensureVerticalSpace(28);
-        ctx.strokeStyle = '#e5e7eb';
+        ctx.strokeStyle = '#e2e8f0';
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(MARGIN_X, cursorY + 8);
@@ -2604,25 +2613,67 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     return 'toolkit';
   }
 
+  function findMatchingProductionResearch(product) {
+    if (!product || !Array.isArray(allProductionCache)) return null;
+    const pTitle = String(product.title || '').trim().toLowerCase();
+    const pBase = pTitle.replace(/\[[^\]]+\]/g, '').trim();
+
+    return allProductionCache.find(item => {
+      const iTitle = String(item.title || '').trim().toLowerCase();
+      const iBase = iTitle.replace(/\[[^\]]+\]/g, '').trim();
+      return iTitle === pTitle || (pBase && iBase && (iBase.includes(pBase) || pBase.includes(iBase)));
+    }) || null;
+  }
+
+  function extractResearchContext(product) {
+    const matched = findMatchingProductionResearch(product);
+    const parsedIdea = matched ? parseTargetMeta(matched.idea) : { targetSummary: '', cleanIdea: '' };
+    const descLines = String(product.description || '')
+      .split('\n')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    const requestLine = descLines.find(l => /^request\s*produk\s*:/i.test(l)) || '';
+    const requestDetail = requestLine
+      ? requestLine.replace(/^request\s*produk\s*:\s*/i, '').split('|')[0].trim()
+      : '';
+
+    const researchDetail = (parsedIdea.cleanIdea || descLines[0] || '').trim();
+    const productType = (matched && matched.product_type)
+      ? String(matched.product_type).trim()
+      : detectProductCategory(product.title || '', product.description || '');
+
+    return {
+      productType,
+      researchDetail,
+      requestDetail,
+      targetSummary: parsedIdea.targetSummary
+    };
+  }
+
   function buildRichProductSections(product) {
     const visuals = getProductVisuals(product);
     const title = String(product.title || 'Produk Digital').trim();
     const cleanTitle = title.replace(/\[[^\]]+\]/g, '').trim() || title;
-    const rawDesc = String(product.description || '').trim();
-    const category = detectProductCategory(cleanTitle, rawDesc);
+    const ctx = extractResearchContext(product);
+    const category = detectProductCategory(`${cleanTitle} ${ctx.productType}`, `${ctx.researchDetail} ${ctx.requestDetail}`);
+
+    const focusTopic = ctx.requestDetail || cleanTitle;
+    const researchNote = ctx.researchDetail || `Riset topik "${cleanTitle}" untuk kebutuhan eksekusi praktis.`;
 
     const sections = [
       {
         type: 'header',
         title: cleanTitle,
-        subtitle: `JOY CORPORATION • ${category.toUpperCase()} • $${Number(product.price_usd || 0).toFixed(2)} (${formatIdr(product.price_usd || 0)})`
+        subtitle: `JOY CORPORATION • ${ctx.productType.toUpperCase()} • $${Number(product.price_usd || 0).toFixed(2)} (${formatIdr(product.price_usd || 0)})`
       },
       {
         type: 'meta',
         text:
           `ID Produk : ${product.id}\n` +
-          `Tanggal   : ${product.created_at ? new Date(product.created_at).toLocaleString('id-ID') : '-'}\n` +
-          `Ringkasan : ${rawDesc.split('\n')[0] || cleanTitle}`
+          `Fokus     : ${focusTopic}\n` +
+          `Riset     : ${researchNote}` +
+          (ctx.requestDetail ? `\nRequest   : ${ctx.requestDetail}` : '')
       }
     ];
 
@@ -2633,58 +2684,78 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     if (category === 'prompt-pack') {
       sections.push(
         { type: 'divider' },
-        { type: 'header', title: '1. Pola Prompt untuk ' + cleanTitle, subtitle: 'Prompt Pack' },
+        { type: 'header', title: '1. Landasan Riset & Prompt Utama', subtitle: focusTopic },
         {
           type: 'body',
           text:
-            `Formula: [Peran Ahli] + [Konteks "${cleanTitle}"] + [Aturan / Batasan] + [Format Output]\n\n` +
-            `[PROMPT RISET]\n` +
-            `"Bertindaklah sebagai spesialis ${cleanTitle}. Susun 5 poin masalah utama, peluang cepat, dan langkah awal praktis."\n\n` +
-            `[PROMPT EKSEKUSI]\n` +
-            `"Berdasarkan topik ${cleanTitle}, buat draf kerja siap pakai dengan urutan langkah jelas dan contoh nyata."\n\n` +
-            `[PROMPT AUDIT]\n` +
-            `"Audit hasil berikut untuk ${cleanTitle}. Perbaiki bagian yang kurang jelas atau berulang."`
+            `Acuan riset & kebutuhan:\n${researchNote}\n\n` +
+            `Prompt 1 (Riset & Pemetaan):\n` +
+            `"Bertindaklah sebagai spesialis untuk ${focusTopic}. Berdasarkan riset (${researchNote}), susun titik masalah utama, peluang tercepat, dan langkah eksekusi pertama."\n\n` +
+            `Prompt 2 (Produksi Konten / Draf):\n` +
+            `"Fokus pada ${focusTopic}. Hasilkan draf terstruktur, contoh nyata, dan langkah praktis tanpa bagian yang mengambang."\n\n` +
+            `Prompt 3 (Audit & Penyempurnaan):\n` +
+            `"Evaluasi draf untuk ${focusTopic} agar sesuai standar kualitas dan siap dipakai langsung."`
         }
       );
     } else if (category === 'template') {
       sections.push(
         { type: 'divider' },
-        { type: 'header', title: '1. Struktur Kolom & Aturan Catat', subtitle: 'Template' },
+        { type: 'header', title: '1. Struktur Template Berbasis Riset', subtitle: focusTopic },
         {
           type: 'body',
           text:
-            `Kolom utama: Tanggal | Nama / Item | Kategori | Target | Realisasi | Status | Catatan.\n` +
-            `Aturan: gunakan format tanggal seragam, pisahkan target vs realisasi, dan perbarui status secara rutin.\n` +
-            `Contoh baris: [${new Date().toISOString().slice(0, 10)}] | ${cleanTitle} | Target: Terukur | Realisasi: Tercatat | Status: Aktif`
+            `Acuan riset & kebutuhan:\n${researchNote}\n\n` +
+            `Kolom inti untuk ${focusTopic}:\n` +
+            `- Tanggal / Periode\n` +
+            `- Item / Aktivitas (${focusTopic})\n` +
+            `- Target / Rencana\n` +
+            `- Realisasi / Aktual\n` +
+            `- Selisih & Status\n` +
+            `- Catatan Tindak Lanjut\n\n` +
+            `Aturan pemakaian: isi setiap baris secara konsisten, pisahkan target dan realisasi, lalu tinjau penyimpangan tiap periode.`
         }
       );
     } else if (category === 'ebook') {
       sections.push(
         { type: 'divider' },
-        { type: 'header', title: '1. Panduan & Langkah Eksekusi', subtitle: 'Playbook / Guide' },
+        { type: 'header', title: '1. Ringkasan Riset & Kerangka Panduan', subtitle: focusTopic },
         {
           type: 'body',
           text:
-            `1. Validasi kebutuhan nyata pada topik "${cleanTitle}".\n` +
-            `2. Susun langkah eksekusi paling berdampak terlebih dahulu.\n` +
-            `3. Jalankan uji coba, ukur hasil, lalu rapikan alur yang sudah terbukti efektif.\n` +
-            `Detail: ${rawDesc || cleanTitle}`
+            `Temuan & arah riset:\n${researchNote}\n\n` +
+            `Langkah penerapan untuk ${focusTopic}:\n` +
+            `1. Petakan kondisi awal dan target hasil pada ${focusTopic}.\n` +
+            `2. Terapkan langkah inti berdasarkan temuan riset di atas.\n` +
+            `3. Uji pada skenario nyata, catat hambatan, lalu sempurnakan alurnya.`
         }
       );
     } else {
       sections.push(
         { type: 'divider' },
-        { type: 'header', title: '1. Komponen & SOP Penggunaan', subtitle: 'Toolkit' },
+        { type: 'header', title: '1. Spesifikasi Riset & SOP Eksekusi', subtitle: focusTopic },
         {
           type: 'body',
           text:
-            `1. Siapkan bahan/data sesuai kebutuhan "${cleanTitle}".\n` +
-            `2. Jalankan alur kerja langkah demi langkah dan cek kelengkapan hasil (QC).\n` +
-            `3. Simpan hasil akhir ke arsip dan gunakan kembali untuk batch berikutnya.\n` +
-            `Detail: ${rawDesc || cleanTitle}`
+            `Acuan riset & permintaan:\n${researchNote}\n\n` +
+            `Alur kerja ${focusTopic}:\n` +
+            `1. Siapkan input dan parameter sesuai kebutuhan ${focusTopic}.\n` +
+            `2. Jalankan langkah utama berdasarkan acuan riset.\n` +
+            `3. Periksa kelengkapan dan akurasi hasil (QC) sebelum digunakan atau dirilis.`
         }
       );
     }
+
+    sections.push(
+      { type: 'divider' },
+      { type: 'header', title: '2. Checklist Validasi & Rencana 7 Hari', subtitle: 'Eksekusi Terukur' },
+      {
+        type: 'body',
+        text:
+          `Hari 1–2: Sesuaikan materi "${cleanTitle}" dengan konteks ${focusTopic}.\n` +
+          `Hari 3–5: Jalankan implementasi harian dan catat hasil serta kendala.\n` +
+          `Hari 6–7: Audit hasil, rapikan format akhir, dan siapkan siklus berikutnya.`
+      }
+    );
 
     if (visuals.thumbnail_data_url) {
       sections.push(
