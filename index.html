@@ -32,6 +32,8 @@ header{display:flex;justify-content:space-between;align-items:center;padding:14p
 .tagline{font-size:.74rem;color:var(--gold);font-style:italic;margin-top:2px}
 .header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .badge{font-size:.72rem;color:var(--muted);padding:5px 9px;border:1px solid var(--border);border-radius:6px;background:var(--soft);display:inline-flex;align-items:center;gap:6px}
+#livePulseBadge{cursor:pointer;user-select:none;transition:border-color .15s,background .15s}
+#livePulseBadge:hover{border-color:var(--accent);background:#e6ece9}
 .pulse-dot{width:8px;height:8px;border-radius:50%;background:#b8c2be;display:inline-block;transition:background .2s}
 .pulse-dot.active{background:var(--green);box-shadow:0 0 6px rgba(46,125,91,.55);animation:joyPulse .9s infinite alternate}
 @keyframes joyPulse{from{opacity:.4;transform:scale(.85)}to{opacity:1;transform:scale(1.18)}}
@@ -131,13 +133,12 @@ th{color:var(--muted);font-weight:700}
     <div class="tagline">"Kami ada karena kamu Ade"</div>
   </div>
   <div class="header-right">
-    <div class="badge" id="livePulseBadge">
+    <div class="badge" id="livePulseBadge" role="button" tabindex="0" title="Ketuk untuk mengunci sesi">
       <span class="pulse-dot" id="livePulseDot"></span>
       <span id="livePulseText">Siaga • 0 Notif</span>
     </div>
     <div class="badge" id="autoOptBadge">Auto-Opt 1j: Aktif</div>
     <div class="badge" id="authStatus">Memeriksa Supabase…</div>
-    <button class="btn" id="btnLockSession" onclick="lockOwnerSession()" style="padding:5px 9px;font-size:.72rem">Kunci</button>
   </div>
 </header>
 
@@ -3218,6 +3219,17 @@ th{color:var(--muted);font-weight:700}
     ensurePinInitialized();
     syncBox4Defaults();
     renderWorklogTable();
+
+    const pulseBadge = document.getElementById('livePulseBadge');
+    if (pulseBadge) {
+      pulseBadge.addEventListener('click', () => lockOwnerSession());
+      pulseBadge.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          lockOwnerSession();
+        }
+      });
+    }
 
     const loginInput = document.getElementById('pinLoginInput');
     if (loginInput) {
