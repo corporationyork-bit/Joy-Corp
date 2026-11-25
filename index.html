@@ -522,6 +522,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   const STORAGE_TARGET_KEY = 'joy_product_storage_target';
   const LOCAL_PRODUCTS_EXPORT_KEY = 'joy_local_products_memory';
   const PRODUCT_VISUALS_KEY = 'joy_product_visuals_v1';
+  const DELETED_VISUAL_KEYS = 'joy_deleted_visual_keys_v1';
   const WORKLOG_STORAGE_KEY = 'joy_agency_worklog';
   const AUTO_ARCHIVED_IDS_KEY = 'joy_auto_archived_phone_ids';
   const PIN_HASH_KEY = 'joy_owner_pin_hash';
@@ -727,6 +728,33 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     return canvas.toDataURL('image/png');
   }
 
+  function getDeletedVisualKeys() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(DELETED_VISUAL_KEYS) || '[]');
+      return new Set(Array.isArray(parsed) ? parsed : []);
+    } catch (_) {
+      return new Set();
+    }
+  }
+
+  function addDeletedVisualKey(key) {
+    if (!key) return;
+    const set = getDeletedVisualKeys();
+    set.add(String(key));
+    try {
+      localStorage.setItem(DELETED_VISUAL_KEYS, JSON.stringify([...set].slice(-300)));
+    } catch (_) {}
+  }
+
+  function removeDeletedVisualKey(key) {
+    if (!key) return;
+    const set = getDeletedVisualKeys();
+    set.delete(String(key));
+    try {
+      localStorage.setItem(DELETED_VISUAL_KEYS, JSON.stringify([...set]));
+    } catch (_) {}
+  }
+
   function getVisualsStore() {
     try {
       const parsed = JSON.parse(localStorage.getItem(PRODUCT_VISUALS_KEY) || '{}');
@@ -749,29 +777,40 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   }
 
   function removeProductVisualFromStore(product) {
-    if (!product || !product.title) return;
-    const normKey = String(product.title || '').trim().toLowerCase();
+    if (!product) return;
+    const titleKey = String(product.title || '').trim().toLowerCase();
+    const idKey = product.id ? `id:${String(product.id)}` : '';
     const store = getVisualsStore();
-    if (normKey && store[normKey]) {
-      delete store[normKey];
-      saveVisualsStore(store);
-    }
+    if (titleKey && store[titleKey]) delete store[titleKey];
+    if (idKey && store[idKey]) delete store[idKey];
+    saveVisualsStore(store);
+
+    if (titleKey) addDeletedVisualKey(titleKey);
+    if (idKey) addDeletedVisualKey(idKey);
   }
 
   function clearVisualAssetsCache() {
     if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
     if (!confirm('Hapus semua cache aset cover & thumbnail lokal?')) return;
     localStorage.removeItem(PRODUCT_VISUALS_KEY);
+    allProductsCache.forEach(p => {
+      if (p && p.title) addDeletedVisualKey(String(p.title).trim().toLowerCase());
+      if (p && p.id) addDeletedVisualKey(`id:${String(p.id)}`);
+    });
     if (activePreviewProduct) {
       viewOwnerProduct(activePreviewProduct.id);
     }
-    loadCatalog();
+    renderCatalogGrid(allProductsCache);
     appendWorklogEntry('Hendrick\'s', 'Cache aset cover & thumbnail dibersihkan', 'ok');
     alert('Cache aset gambar lokal telah dibersihkan.');
   }
 
-  function ensureProductVisuals(title, productType = 'digital-pack', ideaText = '') {
+  function ensureProductVisuals(title, productType = 'digital-pack', ideaText = '', productId = '') {
     const normKey = String(title || '').trim().toLowerCase();
+    const idKey = productId ? `id:${String(productId)}` : '';
+    if (normKey) removeDeletedVisualKey(normKey);
+    if (idKey) removeDeletedVisualKey(idKey);
+
     const store = getVisualsStore();
     if (normKey && store[normKey] && store[normKey].cover_data_url && store[normKey].thumbnail_data_url) {
       return store[normKey];
@@ -797,11 +836,17 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   function getProductVisuals(product) {
     if (!product) return { cover_data_url: '', thumbnail_data_url: '' };
     const normKey = String(product.title || '').trim().toLowerCase();
+    const idKey = product.id ? `id:${String(product.id)}` : '';
+    const deletedSet = getDeletedVisualKeys();
     const store = getVisualsStore();
+
     if (normKey && store[normKey] && store[normKey].cover_data_url && store[normKey].thumbnail_data_url) {
       return store[normKey];
     }
-    return ensureProductVisuals(product.title || 'Produk', 'digital-pack', product.description || '');
+    if ((normKey && deletedSet.has(normKey)) || (idKey && deletedSet.has(idKey))) {
+      return { cover_data_url: '', thumbnail_data_url: '' };
+    }
+    return ensureProductVisuals(product.title || 'Produk', 'digital-pack', product.description || '', product.id || '');
   }
 
   function createAppIconDataUrl(size) {
@@ -850,7 +895,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
         const swCode = `
-          const CACHE_NAME = 'joy-corp-inline-v5';
+          const CACHE_NAME = 'joy-corp-inline-v6';
           self.addEventListener('install', (event) => {
             self.skipWaiting();
           });
@@ -1451,26 +1496,51 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     };
   }
 
+  function syncAfterProductRemoval(removedIds = null) {
+    if (removedIds && removedIds.length > 0) {
+      const remSet = new Set(removedIds.map(String));
+      allProductsCache = allProductsCache.filter(p => !remSet.has(String(p.id)));
+    } else {
+      allProductsCache = [];
+    }
+    localStorage.setItem(LOCAL_PRODUCTS_EXPORT_KEY, JSON.stringify(allProductsCache));
+    renderCatalogGrid(allProductsCache);
+    renderPendingProductsTable();
+    updateDailyTargetMetrics();
+    if (isOwnerUnlocked) {
+      renderOwnerProductsTable(allProductsCache);
+      updateMemoryStorageStats();
+    }
+  }
+
   async function deleteSingleProduct(productId) {
     if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
     if (!connected || !sb) return alert('Supabase belum terhubung.');
     const target = allProductsCache.find(p => String(p.id) === String(productId));
     const label = target ? `"${target.title}"` : `ID ${productId}`;
-    if (!confirm(`Hapus produk ${label} beserta aset lokalnya? Tindakan ini tidak bisa dibatalkan.`)) return;
+    if (!confirm(`Hapus produk ${label} dari publik, arsip & aset lokalnya?`)) return;
 
     await runGuard('del-prod-' + productId, async () => {
       try {
-        const { error } = await sb.from('products').delete().eq('id', productId);
+        const { data: deletedRows, error } = await sb
+          .from('products')
+          .delete()
+          .eq('id', productId)
+          .select();
         if (error) throw new Error(error.message);
+        if (!Array.isArray(deletedRows) || deletedRows.length === 0) {
+          throw new Error('Tidak ada baris yang terhapus di Supabase (cek RLS Policy DELETE pada tabel products).');
+        }
 
         if (target) removeProductVisualFromStore(target);
+        addDeletedVisualKey(`id:${String(productId)}`);
         if (activePreviewProduct && String(activePreviewProduct.id) === String(productId)) {
           closeOwnerPreview();
         }
 
-        await loadCatalog();
-        triggerLivePulse('worklog', `Produk Dihapus: ${label}`, 'Hennessy', 'ok');
-        alert(`Produk ${label} berhasil dihapus.`);
+        syncAfterProductRemoval([productId]);
+        triggerLivePulse('worklog', `Produk & Aset Dihapus: ${label}`, 'Hennessy', 'ok');
+        alert(`Produk ${label} berhasil dihapus dari publik & aset.`);
       } catch (err) {
         alert('Gagal menghapus produk: ' + err.message);
       }
@@ -1480,26 +1550,36 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   async function deleteActiveProductAsset() {
     if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
     if (!activePreviewProduct) return;
-    await deleteSingleProduct(activePreviewProduct.id);
+    const prod = activePreviewProduct;
+    if (!confirm(`Hapus aset & produk "${prod.title}" dari publik dan arsip?`)) return;
+    await deleteSingleProduct(prod.id);
   }
 
   async function deleteAllProducts() {
     if (!isOwnerUnlocked) return openPinModalForOwner('owner-vault');
     if (!connected || !sb) return alert('Supabase belum terhubung.');
-    if (!confirm('PERINGATAN: Hapus SEMUA produk yang ada di database & aset lokalnya?')) return;
+    if (!confirm('PERINGATAN: Hapus SEMUA produk dari publik, arsip & aset lokalnya?')) return;
     if (!confirm('Konfirmasi terakhir: benar-benar ingin menghapus SEMUA produk?')) return;
 
     await runGuard('del-all-prod', async () => {
       try {
-        const { error } = await sb.from('products').delete().not('id', 'is', null);
+        const idsToDelete = allProductsCache.map(p => p.id).filter(Boolean);
+        let query = sb.from('products').delete();
+        if (idsToDelete.length > 0) {
+          query = query.in('id', idsToDelete);
+        } else {
+          query = query.not('id', 'is', null);
+        }
+        const { error } = await query.select();
         if (error) throw new Error(error.message);
 
+        allProductsCache.forEach(p => removeProductVisualFromStore(p));
         localStorage.removeItem(PRODUCT_VISUALS_KEY);
         localStorage.removeItem(LOCAL_PRODUCTS_EXPORT_KEY);
         localStorage.removeItem(AUTO_ARCHIVED_IDS_KEY);
-        allProductsCache = [];
         closeOwnerPreview();
 
+        syncAfterProductRemoval(null);
         await loadCatalog();
         triggerLivePulse('worklog', 'Semua Produk & Aset Dihapus', 'Hennessy', 'ok');
         alert('Semua produk dan aset terkait berhasil dihapus.');
@@ -1755,7 +1835,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       try {
         const current = allProductsCache.find(p => String(p.id) === String(productId));
         if (current) {
-          ensureProductVisuals(current.title, 'digital-pack', current.description || '');
+          ensureProductVisuals(current.title, 'digital-pack', current.description || '', current.id);
         }
         const defaultPrice = current && Number(current.price_usd) > 0 ? Number(current.price_usd) : 29.00;
         const rawPrice = prompt('Konfirmasi harga jual produk (USD) sebelum dipublikasikan ke Produk Public & Gumroad:', String(defaultPrice.toFixed(2)));
@@ -1954,7 +2034,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
       `ID Produk : ${p.id}\n` +
       `Status    : ${p.status || '-'}\n` +
       `Harga     : $${Number(p.price_usd || 0).toFixed(2)} (${formatIdr(p.price_usd || 0)})\n` +
-      `Visual    : Cover (1280x720) & Thumbnail (600x600) Auto-Generated\n` +
+      `Visual    : ${visuals.cover_data_url ? 'Cover (1280x720) & Thumbnail (600x600) Tersedia' : 'Aset gambar kosong / terhapus'}\n` +
       `Tanggal   : ${p.created_at ? new Date(p.created_at).toLocaleString('id-ID') : '-'}\n\n` +
       `Deskripsi:\n${p.description || '-'}`;
     card.style.display = 'block';
@@ -1965,7 +2045,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     if (!activePreviewProduct) return;
     const visuals = getProductVisuals(activePreviewProduct);
     const dataUrl = kind === 'thumbnail' ? visuals.thumbnail_data_url : visuals.cover_data_url;
-    if (!dataUrl) return alert('Aset gambar belum tersedia.');
+    if (!dataUrl) return alert('Aset gambar belum tersedia atau sudah dihapus.');
     const safeSlug = String(activePreviewProduct.title || 'produk').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'produk';
     const a = document.createElement('a');
     a.href = dataUrl;
@@ -2034,6 +2114,58 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     });
   }
 
+  function renderCatalogGrid(products) {
+    const grid = document.getElementById('catalogGrid');
+    grid.innerHTML = '';
+    const published = (products || []).filter(p => String(p.status || '').toLowerCase() === 'published');
+
+    if (published.length === 0) {
+      grid.innerHTML = '<p style="color:var(--muted)">Belum ada produk berstatus <b>public</b>. Setujui produk di tab <b>Produksi & Pending</b> agar tampil di sini.</p>';
+      return;
+    }
+
+    const pay = getPaymentConfig();
+
+    published.forEach(p => {
+      const visuals = getProductVisuals(p);
+      const card = document.createElement('div');
+      card.className = 'product';
+
+      if (visuals.thumbnail_data_url) {
+        const thumbImg = document.createElement('img');
+        thumbImg.className = 'prod-thumb';
+        thumbImg.src = visuals.thumbnail_data_url;
+        thumbImg.alt = p.title || 'Thumbnail Produk';
+        card.appendChild(thumbImg);
+      }
+
+      const h3 = document.createElement('h3');
+      h3.textContent = p.title || 'Tanpa Judul';
+
+      const pd = document.createElement('p');
+      pd.style.fontSize = '.8rem';
+      pd.style.color = 'var(--muted)';
+      pd.textContent = p.description || '';
+
+      const price = document.createElement('div');
+      price.className = 'price';
+      price.textContent = '$' + Number(p.price_usd || 0).toFixed(2) + ' (' + formatIdr(p.price_usd || 0) + ')';
+
+      const methodSelect = document.createElement('select');
+      methodSelect.innerHTML =
+        '<option value="mandiri">Bank Mandiri (' + escapeHtml(pay.mandiriAccount) + ')</option>' +
+        '<option value="paypal">PayPal (paypal.me/akurniasandy)</option>';
+
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-gold';
+      btn.textContent = 'Beli Sekarang';
+      btn.addEventListener('click', () => startCheckout(p, methodSelect.value));
+
+      card.append(h3, pd, price, methodSelect, btn);
+      grid.appendChild(card);
+    });
+  }
+
   async function loadCatalog() {
     const grid = document.getElementById('catalogGrid');
     grid.innerHTML = '';
@@ -2062,54 +2194,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
       renderPendingProductsTable();
       updateDailyTargetMetrics();
-
-      const published = allProductsCache.filter(p => String(p.status || '').toLowerCase() === 'published');
-
-      if (published.length === 0) {
-        grid.innerHTML = '<p style="color:var(--muted)">Belum ada produk berstatus <b>public</b>. Setujui produk di tab <b>Produksi & Pending</b> agar tampil di sini.</p>';
-        return;
-      }
-
-      const pay = getPaymentConfig();
-
-      published.forEach(p => {
-        const visuals = getProductVisuals(p);
-        const card = document.createElement('div');
-        card.className = 'product';
-
-        if (visuals.thumbnail_data_url) {
-          const thumbImg = document.createElement('img');
-          thumbImg.className = 'prod-thumb';
-          thumbImg.src = visuals.thumbnail_data_url;
-          thumbImg.alt = p.title || 'Thumbnail Produk';
-          card.appendChild(thumbImg);
-        }
-
-        const h3 = document.createElement('h3');
-        h3.textContent = p.title || 'Tanpa Judul';
-
-        const pd = document.createElement('p');
-        pd.style.fontSize = '.8rem';
-        pd.style.color = 'var(--muted)';
-        pd.textContent = p.description || '';
-
-        const price = document.createElement('div');
-        price.className = 'price';
-        price.textContent = '$' + Number(p.price_usd || 0).toFixed(2) + ' (' + formatIdr(p.price_usd || 0) + ')';
-
-        const methodSelect = document.createElement('select');
-        methodSelect.innerHTML =
-          '<option value="mandiri">Bank Mandiri (' + escapeHtml(pay.mandiriAccount) + ')</option>' +
-          '<option value="paypal">PayPal (paypal.me/akurniasandy)</option>';
-
-        const btn = document.createElement('button');
-        btn.className = 'btn btn-gold';
-        btn.textContent = 'Beli Sekarang';
-        btn.addEventListener('click', () => startCheckout(p, methodSelect.value));
-
-        card.append(h3, pd, price, methodSelect, btn);
-        grid.appendChild(card);
-      });
+      renderCatalogGrid(allProductsCache);
     } catch (err) {
       grid.innerHTML = '<p style="color:var(--red)">Kesalahan: ' + escapeHtml(err.message) + '</p>';
     }
