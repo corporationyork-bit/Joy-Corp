@@ -69,7 +69,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 .actions{display:flex;gap:6px;flex-wrap:wrap}
 .progress-track{width:100%;height:9px;background:var(--bg);border:1px solid var(--border);border-radius:999px;overflow:hidden;margin-top:8px}
 .progress-fill{height:100%;background:var(--gold);width:0%;transition:width .25s ease}
-.lock-overlay{position:fixed;inset:0;background:rgba(10,12,15,.96);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+.lock-overlay{position:fixed;inset:0;background:rgba(10,12,15,.96);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
 .lock-card{width:100%;max-width:410px;background:var(--card);border:1px solid var(--gold);border-radius:12px;padding:22px}
 .err-msg{color:var(--red);font-size:.78rem;margin-bottom:10px;min-height:18px}
 .ok-msg{color:var(--green);font-size:.78rem;margin-bottom:10px;min-height:18px}
@@ -115,6 +115,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     </div>
     <div class="badge" id="autoOptBadge">Auto-Opt 1j: Aktif</div>
     <div class="badge" id="authStatus">Memeriksa Supabase…</div>
+    <button class="btn" id="btnLockSession" onclick="lockOwnerSession()" style="padding:5px 9px;font-size:.72rem">Kunci</button>
   </div>
 </header>
 
@@ -528,6 +529,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
   const WORKLOG_STORAGE_KEY = 'joy_agency_worklog';
   const AUTO_ARCHIVED_IDS_KEY = 'joy_auto_archived_phone_ids';
   const PIN_HASH_KEY = 'joy_owner_pin_hash';
+  const PIN_SESSION_KEY = 'joy_pin_session_active';
   const PIN_ATTEMPTS_KEY = 'joy_pin_attempts';
   const PIN_LOCK_UNTIL_KEY = 'joy_pin_lock_until';
   const DAILY_TARGET_COUNT = 10;
@@ -670,7 +672,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
     ctx.font = '400 26px Inter, sans-serif';
     ctx.fillStyle = '#a3aab8';
-    const cleanDesc = String(ideaText || '').replace(/\[TARGET\s*:[^\]]+\]/gi, '').trim();
+    const cleanDesc = String(ideaText || '').replace(/\[TARGET\s*:\s*[^\]]+\]/gi, '').trim();
     const descLines = wrapCanvasText(ctx, cleanDesc || 'Structured digital asset with auto-QC verification.', 1060).slice(0, 3);
     y = Math.max(430, y + 20);
     for (const dLine of descLines) {
@@ -915,18 +917,11 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
         const swCode = `
-          const CACHE_NAME = 'joy-corp-inline-v7';
           self.addEventListener('install', (event) => {
             self.skipWaiting();
           });
           self.addEventListener('activate', (event) => {
             event.waitUntil(self.clients.claim());
-          });
-          self.addEventListener('fetch', (event) => {
-            if (event.request.method !== 'GET') return;
-            event.respondWith(
-              fetch(event.request).catch(() => caches.match(event.request))
-            );
           });
         `;
         const swBlob = new Blob([swCode], { type: 'application/javascript' });
@@ -1027,6 +1022,18 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     }
   }
 
+  function hasActivePinSession() {
+    return localStorage.getItem(PIN_SESSION_KEY) === '1';
+  }
+
+  function lockOwnerSession() {
+    localStorage.removeItem(PIN_SESSION_KEY);
+    initialLoginDone = false;
+    isOwnerUnlocked = false;
+    syncOwnerPanelsUI();
+    setPinModalVisible(true, '', 'Sesi dikunci. Masukkan PIN untuk membuka Command Center.');
+  }
+
   function getLockRemainingMs() {
     const until = Number(localStorage.getItem(PIN_LOCK_UNTIL_KEY) || 0);
     return Math.max(0, until - Date.now());
@@ -1098,6 +1105,7 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
     if (hashPinValue(inputPin) === expectedHash) {
       localStorage.removeItem(PIN_ATTEMPTS_KEY);
       localStorage.removeItem(PIN_LOCK_UNTIL_KEY);
+      localStorage.setItem(PIN_SESSION_KEY, '1');
       const wasInitial = !initialLoginDone;
       initialLoginDone = true;
       isOwnerUnlocked = true;
@@ -2861,10 +2869,18 @@ th,td{text-align:left;padding:9px;border-bottom:1px solid var(--border);vertical
 
     setInterval(() => runHourlyOptimization(false), ONE_HOUR_MS);
 
-    initialLoginDone = false;
-    isOwnerUnlocked = false;
-    syncOwnerPanelsUI();
-    setPinModalVisible(true, '', 'Masukkan PIN untuk membuka Command Center.');
+    if (hasActivePinSession()) {
+      initialLoginDone = true;
+      isOwnerUnlocked = true;
+      setPinModalVisible(false);
+      syncOwnerPanelsUI();
+      initApp();
+    } else {
+      initialLoginDone = false;
+      isOwnerUnlocked = false;
+      syncOwnerPanelsUI();
+      setPinModalVisible(true, '', 'Masukkan PIN untuk membuka Command Center.');
+    }
   });
 </script>
 </body>
