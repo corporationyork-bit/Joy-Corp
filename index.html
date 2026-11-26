@@ -1083,6 +1083,296 @@
       }
     ];
 
+
+    // ==================== COMPLETE PDF + COVER + THUMBNAIL GENERATOR ====================
+    function buildFullProductCoverDataUri(title, subtitle, category, price) {
+      const safeTitle = String(title || "JOY CORPORATION PRODUCT").slice(0, 34).replace(/[<>&"]/g, "");
+      const safeSub = String(subtitle || "Complete Actionable Blueprint & Master Kit").slice(0, 56).replace(/[<>&"]/g, "");
+      const safeCat = String(category || "DIGITAL PRODUCT").toUpperCase().slice(0, 18).replace(/[<>&"]/g, "");
+      const safePrice = String(price || "$9.99").replace(/[<>&"]/g, "");
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1060" viewBox="0 0 800 1060">
+        <defs>
+          <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0f2342"/>
+            <stop offset="100%" stop-color="#16325b"/>
+          </linearGradient>
+        </defs>
+        <rect width="800" height="1060" fill="url(#bgGrad)"/>
+        <rect x="44" y="44" width="712" height="972" rx="22" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+        <rect x="76" y="86" width="84" height="8" rx="4" fill="#e67e22"/>
+        <text x="76" y="132" fill="#fdba74" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="800" letter-spacing="3">${safeCat} • MASTER EDITION</text>
+        <text x="76" y="230" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="800">${safeTitle}</text>
+        <text x="76" y="285" fill="#e2e8f0" font-family="Arial,Helvetica,sans-serif" font-size="20" font-style="italic">${safeSub}</text>
+        <rect x="76" y="340" width="648" height="340" rx="18" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+        <text x="108" y="395" fill="#e67e22" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="800" letter-spacing="2">COMPLETE DELIVERABLE INCLUDES:</text>
+        <text x="108" y="445" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="20">• Full Executive Strategy &amp; Architecture</text>
+        <text x="108" y="492" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="20">• Step-by-Step SOP, Templates &amp; Prompts</text>
+        <text x="108" y="539" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="20">• 30-Day Execution &amp; Monetization Roadmap</text>
+        <text x="108" y="586" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="20">• QA Checklist, KPI Tracker &amp; GTM Playbook</text>
+        <text x="108" y="633" fill="#fdba74" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="700">Commercial License • Instant Digital Download (${safePrice})</text>
+        <rect x="76" y="880" width="648" height="86" rx="14" fill="#e67e22"/>
+        <text x="108" y="932" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="800" letter-spacing="2">JOY CORPORATION</text>
+        <text x="515" y="932" fill="#fff7ed" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="700">VERIFIED ASSET</text>
+      </svg>`;
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    }
+
+    function buildFullProductThumbDataUri(title, subtitle, category) {
+      const safeTitle = String(title || "JOY PRODUCT").slice(0, 34).replace(/[<>&"]/g, "");
+      const safeSub = String(subtitle || "Complete PDF + Cover + Thumbnail Pack").slice(0, 54).replace(/[<>&"]/g, "");
+      const safeCat = String(category || "PRODUCT").toUpperCase().slice(0, 16).replace(/[<>&"]/g, "");
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+        <rect width="1280" height="720" fill="#16325b"/>
+        <rect x="36" y="36" width="1208" height="648" rx="22" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="3"/>
+        <rect x="76" y="84" width="76" height="8" rx="4" fill="#e67e22"/>
+        <text x="76" y="132" fill="#fdba74" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="800" letter-spacing="3">${safeCat} • COMPLETE PDF &amp; KIT</text>
+        <text x="76" y="232" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="52" font-weight="800">${safeTitle}</text>
+        <text x="76" y="294" fill="#e2e8f0" font-family="Arial,Helvetica,sans-serif" font-size="26" font-style="italic">${safeSub}</text>
+        <rect x="76" y="352" width="1128" height="190" rx="16" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+        <text x="110" y="412" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="24">✓ Full Multi-Page Detailed PDF Guide &amp; Execution SOP</text>
+        <text x="110" y="458" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="24">✓ High-Resolution Cover &amp; Gumroad Thumbnail Included</text>
+        <text x="110" y="504" fill="#fdba74" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700">✓ Ready-to-Deploy Frameworks, Checklists &amp; Prompts</text>
+        <text x="76" y="626" fill="#e67e22" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="800" letter-spacing="3">JOY CORPORATION</text>
+      </svg>`;
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    }
+
+    function downloadSvgAsPng(svgDataUri, filename) {
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width || 1280;
+        canvas.height = img.height || 720;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(function (blob) {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 1200);
+        }, "image/png");
+      };
+      img.src = svgDataUri;
+    }
+
+    function escapePdfText(str) {
+      return String(str || "")
+        .replace(/[^ -~]/g, "-")
+        .replace(/\/g, "\\")
+        .replace(/\(/g, "\(")
+        .replace(/\)/g, "\)");
+    }
+
+    function wrapPdfLines(text, maxChars) {
+      const words = String(text || "").split(/\s+/);
+      const lines = [];
+      let current = "";
+      words.forEach((w) => {
+        if (!w) return;
+        if ((current + " " + w).trim().length <= maxChars) {
+          current = (current + " " + w).trim();
+        } else {
+          if (current) lines.push(current);
+          current = w;
+        }
+      });
+      if (current) lines.push(current);
+      return lines;
+    }
+
+    function buildDetailedMultiPagePdfBlob(item) {
+      const title = item.title || "JOY CORPORATION Master Blueprint";
+      const category = String(item.type || "BLUEPRINT").toUpperCase();
+      const price = item.price || "$9.99";
+      const dateStr = item.created_date || new Date().toLocaleDateString("en-GB");
+      const summary = item.summary || "Comprehensive end-to-end digital product system, implementation SOP, and monetization kit.";
+      const highlights = Array.isArray(item.highlights) && item.highlights.length
+        ? item.highlights
+        : [
+            "Complete step-by-step system architecture & workflow",
+            "Ready-to-use templates, prompts, and SOP checklists",
+            "30-day launch, pricing, and Gumroad conversion roadmap"
+          ];
+
+      const pagesContent = [
+        // PAGE 1: COVER PAGE
+        [
+          "q 0.086 0.196 0.357 rg 0 0 595 842 re f Q",
+          "q 0.902 0.494 0.133 rg 48 765 72 6 re f Q",
+          `BT /F2 12 Tf 0.992 0.729 0.455 rg 48 742 Td (${escapePdfText(category + " • COMPLETE MASTER EDITION")}) Tj ET`,
+          ...wrapPdfLines(title, 34).map((ln, idx) =>
+            `BT /F2 24 Tf 1 1 1 rg 48 ${690 - idx * 32} Td (${escapePdfText(ln)}) Tj ET`
+          ),
+          ...wrapPdfLines(summary, 66).map((ln, idx) =>
+            `BT /F1 12 Tf 0.886 0.910 0.941 rg 48 ${580 - idx * 18} Td (${escapePdfText(ln)}) Tj ET`
+          ),
+          "q 0.125 0.255 0.447 rg 48 260 499 240 re f Q",
+          "q 0.902 0.494 0.133 rg 48 496 499 4 re f Q",
+          `BT /F2 12 Tf 0.992 0.729 0.455 rg 68 468 Td (COMPLETE PACKAGE SPECIFICATION) Tj ET`,
+          `BT /F1 11 Tf 1 1 1 rg 68 442 Td (• Full Detailed Operational Guide & Architecture) Tj ET`,
+          `BT /F1 11 Tf 1 1 1 rg 68 418 Td (• Actionable Templates, Prompts & Standard Operating Procedures) Tj ET`,
+          `BT /F1 11 Tf 1 1 1 rg 68 394 Td (• 30-Day Go-To-Market, Gumroad Listing & Pricing Playbook) Tj ET`,
+          `BT /F1 11 Tf 1 1 1 rg 68 370 Td (• Quality Assurance Checklist & KPI Tracking Matrix) Tj ET`,
+          `BT /F2 11 Tf 0.992 0.729 0.455 rg 68 332 Td (${escapePdfText("Release Date: " + dateStr + "  |  Retail Value: " + price)}) Tj ET`,
+          `BT /F1 10 Tf 0.80 0.85 0.92 rg 68 292 Td (${escapePdfText("Thumbnail & Cover Included • Gumroad: " + (item.gumroad_url || "https://corporationyork.gumroad.com"))}) Tj ET`,
+          "q 0.902 0.494 0.133 rg 48 64 499 54 re f Q",
+          `BT /F2 15 Tf 1 1 1 rg 68 85 Td (JOY CORPORATION — OFFICIAL DIGITAL DELIVERABLE) Tj ET`
+        ].join("\n"),
+
+        // PAGE 2: EXECUTIVE OVERVIEW & CORE ARCHITECTURE
+        [
+          "q 0.086 0.196 0.357 rg 0 782 595 60 re f Q",
+          `BT /F2 14 Tf 1 1 1 rg 48 806 Td (CHAPTER 1: EXECUTIVE SUMMARY & SYSTEM ARCHITECTURE) Tj ET`,
+          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 746 Td (1.1 Core Value Proposition & Target Outcome) Tj ET`,
+          ...wrapPdfLines(
+            `${title} is engineered as an end-to-end execution system built for immediate deployment. Rather than abstract theory, every module translates directly into repeatable daily workflows, measurable conversion assets, and structured deliverables.`,
+            82
+          ).map((ln, idx) => `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 48 ${724 - idx * 16} Td (${escapePdfText(ln)}) Tj ET`),
+          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 636 Td (1.2 Primary Deliverable Pillars) Tj ET`,
+          ...highlights.flatMap((h, hIdx) =>
+            wrapPdfLines(`Pillar ${hIdx + 1}: ${h} — Includes step-by-step setup rules, validation criteria, and ready-to-copy templates.`, 80).map(
+              (ln, lIdx) => `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 ${612 - hIdx * 44 - lIdx * 15} Td (${escapePdfText(ln)}) Tj ET`
+            )
+          ),
+          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 456 Td (1.3 End-to-End Implementation Workflow) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 432 Td (Step 1 — Audit & Baseline Setup: Define target audience segment, core pain point, and offer angle.) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 410 Td (Step 2 — Asset Production: Assemble core workbook, prompt bank, cover graphic, and thumbnail.) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 388 Td (Step 3 — Quality Assurance Gate: Verify completeness, formatting clarity, and actionable checklists.) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 366 Td (Step 4 — Gumroad Storefront Deployment: Publish listing with high-contrast cover and preview bullets.) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 344 Td (Step 5 — Traffic & Optimization Loop: Track conversion rate, refine hooks, and bundle upsells.) Tj ET`,
+          `BT /F1 9.5 Tf 0.4 0.45 0.52 rg 48 42 Td (JOY CORPORATION • Page 2 of 3 • ${escapePdfText(title)}) Tj ET`
+        ].join("\n"),
+
+        // PAGE 3: 30-DAY EXECUTION SOP, GUMROAD LAUNCH & QA CHECKLIST
+        [
+          "q 0.086 0.196 0.357 rg 0 782 595 60 re f Q",
+          `BT /F2 14 Tf 1 1 1 rg 48 806 Td (CHAPTER 2: 30-DAY EXECUTION SOP & LAUNCH CHECKLIST) Tj ET`,
+          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 746 Td (2.1 30-Day Rollout Schedule) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 722 Td (• Week 1 (Foundation): Finalize niche positioning, core templates, and internal QA review.) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 700 Td (• Week 2 (Packaging): Export master PDF, 1280x720 thumbnail, and 800x1060 product cover.) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 678 Td (• Week 3 (Distribution): Publish on Gumroad at ${escapePdfText(price)}, distribute preview threads & demos.) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 656 Td (• Week 4 (Scale & Bundle): Collect buyer feedback, add bonus prompts, and launch tier-2 bundle.) Tj ET`,
+          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 606 Td (2.2 Gumroad Conversion & Listing Blueprint) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 582 Td (• Headline Formula: [Outcome] + [Timeframe] without [Primary Friction].) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 560 Td (• Thumbnail Rule: High-contrast Navy #16325B + Orange #E67E22 accent bar + 3 clear benefits.) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 538 Td (• Pricing Anchor: Entry tier at ${escapePdfText(price)} with instant PDF + template vault access.) Tj ET`,
+          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 488 Td (2.3 Pre-Publish Owner Quality Assurance Checklist) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 464 Td ([X] Complete multi-page PDF verified with Cover + Actionable Chapters) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 442 Td ([X] High-resolution Cover PNG & Gumroad Thumbnail PNG exported) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 420 Td ([X] Gumroad product URL synced and Owner Approval confirmed) Tj ET`,
+          `BT /F1 9.5 Tf 0.4 0.45 0.52 rg 48 42 Td (JOY CORPORATION • Page 3 of 3 • Complete Deliverable Package) Tj ET`
+        ].join("\n")
+      ];
+
+      // Build valid multi-page PDF 1.4 binary string
+      const objects = [];
+      const addObj = (body) => {
+        objects.push(body);
+        return objects.length;
+      };
+
+      const catalogId = addObj("");
+      const pagesId = addObj("");
+      const fontRegularId = addObj("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+      const fontBoldId = addObj("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
+
+      const pageIds = [];
+      pagesContent.forEach((streamText) => {
+        const contentId = addObj(`<< /Length ${streamText.length} >>
+stream
+${streamText}
+endstream`);
+        const pageId = addObj(
+          `<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 ${fontRegularId} 0 R /F2 ${fontBoldId} 0 R >> >> /Contents ${contentId} 0 R >>`
+        );
+        pageIds.push(pageId);
+      });
+
+      objects[pagesId - 1] = `<< /Type /Pages /Kids [${pageIds.map((id) => `${id} 0 R`).join(" ")}] /Count ${pageIds.length} >>`;
+      objects[catalogId - 1] = `<< /Type /Catalog /Pages ${pagesId} 0 R >>`;
+
+      let pdf = "%PDF-1.4
+";
+      const offsets = [0];
+      objects.forEach((objBody, idx) => {
+        offsets.push(pdf.length);
+        pdf += `${idx + 1} 0 obj
+${objBody}
+endobj
+`;
+      });
+
+      const xrefPos = pdf.length;
+      pdf += `xref
+0 ${objects.length + 1}
+`;
+      pdf += "0000000000 65535 f 
+";
+      for (let i = 1; i <= objects.length; i++) {
+        pdf += `${String(offsets[i]).padStart(10, "0")} 00000 n 
+`;
+      }
+      pdf += `trailer
+<< /Size ${objects.length + 1} /Root ${catalogId} 0 R >>
+startxref
+${xrefPos}
+%%EOF`;
+
+      return new Blob([pdf], { type: "application/pdf" });
+    }
+
+    function slugifyFilename(title) {
+      return String(title || "joy-product")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "joy-product";
+    }
+
+    window.downloadCompleteProductPdf = function downloadCompleteProductPdf(sourceType, itemId) {
+      const list = sourceType === "public" ? (window.publicProducts || []) : (window.ownerProductAssets || []);
+      const item = list.find((x) => String(x.id) === String(itemId));
+      if (!item) return;
+
+      const blob = buildDetailedMultiPagePdfBlob(item);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${slugifyFilename(item.title)}-complete-guide.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1200);
+    };
+
+    window.downloadCompleteProductCover = function downloadCompleteProductCover(sourceType, itemId) {
+      const list = sourceType === "public" ? (window.publicProducts || []) : (window.ownerProductAssets || []);
+      const item = list.find((x) => String(x.id) === String(itemId));
+      if (!item) return;
+
+      const coverUri = item.cover_image || buildFullProductCoverDataUri(item.title, item.summary, item.type, item.price || "$9.99");
+      downloadSvgAsPng(coverUri, `${slugifyFilename(item.title)}-cover.png`);
+    };
+
+    window.downloadCompleteProductThumbnail = function downloadCompleteProductThumbnail(sourceType, itemId) {
+      const list = sourceType === "public" ? (window.publicProducts || []) : (window.ownerProductAssets || []);
+      const item = list.find((x) => String(x.id) === String(itemId));
+      if (!item) return;
+
+      const thumbUri = item.thumbnail_image || buildFullProductThumbDataUri(item.title, item.summary, item.type);
+      downloadSvgAsPng(thumbUri, `${slugifyFilename(item.title)}-thumbnail.png`);
+    };
+
+    window.downloadFullProductBundle = function downloadFullProductBundle(sourceType, itemId) {
+      downloadCompleteProductPdf(sourceType, itemId);
+      setTimeout(() => downloadCompleteProductCover(sourceType, itemId), 250);
+      setTimeout(() => downloadCompleteProductThumbnail(sourceType, itemId), 500);
+    };
+
     function buildAssetThumbnailDataUri(title, badgeText) {
       const safeTitle = String(title || "JOY ASSET").slice(0, 28).replace(/[<>&"]/g, "");
       const safeBadge = String(badgeText || "ASSET").slice(0, 12).replace(/[<>&"]/g, "");
@@ -1090,13 +1380,46 @@
       return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
     }
 
+    function buildGumroadDraftUrl(titleOrSlug) {
+      const clean = String(titleOrSlug || "item")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "")
+        .slice(0, 8) || "joy001";
+      return `https://corporationyork.gumroad.com/l/${clean}`;
+    }
+
     const DEFAULT_OWNER_ASSETS = [
       {
         id: "ast-1",
-        title: "AI-Powered 3D Interior Design Blueprint (Master Package)",
+        title: "StyleSync AI – Smart Wardrobe Assistant",
         type: "blueprint",
         format: "Markdown / Kit",
-        image: buildAssetThumbnailDataUri("AI-Powered 3D Interior Design", "BLUEPRINT"),
+        created_date: "25/11/2026",
+        qa_score: "8/10",
+        price: "$9.99",
+        approved: false,
+        published_gumroad: false,
+        gumroad_url: "https://corporationyork.gumroad.com/l/rwjfzy",
+        image: buildAssetThumbnailDataUri("StyleSync AI Wardrobe", "BLUEPRINT"),
+        summary: "AI-powered outfits, shopping & privacy in one click with structured workflow.",
+        highlights: [
+          "Instant AI outfit ideas",
+          "Privacy-first on-device AI",
+          "Integrated shopping & calendar"
+        ]
+      },
+      {
+        id: "ast-2",
+        title: "AI-Powered 3D Interior Design Blueprint",
+        type: "blueprint",
+        format: "Markdown / Kit",
+        created_date: "26/11/2026",
+        qa_score: "9/10",
+        price: "$9.99",
+        approved: false,
+        published_gumroad: false,
+        gumroad_url: "https://corporationyork.gumroad.com/l/3dint01",
+        image: buildAssetThumbnailDataUri("3D Interior Design Blueprint", "BLUEPRINT"),
         summary: "Full deliverable package: market insights, AI workflow architecture, GTM roadmap & finance.",
         highlights: [
           "Market insights & trends",
@@ -1105,29 +1428,22 @@
         ]
       },
       {
-        id: "ast-2",
-        title: "Faceless Aesthetic Photo & B-Roll Content Kit (Master Package)",
+        id: "ast-3",
+        title: "Faceless Aesthetic Photo & B-Roll Content Kit",
         type: "toolkit",
         format: "Prompt & Shot Sheet",
+        created_date: "26/11/2026",
+        qa_score: "8/10",
+        price: "$9.99",
+        approved: false,
+        published_gumroad: false,
+        gumroad_url: "https://corporationyork.gumroad.com/l/broll02",
         image: buildAssetThumbnailDataUri("Faceless Aesthetic Photo & B-Roll", "TOOLKIT"),
         summary: "Complete prompt bank, daily batch shooting checklist, and hook/caption pairing guide.",
         highlights: [
           "45+ scene & camera angle prompts",
           "Daily batch shooting checklist",
           "Hook & caption pairing guide"
-        ]
-      },
-      {
-        id: "ast-3",
-        title: "Cold DM & Client Closing Script Playbook",
-        type: "ebook",
-        format: "Playbook",
-        image: buildAssetThumbnailDataUri("Cold DM & Closing Script Playbook", "EBOOK"),
-        summary: "Outreach sequences, objection responses, and closing call framework.",
-        highlights: [
-          "Cold DM scripts & follow-ups",
-          "Objection handling matrix",
-          "Closing checklist"
         ]
       }
     ];
@@ -1401,9 +1717,12 @@
           </div>
           <div class="pub-footer">
             <span class="pub-brand-tag">JOY CORPORATION</span>
-            <div class="pub-actions">
+            <div class="pub-actions" style="flex-wrap:wrap;">
+              <button type="button" class="btn btn-copy-data" style="padding:5px 7px; font-size:11px;" onclick="downloadCompleteProductPdf('public', '${esc(item.id)}')">PDF</button>
+              <button type="button" class="btn" style="padding:5px 7px; font-size:11px;" onclick="downloadCompleteProductCover('public', '${esc(item.id)}')">Cover</button>
+              <button type="button" class="btn" style="padding:5px 7px; font-size:11px;" onclick="downloadCompleteProductThumbnail('public', '${esc(item.id)}')">Thumb</button>
               ${gumroadHtml}
-              <button type="button" class="btn btn-delete" onclick="deleteSingleSectionItem('public', '${esc(item.id)}')">Delete</button>
+              <button type="button" class="btn btn-delete" style="padding:5px 7px; font-size:11px;" onclick="deleteSingleSectionItem('public', '${esc(item.id)}')">Delete</button>
             </div>
           </div>
         `;
@@ -1580,12 +1899,23 @@
         : "";
 
       previewEl.style.display = "block";
+      const fullCover = asset.cover_image || buildFullProductCoverDataUri(asset.title, asset.summary, asset.type, asset.price || "$9.99");
+      const fullThumb = asset.thumbnail_image || buildFullProductThumbDataUri(asset.title, asset.summary, asset.type);
       previewEl.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
-          <strong style="color:var(--navy); font-size:13px;">${esc(asset.title)}</strong>
+          <strong style="color:var(--navy); font-size:13px;">${esc(asset.title)} — Preview Cover, Thumbnail &amp; PDF</strong>
           <button type="button" class="btn" style="padding:3px 8px; font-size:11px;" onclick="document.getElementById('assetTabDetailPreview').style.display='none'">Tutup</button>
         </div>
-        <img src="${esc(thumb)}" alt="${esc(asset.title)}" style="width:100%; max-height:170px; object-fit:cover; border-radius:8px; border:1px solid var(--border); margin-bottom:8px;" />
+        <div style="display:grid; grid-template-columns:1fr 1.6fr; gap:8px; margin-bottom:8px;">
+          <div>
+            <div style="font-size:10px; font-weight:700; color:var(--navy); margin-bottom:3px;">Cover (800x1060)</div>
+            <img src="${esc(fullCover)}" alt="Cover" style="width:100%; height:150px; object-fit:cover; border-radius:8px; border:1px solid var(--border);" />
+          </div>
+          <div>
+            <div style="font-size:10px; font-weight:700; color:var(--navy); margin-bottom:3px;">Thumbnail Gumroad (1280x720)</div>
+            <img src="${esc(fullThumb)}" alt="Thumbnail" style="width:100%; height:150px; object-fit:cover; border-radius:8px; border:1px solid var(--border);" />
+          </div>
+        </div>
         <div style="color:var(--muted);">${esc(asset.summary || "Aset hasil produksi JOY CORPORATION.")}</div>
         ${highlightsHtml}
       `;
@@ -1605,6 +1935,108 @@
 
       renderOrdersPanel();
       updateDashboardCounters();
+    };
+
+    function syncApprovedAssetToPublic(asset) {
+      const pubList = Array.isArray(window.publicProducts) ? window.publicProducts : [];
+      const syncedId = `pub-asset-${asset.id}`;
+      const gumroadLink = asset.gumroad_url || buildGumroadDraftUrl(asset.title);
+
+      const publicCardItem = {
+        id: syncedId,
+        source_asset_id: asset.id,
+        title: asset.title || "Untitled Product",
+        type: asset.type || "product",
+        summary: `${asset.summary || "Digital product by JOY CORPORATION."} (${asset.price || "$9.99"})`,
+        highlights: Array.isArray(asset.highlights) && asset.highlights.length
+          ? asset.highlights.slice(0, 3)
+          : ["Approved by Owner", "Synced to Public & Gumroad", "JOY CORPORATION"],
+        gumroad_url: gumroadLink
+      };
+
+      const existingIdx = pubList.findIndex(
+        (p) => String(p.id) === syncedId || String(p.source_asset_id) === String(asset.id)
+      );
+      if (existingIdx >= 0) {
+        pubList[existingIdx] = publicCardItem;
+        window.publicProducts = [...pubList];
+      } else {
+        window.publicProducts = [...pubList, publicCardItem];
+      }
+    }
+
+    function removeApprovedAssetFromPublic(assetId) {
+      const syncedId = `pub-asset-${assetId}`;
+      window.publicProducts = (window.publicProducts || []).filter(
+        (p) => String(p.id) !== syncedId && String(p.source_asset_id) !== String(assetId)
+      );
+    }
+
+    window.approveAndPublishAsset = function approveAndPublishAsset(assetId) {
+      const list = window.ownerProductAssets || [];
+      const idx = list.findIndex((a) => String(a.id) === String(assetId));
+      if (idx < 0) return;
+
+      const updated = {
+        ...list[idx],
+        approved: true,
+        published_gumroad: true,
+        gumroad_url: list[idx].gumroad_url || buildGumroadDraftUrl(list[idx].title)
+      };
+
+      const nextList = [...list];
+      nextList[idx] = updated;
+      saveOwnerAssets(nextList);
+
+      syncApprovedAssetToPublic(updated);
+      renderOrdersPanel();
+      renderPublicPanel();
+      updateDashboardCounters();
+      setTransferStatus("orders", `Disetujui & otomatis masuk ke Public + Gumroad: ${updated.title}`);
+    };
+
+    window.unapproveOwnerAsset = function unapproveOwnerAsset(assetId) {
+      const list = window.ownerProductAssets || [];
+      const idx = list.findIndex((a) => String(a.id) === String(assetId));
+      if (idx < 0) return;
+
+      const updated = {
+        ...list[idx],
+        approved: false,
+        published_gumroad: false
+      };
+
+      const nextList = [...list];
+      nextList[idx] = updated;
+      saveOwnerAssets(nextList);
+
+      removeApprovedAssetFromPublic(assetId);
+      renderOrdersPanel();
+      renderPublicPanel();
+      updateDashboardCounters();
+      setTransferStatus("orders", `Approval dibatalkan & dihapus dari Public: ${updated.title}`);
+    };
+
+    window.updateAssetGumroadUrl = function updateAssetGumroadUrl(assetId, newUrl) {
+      const list = window.ownerProductAssets || [];
+      const idx = list.findIndex((a) => String(a.id) === String(assetId));
+      if (idx < 0) return;
+
+      const cleanUrl = String(newUrl || "").trim();
+      const updated = {
+        ...list[idx],
+        gumroad_url: cleanUrl || buildGumroadDraftUrl(list[idx].title)
+      };
+      const nextList = [...list];
+      nextList[idx] = updated;
+      saveOwnerAssets(nextList);
+
+      if (updated.approved) {
+        syncApprovedAssetToPublic(updated);
+        renderPublicPanel();
+      }
+      renderOrdersPanel();
+      setTransferStatus("orders", `Link Gumroad diperbarui untuk ${updated.title}`);
     };
 
     function renderOrdersPanel() {
@@ -1630,6 +2062,17 @@
           ? asset.highlights.slice(0, 3)
           : ["Aset hasil produksi siap pakai", "Format terstruktur JOY CORPORATION", "Akses khusus owner"];
 
+        const isApproved = Boolean(asset.approved);
+        const gumroadUrl = asset.gumroad_url || buildGumroadDraftUrl(asset.title);
+        const safeGumroad = isSafeHttpUrl(gumroadUrl) ? gumroadUrl : "https://gumroad.com/";
+        const statusBadge = isApproved
+          ? `<span class="pill orange">Disetujui • Public &amp; Gumroad</span>`
+          : `<span class="pill">Menunggu Approve Owner</span>`;
+
+        const approvalBtnHtml = isApproved
+          ? `<button type="button" class="btn" style="padding:5px 8px; font-size:11px;" onclick="unapproveOwnerAsset('${esc(asset.id)}')">Batal Setuju</button>`
+          : `<button type="button" class="btn btn-orange" style="padding:5px 8px; font-size:11px;" onclick="approveAndPublishAsset('${esc(asset.id)}')">Setujui &amp; Publish</button>`;
+
         const card = document.createElement("article");
         card.className = "pub-card";
         card.innerHTML = `
@@ -1641,17 +2084,32 @@
             />
             <div class="pub-meta-top">
               <span>${esc(asset.type || "ASSET")}</span>
-              <span>${esc(asset.format || "PACKAGE")}</span>
+              <span>${esc(asset.price || "$9.99")}</span>
             </div>
             <h3 class="pub-title">${esc(asset.title || "Untitled Asset")}</h3>
+            <div style="font-size:11px; color:#cbd5e1; margin-bottom:6px;">
+              Dibuat ${esc(asset.created_date || "26/11/2026")} • QA ${esc(asset.qa_score || "8/10")}
+            </div>
+            <div style="margin-bottom:8px;">${statusBadge}</div>
             <p class="pub-summary">${esc(asset.summary || "Hasil produk tersimpan di vault owner.")}</p>
             <ul class="pub-bullets">${bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
+            <div style="margin-top:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); border-radius:8px; padding:7px 9px; font-size:11px; color:#e2e8f0; word-break:break-all;">
+              <div style="font-size:10px; color:#fdba74; font-weight:700; margin-bottom:3px;">
+                ${isApproved ? "Auto-Synced Gumroad:" : "Draft Gumroad:"}
+              </div>
+              <a href="${esc(safeGumroad)}" target="_blank" rel="noopener noreferrer" style="color:#ffffff; text-decoration:underline;">${esc(safeGumroad)}</a>
+            </div>
           </div>
-          <div class="pub-footer">
-            <span class="pub-brand-tag">OWNER ASSET</span>
-            <div class="pub-actions">
-              <button type="button" class="btn" style="padding:5px 8px; font-size:11px;" onclick="viewAssetTabDetail('${esc(asset.id)}')">Lihat</button>
-              <button type="button" class="btn btn-copy-data" style="padding:5px 8px; font-size:11px;" onclick="downloadOwnerAsset('${esc(asset.id)}')">Download</button>
+          <div class="pub-footer" style="flex-wrap:wrap;">
+            <div class="pub-actions" style="flex-wrap:wrap; width:100%; justify-content:space-between;">
+              <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                ${approvalBtnHtml}
+                <button type="button" class="btn" style="padding:5px 8px; font-size:11px;" onclick="viewAssetTabDetail('${esc(asset.id)}')">Lihat</button>
+                <button type="button" class="btn btn-copy-data" style="padding:5px 8px; font-size:11px;" onclick="downloadCompleteProductPdf('asset', '${esc(asset.id)}')">PDF Komplit</button>
+                <button type="button" class="btn" style="padding:5px 8px; font-size:11px;" onclick="downloadCompleteProductCover('asset', '${esc(asset.id)}')">Cover</button>
+                <button type="button" class="btn" style="padding:5px 8px; font-size:11px;" onclick="downloadCompleteProductThumbnail('asset', '${esc(asset.id)}')">Thumbnail</button>
+                <button type="button" class="btn btn-move-data" style="padding:5px 8px; font-size:11px;" onclick="downloadFullProductBundle('asset', '${esc(asset.id)}')">Paket Lengkap</button>
+              </div>
               <button type="button" class="btn btn-delete" style="padding:5px 8px; font-size:11px;" onclick="deleteAssetTabItem('${esc(asset.id)}')">Hapus</button>
             </div>
           </div>
