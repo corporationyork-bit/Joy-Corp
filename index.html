@@ -753,7 +753,7 @@
         <div class="brand-sub">"We exist because of you Ade"</div>
       </div>
       <div class="status-row">
-        <button id="dbStatusBadge" type="button" class="pill" title="Open Supabase PIN & Assets" onclick="openSupabasePinModal()">supabase ready</button>
+        <button id="dbStatusBadge" type="button" class="pill" title="Owner PIN & Assets" onclick="openSupabasePinModal()">owner vault</button>
         <span id="autoOptBadge" class="pill orange">auto opt 1h ready</span>
         <span id="liveActivityDot" class="live-dot" title="Production & notification indicator"></span>
       </div>
@@ -947,22 +947,10 @@
   </div>
 
   <script>
-    const SUPABASE_URL = window.SUPABASE_URL || "";
-    const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "";
-
-    const DB_TABLES = {
-      pending: "pending_products",
-      pipeline: "pipeline_queue",
-      worklog: "work_logs",
-      orders: "orders",
-      public: "public_products"
-    };
-
     const ONE_HOUR_MS = 60 * 60 * 1000;
-    const DELETE_BATCH_SIZE = 10;
     const MAX_WORKLOG_ITEMS = 200;
+    const OWNER_ASSETS_STORAGE_KEY = "joy_owner_product_assets_v1";
 
-    let dbClient = null;
     let isDeletingBusy = false;
     let isOptimizingBusy = false;
     let publicSearchQuery = "";
@@ -975,7 +963,7 @@
     window.pipelineQueue = Array.isArray(window.pipelineQueue) ? window.pipelineQueue : [
       { id: "pip-1", title: "AI-Powered 3D Interior Design Blueprint", type: "blueprint", target: "Qty 5 • Global Market", status: "PUBLISHED" },
       { id: "pip-2", title: "Faceless Aesthetic Photo & B-Roll Content Kit", type: "toolkit", target: "Qty 5 • Global Market", status: "PUBLISHED" },
-      { id: "pip-3", title: "Cold DM & Client Closing Script Playbook", type: "ebook", target: "Qty 5 • Global Market", status: "PUBLISHED" }
+      { id: "pip-3", title: "Cold DM & Client Closing Script Playbook", type="ebook", target: "Qty 5 • Global Market", status: "PUBLISHED" }
     ];
 
     window.workLogs = Array.isArray(window.workLogs) ? window.workLogs : [
@@ -1013,6 +1001,65 @@
       }
     ];
 
+    const DEFAULT_OWNER_ASSETS = [
+      {
+        id: "ast-1",
+        title: "AI-Powered 3D Interior Design Blueprint (Master Package)",
+        type: "blueprint",
+        format: "Markdown / Kit",
+        summary: "Full deliverable package: market insights, AI workflow architecture, GTM roadmap & finance.",
+        highlights: [
+          "Market insights & trends",
+          "AI-driven product architecture",
+          "GTM roadmap & finance"
+        ]
+      },
+      {
+        id: "ast-2",
+        title: "Faceless Aesthetic Photo & B-Roll Content Kit (Master Package)",
+        type: "toolkit",
+        format: "Prompt & Shot Sheet",
+        summary: "Complete prompt bank, daily batch shooting checklist, and hook/caption pairing guide.",
+        highlights: [
+          "45+ scene & camera angle prompts",
+          "Daily batch shooting checklist",
+          "Hook & caption pairing guide"
+        ]
+      },
+      {
+        id: "ast-3",
+        title: "Cold DM & Client Closing Script Playbook",
+        type: "ebook",
+        format: "Playbook",
+        summary: "Outreach sequences, objection responses, and closing call framework.",
+        highlights: [
+          "Cold DM scripts & follow-ups",
+          "Objection handling matrix",
+          "Closing checklist"
+        ]
+      }
+    ];
+
+    function loadOwnerAssets() {
+      try {
+        const raw = localStorage.getItem(OWNER_ASSETS_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (_) {}
+      return DEFAULT_OWNER_ASSETS.map((a) => ({ ...a, highlights: [...a.highlights] }));
+    }
+
+    function saveOwnerAssets(list) {
+      window.ownerProductAssets = Array.isArray(list) ? list : [];
+      try {
+        localStorage.setItem(OWNER_ASSETS_STORAGE_KEY, JSON.stringify(window.ownerProductAssets));
+      } catch (_) {}
+    }
+
+    window.ownerProductAssets = loadOwnerAssets();
+
     window.JOY_PRODUCT_LANGUAGE = {
       lang: "en",
       output_language: "English",
@@ -1032,94 +1079,33 @@
       return /^https?:\/\//i.test(String(url || "").trim());
     }
 
-    function initSupabaseClient() {
-      const badge = document.getElementById("dbStatusBadge");
-
-      if (window.supabase && typeof window.supabase.from === "function") {
-        dbClient = window.supabase;
-      } else if (window.sb && typeof window.sb.from === "function") {
-        dbClient = window.sb;
-      } else if (
-        window.supabase &&
-        typeof window.supabase.createClient === "function" &&
-        SUPABASE_URL &&
-        SUPABASE_ANON_KEY
-      ) {
-        dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      }
-
-      if (badge) {
-        if (dbClient) {
-          badge.textContent = "supabase connected";
-          badge.classList.add("orange");
-        } else {
-          badge.textContent = "supabase ready";
-          badge.classList.remove("orange");
-        }
-      }
-      return dbClient;
-    }
-
-    async function syncFromSupabaseTables() {
-      if (!dbClient) return;
-
-      const loaders = [
-        { table: DB_TABLES.pending, setter: (d) => { window.pendingProducts = d; } },
-        { table: DB_TABLES.pipeline, setter: (d) => { window.pipelineQueue = d; } },
-        { table: DB_TABLES.worklog, setter: (d) => { window.workLogs = d; } },
-        { table: DB_TABLES.orders, setter: (d) => { window.ordersList = d; } },
-        { table: DB_TABLES.public, setter: (d) => { window.publicProducts = d; } }
-      ];
-
-      for (const entry of loaders) {
-        try {
-          const { data, error } = await dbClient.from(entry.table).select("*");
-          if (!error && Array.isArray(data)) {
-            entry.setter(data);
-          }
-        } catch (err) {
-          console.warn(`[Supabase Sync:${entry.table}] Skipped/Error:`, err?.message || err);
-        }
-      }
-
-      requestAnimationFrame(() => {
-        renderAllSections();
-        updateDashboardCounters();
-      });
-    }
-
     const SECTIONS = {
       pending: {
         title: "Pending Products",
-        table: DB_TABLES.pending,
         getList: () => window.pendingProducts,
         setList: (arr) => { window.pendingProducts = arr; },
         render: renderPendingPanel
       },
       pipeline: {
         title: "Pipeline Queue",
-        table: DB_TABLES.pipeline,
         getList: () => window.pipelineQueue,
         setList: (arr) => { window.pipelineQueue = arr; },
         render: renderPipelinePanel
       },
       worklog: {
         title: "Work Log",
-        table: DB_TABLES.worklog,
         getList: () => window.workLogs,
         setList: (arr) => { window.workLogs = arr; },
         render: renderWorkLogPanel
       },
       orders: {
         title: "Orders",
-        table: DB_TABLES.orders,
         getList: () => window.ordersList,
         setList: (arr) => { window.ordersList = arr; },
         render: renderOrdersPanel
       },
       public: {
         title: "Public Products",
-        table: DB_TABLES.public,
         getList: () => window.publicProducts,
         setList: (arr) => { window.publicProducts = arr; },
         render: renderPublicPanel
@@ -1408,7 +1394,7 @@
       renderOrdersPanel();
     }
 
-    window.deleteSingleSectionItem = async function deleteSingleSectionItem(sectionKey, id) {
+    window.deleteSingleSectionItem = function deleteSingleSectionItem(sectionKey, id) {
       const cfg = SECTIONS[sectionKey];
       if (!cfg || isDeletingBusy) return;
 
@@ -1422,11 +1408,6 @@
       isDeletingBusy = true;
       syncProductionAndNotifDot();
       try {
-        if (dbClient && cfg.table && id !== undefined && id !== null && id !== "") {
-          const { error } = await dbClient.from(cfg.table).delete().eq("id", id);
-          if (error) throw error;
-        }
-
         cfg.setList(list.filter((item) => String(item.id) !== String(id)));
 
         requestAnimationFrame(() => {
@@ -1442,7 +1423,7 @@
       }
     };
 
-    window.deleteAllSectionItems = async function deleteAllSectionItems(sectionKey) {
+    window.deleteAllSectionItems = function deleteAllSectionItems(sectionKey) {
       if (sectionKey === "public") {
         alert("Bulk delete is disabled on Public Products.");
         return;
@@ -1468,18 +1449,6 @@
       }
 
       try {
-        const ids = list
-          .map((item) => item.id)
-          .filter((v) => v !== undefined && v !== null && v !== "");
-
-        if (dbClient && cfg.table && ids.length > 0) {
-          for (let i = 0; i < ids.length; i += DELETE_BATCH_SIZE) {
-            const chunk = ids.slice(i, i + DELETE_BATCH_SIZE);
-            const { error } = await dbClient.from(cfg.table).delete().in("id", chunk);
-            if (error) throw error;
-          }
-        }
-
         cfg.setList([]);
 
         requestAnimationFrame(() => {
@@ -1531,7 +1500,7 @@
       if (badge) badge.textContent = msg;
     }
 
-    window.runHourlyAutoOptimization = async function runHourlyAutoOptimization(isManual = false) {
+    window.runHourlyAutoOptimization = function runHourlyAutoOptimization(isManual = false) {
       if (isOptimizingBusy || isDeletingBusy) return;
       isOptimizingBusy = true;
       syncProductionAndNotifDot();
@@ -1546,8 +1515,6 @@
         if (Array.isArray(window.pipelineQueue)) {
           window.pipelineQueue = window.pipelineQueue.filter((item) => item && (item.id || item.title));
         }
-
-        await syncFromSupabaseTables();
 
         requestAnimationFrame(() => {
           updateDashboardCounters();
@@ -1564,13 +1531,9 @@
       }
     };
 
-    initSupabaseClient();
     renderAllSections();
     updateDashboardCounters();
     setAutoOptText("auto opt 1h ready • 60m");
-    if (dbClient) {
-      syncFromSupabaseTables();
-    }
 
     const SUPABASE_PIN_STORAGE_KEY = "joy_supabase_pin_v1";
     const DEFAULT_SUPABASE_PIN = "444033";
@@ -1597,23 +1560,99 @@
       return `${s.slice(0, 6)}••••${s.slice(-4)}`;
     }
 
+    function triggerJsonDownload(filename, payloadObj) {
+      try {
+        const blob = new Blob([JSON.stringify(payloadObj, null, 2)], { type: "application/json;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (err) {
+        console.error("[DownloadAsset] Error:", err);
+      }
+    }
+
+    window.viewOwnerAsset = function viewOwnerAsset(assetId) {
+      const previewEl = document.getElementById("ownerAssetDetailPreview");
+      const asset = (window.ownerProductAssets || []).find((a) => String(a.id) === String(assetId));
+      if (!previewEl || !asset) return;
+
+      const highlightsHtml = Array.isArray(asset.highlights) && asset.highlights.length
+        ? `<ul style="margin:6px 0 0 16px;">${asset.highlights.map((h) => `<li>${esc(h)}</li>`).join("")}</ul>`
+        : "";
+
+      previewEl.style.display = "block";
+      previewEl.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+          <strong style="color:var(--navy); font-size:12px;">${esc(asset.title)}</strong>
+          <button type="button" class="btn" style="padding:2px 7px; font-size:10px;" onclick="document.getElementById('ownerAssetDetailPreview').style.display='none'">Tutup</button>
+        </div>
+        <div style="color:var(--muted); margin-top:4px;">${esc(asset.summary || "")}</div>
+        ${highlightsHtml}
+      `;
+    };
+
+    window.downloadOwnerAsset = function downloadOwnerAsset(assetId) {
+      const asset = (window.ownerProductAssets || []).find((a) => String(a.id) === String(assetId));
+      if (!asset) return;
+      const slug = String(asset.title || "product-asset")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "product-asset";
+      triggerJsonDownload(`${slug}.json`, asset);
+    };
+
+    window.downloadAllOwnerAssets = function downloadAllOwnerAssets() {
+      const list = window.ownerProductAssets || [];
+      if (!list.length) {
+        alert("Belum ada aset produk tersimpan.");
+        return;
+      }
+      triggerJsonDownload("joy-corporation-owner-assets.json", list);
+    };
+
+    window.deleteOwnerAsset = function deleteOwnerAsset(assetId) {
+      const list = window.ownerProductAssets || [];
+      const target = list.find((a) => String(a.id) === String(assetId));
+      if (!target) return;
+      if (!confirm(`Hapus aset "${target.title || "aset ini"}" secara permanen?`)) return;
+
+      const nextList = list.filter((a) => String(a.id) !== String(assetId));
+      saveOwnerAssets(nextList);
+
+      const previewEl = document.getElementById("ownerAssetDetailPreview");
+      if (previewEl) previewEl.style.display = "none";
+
+      renderSupabaseAssets();
+    };
+
     function renderSupabaseAssets() {
       const box = document.getElementById("supabaseAssetsList");
       if (!box) return;
 
-      const assets = [
-        { k: "Status", v: dbClient ? "Connected" : "Local Ready" },
-        { k: "SUPABASE_URL", v: SUPABASE_URL || "(not configured)" },
-        { k: "SUPABASE_ANON_KEY", v: maskSecret(SUPABASE_ANON_KEY) },
-        { k: "Tables", v: Object.values(DB_TABLES).join(", ") }
-      ];
+      const assets = window.ownerProductAssets || [];
+      if (!assets.length) {
+        box.innerHTML = `<div style="font-size:11px; color:var(--muted); padding:6px 2px;">Belum ada hasil produk di vault owner.</div>`;
+        return;
+      }
 
       box.innerHTML = assets
         .map(
           (a) => `
-          <div class="asset-item">
-            <span class="asset-key">${esc(a.k)}</span>
-            <span class="asset-val">${esc(a.v)}</span>
+          <div class="asset-item" style="flex-direction:column; align-items:stretch; gap:6px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+              <span class="asset-key">${esc(a.title || "Untitled Asset")}</span>
+              <span class="asset-val">${esc(a.type || "asset")}</span>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:6px;">
+              <button type="button" class="btn" style="padding:4px 8px; font-size:11px;" onclick="viewOwnerAsset('${esc(a.id)}')">Lihat</button>
+              <button type="button" class="btn btn-copy-data" style="padding:4px 8px; font-size:11px;" onclick="downloadOwnerAsset('${esc(a.id)}')">Unduh</button>
+              <button type="button" class="btn btn-delete" style="padding:4px 8px; font-size:11px;" onclick="deleteOwnerAsset('${esc(a.id)}')">Hapus</button>
+            </div>
           </div>
         `
         )
@@ -1879,26 +1918,17 @@
     }
 
     async function persistTransferredItems(targetKey, normalizedItems, sourceKey, removedItems) {
-      if (!dbClient) return;
-
-      const targetCfg = SECTIONS[targetKey];
-      if (targetCfg?.table && normalizedItems.length > 0) {
-        const { error: insErr } = await dbClient.from(targetCfg.table).insert(normalizedItems);
-        if (insErr) throw insErr;
-      }
-
-      const sourceCfg = SECTIONS[sourceKey];
-      if (sourceCfg?.table && Array.isArray(removedItems) && removedItems.length > 0) {
-        const ids = removedItems
-          .map((it) => it?.id)
-          .filter((v) => v !== undefined && v !== null && v !== "");
-        if (ids.length > 0) {
-          for (let i = 0; i < ids.length; i += DELETE_BATCH_SIZE) {
-            const chunk = ids.slice(i, i + DELETE_BATCH_SIZE);
-            const { error: delErr } = await dbClient.from(sourceCfg.table).delete().in("id", chunk);
-            if (delErr) throw delErr;
-          }
-        }
+      if (targetKey === "public" && Array.isArray(normalizedItems) && normalizedItems.length > 0) {
+        const existing = window.ownerProductAssets || [];
+        const addedAssets = normalizedItems.map((item, idx) => ({
+          id: `ast-${Date.now().toString(36)}-${idx + 1}`,
+          title: item.title || "Product Asset",
+          type: item.type || "asset",
+          format: "JSON",
+          summary: item.summary || `Generated asset from ${SECTIONS[sourceKey]?.title || "workspace"}.`,
+          highlights: Array.isArray(item.highlights) ? item.highlights : []
+        }));
+        saveOwnerAssets([...existing, ...addedAssets]);
       }
     }
 
@@ -2004,18 +2034,18 @@
     }
 
   </script>
-  <!-- Supabase PIN Gate & Assets Modal -->
+  <!-- Owner PIN Gate & Product Assets Vault Modal -->
   <div id="supabasePinModal" class="pin-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pinModalTitle">
-    <div class="pin-modal">
+    <div class="pin-modal" style="max-width:520px; max-height:88vh; overflow-y:auto;">
       <div class="pin-modal-head">
-        <h2 id="pinModalTitle" class="pin-modal-title">Supabase PIN &amp; Assets</h2>
+        <h2 id="pinModalTitle" class="pin-modal-title">Owner PIN &amp; Product Assets</h2>
         <button type="button" class="btn" onclick="closeSupabasePinModal()">Close</button>
       </div>
 
       <!-- Step 1: Enter PIN -->
       <div id="pinStepUnlock" style="display:flex; flex-direction:column; gap:10px;">
         <p style="font-size:12px; color:var(--muted);">
-          Masukkan PIN dulu untuk membuka pengaturan, ganti PIN, dan melihat aset Supabase.
+          Khusus owner: masukkan PIN untuk melihat, mengunduh, dan menghapus hasil produk (aset), atau mengganti PIN.
         </p>
         <input
           id="supabasePinInput"
@@ -2033,10 +2063,14 @@
         </div>
       </div>
 
-      <!-- Step 2: Unlocked View (Assets + Change PIN) -->
+      <!-- Step 2: Unlocked View (Product Assets + Change PIN) -->
       <div id="pinStepUnlocked" style="display:none; flex-direction:column; gap:12px;">
         <div class="asset-box">
-          <div style="font-weight:800; color:var(--navy); font-size:12px;">Supabase Assets</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <span style="font-weight:800; color:var(--navy); font-size:12px;">Hasil Produk / Aset Owner</span>
+            <button type="button" class="btn" style="padding:4px 8px; font-size:11px;" onclick="downloadAllOwnerAssets()">Unduh Semua (.json)</button>
+          </div>
+          <div id="ownerAssetDetailPreview" style="display:none; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:9px; font-size:11px; color:var(--text);"></div>
           <div id="supabaseAssetsList" style="display:flex; flex-direction:column; gap:6px;"></div>
         </div>
 
