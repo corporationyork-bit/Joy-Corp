@@ -1309,6 +1309,7 @@
             "Ready-to-use templates, prompts, and SOP checklists",
             "30-day launch, pricing, and Gumroad conversion roadmap"
           ];
+      const pack = buildPromptSaktiPack(item);
 
       const pagesContent = [
         // PAGE 1: COVER PAGE
@@ -1322,13 +1323,13 @@
           ...wrapPdfLines(summary, 66).map((ln, idx) =>
             `BT /F1 12 Tf 0.886 0.910 0.941 rg 48 ${580 - idx * 18} Td (${escapePdfText(ln)}) Tj ET`
           ),
-          "q 0.125 0.255 0.447 rg 48 260 499 240 re f Q",
+          "q 0.125 0.255 0.447 rg 48 250 499 250 re f Q",
           "q 0.902 0.494 0.133 rg 48 496 499 4 re f Q",
           `BT /F2 12 Tf 0.992 0.729 0.455 rg 68 468 Td (COMPLETE PACKAGE SPECIFICATION) Tj ET`,
-          `BT /F1 11 Tf 1 1 1 rg 68 442 Td (• Full Detailed Operational Guide & Architecture) Tj ET`,
-          `BT /F1 11 Tf 1 1 1 rg 68 418 Td (• Actionable Templates, Prompts & Standard Operating Procedures) Tj ET`,
-          `BT /F1 11 Tf 1 1 1 rg 68 394 Td (• 30-Day Go-To-Market, Gumroad Listing & Pricing Playbook) Tj ET`,
-          `BT /F1 11 Tf 1 1 1 rg 68 370 Td (• Quality Assurance Checklist & KPI Tracking Matrix) Tj ET`,
+          `BT /F1 11 Tf 1 1 1 rg 68 442 Td (• Page 1: Master Cover & Package Specification) Tj ET`,
+          `BT /F1 11 Tf 1 1 1 rg 68 418 Td (• Page 2: Executive Architecture, Core Pillars & Workflow) Tj ET`,
+          `BT /F1 11 Tf 1 1 1 rg 68 394 Td (• Page 3: Actionable Templates, Prompt Bank & Daily SOP) Tj ET`,
+          `BT /F1 11 Tf 1 1 1 rg 68 370 Td (• Page 4: 30-Day Rollout, Gumroad Launch & QA Audit) Tj ET`,
           `BT /F2 11 Tf 0.992 0.729 0.455 rg 68 332 Td (${escapePdfText("Release Date: " + dateStr + "  |  Retail Value: " + price)}) Tj ET`,
           `BT /F1 10 Tf 0.80 0.85 0.92 rg 68 292 Td (${escapePdfText("Thumbnail & Cover Included • Gumroad: " + (item.gumroad_url || "https://corporationyork.gumroad.com"))}) Tj ET`,
           "q 0.902 0.494 0.133 rg 48 64 499 54 re f Q",
@@ -1346,7 +1347,7 @@
           ).map((ln, idx) => `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 48 ${724 - idx * 16} Td (${escapePdfText(ln)}) Tj ET`),
           `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 636 Td (1.2 Primary Deliverable Pillars) Tj ET`,
           ...highlights.flatMap((h, hIdx) =>
-            wrapPdfLines(`Pillar ${hIdx + 1}: ${h} — Includes step-by-step setup rules, validation criteria, and ready-to-copy templates.`, 80).map(
+            wrapPdfLines(`Pillar ${hIdx + 1}: ${h} — Structured setup rules, clear output specs, and ready-to-copy templates.`, 80).map(
               (ln, lIdx) => `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 ${612 - hIdx * 44 - lIdx * 15} Td (${escapePdfText(ln)}) Tj ET`
             )
           ),
@@ -1356,35 +1357,59 @@
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 388 Td (Step 3 — Quality Assurance Gate: Verify completeness, formatting clarity, and actionable checklists.) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 366 Td (Step 4 — Gumroad Storefront Deployment: Publish listing with high-contrast cover and preview bullets.) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 344 Td (Step 5 — Traffic & Optimization Loop: Track conversion rate, refine hooks, and bundle upsells.) Tj ET`,
-          `BT /F1 9.5 Tf 0.4 0.45 0.52 rg 48 42 Td (JOY CORPORATION • Page 2 of 3 • ${escapePdfText(title)}) Tj ET`
+          `BT /F1 9.5 Tf 0.4 0.45 0.52 rg 48 42 Td (JOY CORPORATION • Page 2 of 4 • ${escapePdfText(title)}) Tj ET`
         ].join("\n"),
 
-        // PAGE 3: 30-DAY EXECUTION SOP, GUMROAD LAUNCH & QA CHECKLIST
+        // PAGE 3: ACTIONABLE TEMPLATES, PROMPT BANK & DAILY SOP
         [
           "q 0.086 0.196 0.357 rg 0 782 595 60 re f Q",
-          `BT /F2 14 Tf 1 1 1 rg 48 806 Td (CHAPTER 2: 30-DAY EXECUTION SOP & LAUNCH CHECKLIST) Tj ET`,
-          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 746 Td (2.1 30-Day Rollout Schedule) Tj ET`,
+          `BT /F2 14 Tf 1 1 1 rg 48 806 Td (CHAPTER 2: ACTIONABLE TEMPLATES, PROMPTS & DAILY SOP) Tj ET`,
+          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 746 Td (2.1 Ready-to-Use Execution Prompts & Templates) Tj ET`,
+          ...wrapPdfLines(`Prompt A (Core Execution): Act as a specialist in ${pack.primaryKw}. Build a step-by-step action plan for ${title} with exact inputs, outputs, and time estimates.`, 82).map(
+            (ln, idx) => `BT /F1 10 Tf 0.1 0.12 0.16 rg 56 ${722 - idx * 15} Td (${escapePdfText(ln)}) Tj ET`
+          ),
+          ...wrapPdfLines(`Prompt B (Hook & Offer Angle): Generate 10 high-retention hooks and 3 clear call-to-action lines for ${title} priced at ${price}.`, 82).map(
+            (ln, idx) => `BT /F1 10 Tf 0.1 0.12 0.16 rg 56 ${674 - idx * 15} Td (${escapePdfText(ln)}) Tj ET`
+          ),
+          ...wrapPdfLines(`Prompt C (QA & Polish): Audit my draft for ${title} and remove fluff, sharpen action verbs, and verify practical usability.`, 82).map(
+            (ln, idx) => `BT /F1 10 Tf 0.1 0.12 0.16 rg 56 ${626 - idx * 15} Td (${escapePdfText(ln)}) Tj ET`
+          ),
+          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 564 Td (2.2 Daily Batch Production SOP) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 540 Td (• Block 1 (30m): Select 1 core deliverable focus & gather reference inputs.) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 518 Td (• Block 2 (45m): Produce structured assets, checklists, and visual previews.) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 496 Td (• Block 3 (20m): Run QA check, export PDF/PNG files, and log status.) Tj ET`,
+          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 446 Td (2.3 Performance & Conversion Metrics) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 422 Td (• Completion Rate: % of steps/checklists finished within target window.) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 400 Td (• Click-to-View Ratio: Storefront & preview engagement rate.) Tj ET`,
+          `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 378 Td (• First-Buyer Conversion: Completed orders divided by qualified clicks.) Tj ET`,
+          `BT /F1 9.5 Tf 0.4 0.45 0.52 rg 48 42 Td (JOY CORPORATION • Page 3 of 4 • ${escapePdfText(title)}) Tj ET`
+        ].join("\n"),
+
+        // PAGE 4: 30-DAY EXECUTION SOP, GUMROAD LAUNCH & QA CHECKLIST
+        [
+          "q 0.086 0.196 0.357 rg 0 782 595 60 re f Q",
+          `BT /F2 14 Tf 1 1 1 rg 48 806 Td (CHAPTER 3: 30-DAY EXECUTION SOP & LAUNCH CHECKLIST) Tj ET`,
+          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 746 Td (3.1 30-Day Rollout Schedule) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 722 Td (• Week 1 (Foundation): Finalize niche positioning, core templates, and internal QA review.) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 700 Td (• Week 2 (Packaging): Export master PDF, 1280x720 thumbnail, and 800x1060 product cover.) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 678 Td (• Week 3 (Distribution): Publish on Gumroad at ${escapePdfText(price)}, distribute preview threads & demos.) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 656 Td (• Week 4 (Scale & Bundle): Collect buyer feedback, add bonus prompts, and launch tier-2 bundle.) Tj ET`,
-          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 606 Td (2.2 Gumroad Conversion & Listing Blueprint) Tj ET`,
+          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 606 Td (3.2 Gumroad Conversion & Listing Blueprint) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 582 Td (• Headline Formula: [Outcome] + [Timeframe] without [Primary Friction].) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 560 Td (• Thumbnail Rule: High-contrast Navy #16325B + Orange #E67E22 accent bar + 3 clear benefits.) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 538 Td (• Pricing Anchor: Entry tier at ${escapePdfText(price)} with instant PDF + template vault access.) Tj ET`,
-          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 488 Td (2.3 Pre-Publish Owner Quality Assurance Checklist) Tj ET`,
+          `BT /F2 12 Tf 0.086 0.196 0.357 rg 48 488 Td (3.3 Pre-Publish Owner Quality Assurance Checklist) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 464 Td ([X] Complete multi-page PDF verified with Cover + Actionable Chapters) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 442 Td ([X] High-resolution Cover PNG & Gumroad Thumbnail PNG exported) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 420 Td ([X] Gumroad product URL synced and Owner Approval confirmed) Tj ET`,
-          `BT /F2 11 Tf 0.086 0.196 0.357 rg 48 378 Td (2.4 Search Visibility & First-Buyer Acquisition Tags) Tj ET`,
-          ...wrapPdfLines("Search Keywords: " + buildPromptSaktiPack(item).searchTags.join(", "), 84).map(
+          `BT /F2 11 Tf 0.086 0.196 0.357 rg 48 378 Td (3.4 Search Visibility & First-Buyer Acquisition Tags) Tj ET`,
+          ...wrapPdfLines("Search Keywords: " + pack.searchTags.join(", "), 84).map(
             (ln, idx) => `BT /F1 9.5 Tf 0.1 0.12 0.16 rg 56 ${356 - idx * 14} Td (${escapePdfText(ln)}) Tj ET`
           ),
-          `BT /F1 9.5 Tf 0.4 0.45 0.52 rg 48 42 Td (JOY CORPORATION • Page 3 of 3 • Complete Deliverable Package) Tj ET`
+          `BT /F1 9.5 Tf 0.4 0.45 0.52 rg 48 42 Td (JOY CORPORATION • Page 4 of 4 • Complete Deliverable Package) Tj ET`
         ].join("\n")
       ];
 
-      // Build valid multi-page PDF 1.4 binary string
       const objects = [];
       const addObj = (body) => {
         objects.push(body);
@@ -1398,10 +1423,7 @@
 
       const pageIds = [];
       pagesContent.forEach((streamText) => {
-        const contentId = addObj(`<< /Length ${streamText.length} >>
-stream
-${streamText}
-endstream`);
+        const contentId = addObj(`<< /Length ${streamText.length} >>\nstream\n${streamText}\nendstream`);
         const pageId = addObj(
           `<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 ${fontRegularId} 0 R /F2 ${fontBoldId} 0 R >> >> /Contents ${contentId} 0 R >>`
         );
