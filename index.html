@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JOY CORPORATION — Operations &amp; Public Products</title>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#1E3A5F" />
   <style>
     :root {
       --navy: #16325b;
@@ -1992,6 +1994,15 @@
     setInterval(() => {
       runHourlyAutoOptimization(false);
     }, ONE_HOUR_MS);
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch((err) => {
+          console.warn("[SW] Registration failed:", err);
+        });
+      });
+    }
+
   </script>
   <!-- Supabase PIN Gate & Assets Modal -->
   <div id="supabasePinModal" class="pin-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pinModalTitle">
