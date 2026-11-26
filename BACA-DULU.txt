@@ -1,0 +1,20 @@
+JOY CORPORATION - Kantor Virtual 5 Divisi
+
+CARA PAKAI CEPAT
+1. Ekstrak file zip ini.
+2. Buka joy-corporation.html dengan Chrome.
+3. Masuk dengan PIN dasar milik owner (ganti di tab Setelan; tombol Lupa PIN mengembalikan ke PIN dasar).
+4. Setelan > Tambah kunci API (Groq, Claude, Gemini, dll.) lalu tekan "Tambah dan cek".
+5. Tab Request > tulis produk > Mulai produksi. Hasil ada di tab Aset dan bisa diunduh.
+
+UNTUK DIPASANG SEBAGAI APLIKASI
+Unggah 5 file ini bersama-sama ke hosting statis:
+index.html, manifest.json, sw.js, icon-192.png, icon-512.png
+(joy-corporation.html tidak perlu diunggah, isinya sama dengan index.html)
+Buka alamatnya di Chrome > menu titik tiga > Instal aplikasi.
+
+CATATAN
+- Data dan kunci API tersimpan hanya di HP ini. Rutin unduh cadangan di Setelan.
+- Hasil riset pasar dari AI adalah perkiraan.
+- Pembayaran dikirim platform (mis. Gumroad) ke rekening Anda; aplikasi hanya pencatat.
+4. Aset dan Setelan dilindungi PIN. Tab Publik menampilkan produk yang sudah dipublikasikan di Gumroad; unduh katalog publik dan unggah sebagai catalog.html.
