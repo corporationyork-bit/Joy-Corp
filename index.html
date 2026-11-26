@@ -1084,6 +1084,117 @@
     ];
 
 
+
+    // ==================== PROMPT SAKTI (SEARCH, SEO & FIRST BUYER ENGINE) ====================
+    function buildPromptSaktiPack(item) {
+      const title = item.title || "JOY CORPORATION Digital Product";
+      const category = String(item.type || "blueprint").toLowerCase();
+      const price = item.price || "$9.99";
+      const gumroadUrl = item.gumroad_url || buildGumroadDraftUrl(title);
+      const highlights = Array.isArray(item.highlights) && item.highlights.length
+        ? item.highlights
+        : [
+            "Step-by-step system & actionable workflow",
+            "Ready-to-use templates & checklists",
+            "Fast implementation without guesswork"
+          ];
+
+      const slugWords = title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]+/g, " ")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+      const primaryKw = slugWords.slice(0, 4).join(" ") || "digital product guide";
+      const searchTags = [
+        primaryKw,
+        `${category} template`,
+        `${category} blueprint`,
+        "step by step guide",
+        "actionable checklist",
+        "productivity workflow",
+        "creator toolkit",
+        "gumroad digital product",
+        "instant download",
+        "joy corporation"
+      ];
+
+      const seoTitle = `${title} — Complete ${category.toUpperCase()} Guide, Templates & SOP (${price})`;
+      const seoMetaDesc = `Get ${title} (${price}) by JOY CORPORATION. Includes ${highlights.join(", ")}. Instant PDF + cover + thumbnail download for immediate execution.`;
+
+      const hooks = [
+        `Stop overcomplicating ${primaryKw} — use this exact step-by-step system to ship faster (${price}): ${gumroadUrl}`,
+        `Want a clean, practical ${category} for ${primaryKw}? Everything is structured inside: ${highlights[0]}. Grab it here: ${gumroadUrl}`,
+        `Day 1 blueprint for ${primaryKw}: skip trial-and-error with our ready-to-use checklist & workflow (${price}) → ${gumroadUrl}`
+      ];
+
+      const masterPromptSakti = [
+        `MASTER PROMPT SAKTI — ${title.toUpperCase()}`,
+        `Role: Senior Growth Marketer, SEO Specialist & Gumroad Conversion Copywriter for JOY CORPORATION.`,
+        `Product: ${title} (${price}) | Category: ${category} | URL: ${gumroadUrl}`,
+        `Core Value: ${item.summary || ""}`,
+        `Key Pillars: ${highlights.join(" | ")}`,
+        `Task: Generate high-ranking search titles, Gumroad sales copy, 5 short-form video hooks (TikTok/Reels/Shorts), 5 X/Threads posts, and FAQ objections tailored to buyers searching for "${primaryKw}" and "${category} template". Emphasize instant value, clear structure, and low-friction first purchase at ${price}.`
+      ].join("\n");
+
+      return {
+        primaryKw,
+        seoTitle,
+        seoMetaDesc,
+        searchTags,
+        hooks,
+        masterPromptSakti
+      };
+    }
+
+    window.copyPromptSakti = async function copyPromptSakti(sourceType, itemId) {
+      const list = sourceType === "public" ? (window.publicProducts || []) : (window.ownerProductAssets || []);
+      const item = list.find((x) => String(x.id) === String(itemId));
+      if (!item) return;
+
+      const pack = buildPromptSaktiPack(item);
+      const formatted = [
+        `=== PROMPT SAKTI: ${item.title} ===`,
+        `SEO Title: ${pack.seoTitle}`,
+        `SEO Meta: ${pack.seoMetaDesc}`,
+        `Search Tags: ${pack.searchTags.join(", ")}`,
+        ``,
+        `--- HOOKS & PROMO FIRST BUYER ---`,
+        ...pack.hooks.map((h, i) => `${i + 1}. ${h}`),
+        ``,
+        `--- MASTER PROMPT SAKTI ---`,
+        pack.masterPromptSakti
+      ].join("\n");
+
+      try {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+          await navigator.clipboard.writeText(formatted);
+        }
+      } catch (_) {}
+
+      const previewEl = document.getElementById("assetTabDetailPreview");
+      if (previewEl) {
+        previewEl.style.display = "block";
+        previewEl.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
+            <strong style="color:var(--navy); font-size:13px;">Prompt Sakti Siap Pakai (Tersalin ke Clipboard): ${esc(item.title)}</strong>
+            <button type="button" class="btn" style="padding:3px 8px; font-size:11px;" onclick="document.getElementById('assetTabDetailPreview').style.display='none'">Tutup</button>
+          </div>
+          <div style="font-size:11px; color:var(--navy); font-weight:700; margin-bottom:4px;">SEO Title:</div>
+          <div style="background:#fff; border:1px solid var(--border); border-radius:7px; padding:7px; margin-bottom:6px;">${esc(pack.seoTitle)}</div>
+          <div style="font-size:11px; color:var(--navy); font-weight:700; margin-bottom:4px;">Search Tags (10):</div>
+          <div style="background:#fff; border:1px solid var(--border); border-radius:7px; padding:7px; margin-bottom:6px;">${esc(pack.searchTags.join(" • "))}</div>
+          <div style="font-size:11px; color:var(--navy); font-weight:700; margin-bottom:4px;">Hook Pelanggan Pertama:</div>
+          <ul style="margin:0 0 6px 16px; color:var(--text);">
+            ${pack.hooks.map((h) => `<li>${esc(h)}</li>`).join("")}
+          </ul>
+          <div style="font-size:11px; color:var(--navy); font-weight:700; margin-bottom:4px;">Master Prompt Sakti:</div>
+          <pre style="white-space:pre-wrap; background:#fff; border:1px solid var(--border); border-radius:7px; padding:8px; font-size:11px; color:var(--text);">${esc(pack.masterPromptSakti)}</pre>
+        `;
+      }
+    };
+
     // ==================== COMPLETE PDF + COVER + THUMBNAIL GENERATOR ====================
     function buildFullProductCoverDataUri(title, subtitle, category, price) {
       const safeTitle = String(title || "JOY CORPORATION PRODUCT").slice(0, 34).replace(/[<>&"]/g, "");
@@ -1163,9 +1274,9 @@
     function escapePdfText(str) {
       return String(str || "")
         .replace(/[^ -~]/g, "-")
-        .replace(/\/g, "\\")
-        .replace(/\(/g, "\(")
-        .replace(/\)/g, "\)");
+        .replace(/\\/g, "\\\\")
+        .replace(/\(/g, "\\(")
+        .replace(/\)/g, "\\)");
     }
 
     function wrapPdfLines(text, maxChars) {
@@ -1265,6 +1376,10 @@
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 464 Td ([X] Complete multi-page PDF verified with Cover + Actionable Chapters) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 442 Td ([X] High-resolution Cover PNG & Gumroad Thumbnail PNG exported) Tj ET`,
           `BT /F1 10.5 Tf 0.1 0.12 0.16 rg 56 420 Td ([X] Gumroad product URL synced and Owner Approval confirmed) Tj ET`,
+          `BT /F2 11 Tf 0.086 0.196 0.357 rg 48 378 Td (2.4 Search Visibility & First-Buyer Acquisition Tags) Tj ET`,
+          ...wrapPdfLines("Search Keywords: " + buildPromptSaktiPack(item).searchTags.join(", "), 84).map(
+            (ln, idx) => `BT /F1 9.5 Tf 0.1 0.12 0.16 rg 56 ${356 - idx * 14} Td (${escapePdfText(ln)}) Tj ET`
+          ),
           `BT /F1 9.5 Tf 0.4 0.45 0.52 rg 48 42 Td (JOY CORPORATION • Page 3 of 3 • Complete Deliverable Package) Tj ET`
         ].join("\n")
       ];
@@ -1296,32 +1411,20 @@ endstream`);
       objects[pagesId - 1] = `<< /Type /Pages /Kids [${pageIds.map((id) => `${id} 0 R`).join(" ")}] /Count ${pageIds.length} >>`;
       objects[catalogId - 1] = `<< /Type /Catalog /Pages ${pagesId} 0 R >>`;
 
-      let pdf = "%PDF-1.4
-";
+      let pdf = "%PDF-1.4\n";
       const offsets = [0];
       objects.forEach((objBody, idx) => {
         offsets.push(pdf.length);
-        pdf += `${idx + 1} 0 obj
-${objBody}
-endobj
-`;
+        pdf += `${idx + 1} 0 obj\n${objBody}\nendobj\n`;
       });
 
       const xrefPos = pdf.length;
-      pdf += `xref
-0 ${objects.length + 1}
-`;
-      pdf += "0000000000 65535 f 
-";
+      pdf += `xref\n0 ${objects.length + 1}\n`;
+      pdf += "0000000000 65535 f \n";
       for (let i = 1; i <= objects.length; i++) {
-        pdf += `${String(offsets[i]).padStart(10, "0")} 00000 n 
-`;
+        pdf += `${String(offsets[i]).padStart(10, "0")} 00000 n \n`;
       }
-      pdf += `trailer
-<< /Size ${objects.length + 1} /Root ${catalogId} 0 R >>
-startxref
-${xrefPos}
-%%EOF`;
+      pdf += `trailer\n<< /Size ${objects.length + 1} /Root ${catalogId} 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;
 
       return new Blob([pdf], { type: "application/pdf" });
     }
@@ -1721,6 +1824,7 @@ ${xrefPos}
               <button type="button" class="btn btn-copy-data" style="padding:5px 7px; font-size:11px;" onclick="downloadCompleteProductPdf('public', '${esc(item.id)}')">PDF</button>
               <button type="button" class="btn" style="padding:5px 7px; font-size:11px;" onclick="downloadCompleteProductCover('public', '${esc(item.id)}')">Cover</button>
               <button type="button" class="btn" style="padding:5px 7px; font-size:11px;" onclick="downloadCompleteProductThumbnail('public', '${esc(item.id)}')">Thumb</button>
+              <button type="button" class="btn btn-orange" style="padding:5px 7px; font-size:11px;" onclick="copyPromptSakti('public', '${esc(item.id)}')">Prompt Sakti</button>
               ${gumroadHtml}
               <button type="button" class="btn btn-delete" style="padding:5px 7px; font-size:11px;" onclick="deleteSingleSectionItem('public', '${esc(item.id)}')">Delete</button>
             </div>
@@ -2109,6 +2213,7 @@ ${xrefPos}
                 <button type="button" class="btn" style="padding:5px 8px; font-size:11px;" onclick="downloadCompleteProductCover('asset', '${esc(asset.id)}')">Cover</button>
                 <button type="button" class="btn" style="padding:5px 8px; font-size:11px;" onclick="downloadCompleteProductThumbnail('asset', '${esc(asset.id)}')">Thumbnail</button>
                 <button type="button" class="btn btn-move-data" style="padding:5px 8px; font-size:11px;" onclick="downloadFullProductBundle('asset', '${esc(asset.id)}')">Paket Lengkap</button>
+                <button type="button" class="btn btn-orange" style="padding:5px 8px; font-size:11px;" onclick="copyPromptSakti('asset', '${esc(asset.id)}')">Prompt Sakti</button>
               </div>
               <button type="button" class="btn btn-delete" style="padding:5px 8px; font-size:11px;" onclick="deleteAssetTabItem('${esc(asset.id)}')">Hapus</button>
             </div>
