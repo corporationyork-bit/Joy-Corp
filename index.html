@@ -603,24 +603,47 @@
     /* Copy & Move Data Controls */
     .transfer-bar {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: center;
       gap: 6px;
       background: var(--surface-soft);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 8px 10px;
-      font-size: 12px;
+      padding: 7px 9px;
+      font-size: 11px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .transfer-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .transfer-bar > span:first-child {
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-weight: 600;
+      color: var(--navy);
     }
 
     .transfer-select {
-      padding: 6px 9px;
+      padding: 5px 7px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       background: var(--surface);
       color: var(--text);
+      min-width: 0;
+      flex: 1 1 auto;
+      max-width: 170px;
+    }
+
+    .transfer-bar .btn {
+      padding: 5px 8px;
+      font-size: 11px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .btn-copy-data {
@@ -636,10 +659,12 @@
     }
 
     .transfer-status {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       color: var(--muted);
       margin-left: auto;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     /* App Entry PIN Gate */
     .app-gate-backdrop {
@@ -1700,6 +1725,7 @@
     window.resetForgotPin = function resetForgotPin(context = "modal") {
       if (!confirm("Reset PIN ke PIN awal? Lanjutkan?")) return;
       setStoredSupabasePin(DEFAULT_SUPABASE_PIN);
+      setAppSessionUnlocked(false);
 
       if (context === "app") {
         const appInput = document.getElementById("appEntryPinInput");
@@ -1753,12 +1779,37 @@
 
       if (errEl) errEl.textContent = "";
       if (inputEl) inputEl.value = "";
+      setAppSessionUnlocked(true);
       if (gateEl) gateEl.classList.add("unlocked");
     };
+
+    const APP_SESSION_UNLOCKED_KEY = "joy_app_session_unlocked_v1";
+
+    function setAppSessionUnlocked(unlocked) {
+      try {
+        if (unlocked) {
+          sessionStorage.setItem(APP_SESSION_UNLOCKED_KEY, "1");
+        } else {
+          sessionStorage.removeItem(APP_SESSION_UNLOCKED_KEY);
+        }
+      } catch (_) {}
+    }
+
+    function isAppSessionUnlocked() {
+      try {
+        return sessionStorage.getItem(APP_SESSION_UNLOCKED_KEY) === "1";
+      } catch (_) {
+        return false;
+      }
+    }
 
     (function initAppEntryGate() {
       const gateEl = document.getElementById("appEntryGate");
       const inputEl = document.getElementById("appEntryPinInput");
+      if (isAppSessionUnlocked()) {
+        if (gateEl) gateEl.classList.add("unlocked");
+        return;
+      }
       if (gateEl) gateEl.classList.remove("unlocked");
       if (inputEl) {
         setTimeout(() => inputEl.focus(), 50);
