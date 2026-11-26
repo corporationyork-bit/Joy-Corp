@@ -767,10 +767,10 @@
         Public Products
       </button>
       <button type="button" class="nav-tab" data-tab="worklog" onclick="switchTopTab('worklog')">
-        Work Log
+        Working
       </button>
       <button type="button" class="nav-tab" data-tab="orders" onclick="switchTopTab('orders')">
-        Orders
+        Asset
       </button>
     </nav>
 
@@ -791,14 +791,14 @@
 
         <button type="button" class="stat-card" onclick="switchTopTab('worklog')">
           <div class="stat-label">Activity</div>
-          <div class="stat-title">Work Log</div>
-          <div id="count-worklog" class="stat-meta">0 entries • Click to open</div>
+          <div class="stat-title">Working</div>
+          <div id="count-worklog" class="stat-meta">0 working • Click to open</div>
         </button>
 
         <button type="button" class="stat-card" onclick="switchTopTab('orders')">
-          <div class="stat-label">Sales</div>
-          <div class="stat-title">Orders</div>
-          <div id="count-orders" class="stat-meta">0 orders • Click to open</div>
+          <div class="stat-label">Vault</div>
+          <div class="stat-title">Asset</div>
+          <div id="count-orders" class="stat-meta">0 assets • Click to open</div>
         </button>
       </div>
 
@@ -818,8 +818,8 @@
           <select id="transferTarget-pending" class="transfer-select" aria-label="Target section for Pending Products">
             <option value="pipeline">Pipeline Queue</option>
             <option value="public">Public Products</option>
-            <option value="worklog">Work Log</option>
-            <option value="orders">Orders</option>
+            <option value="worklog">Working</option>
+            <option value="orders">Asset</option>
           </select>
           <button type="button" class="btn btn-copy-data" onclick="copySectionData('pending')">Salin Data</button>
           <button type="button" class="btn btn-move-data" onclick="moveSectionData('pending')">Pindahkan Data</button>
@@ -844,8 +844,8 @@
           <select id="transferTarget-pipeline" class="transfer-select" aria-label="Target section for Pipeline Queue">
             <option value="pending">Pending Products</option>
             <option value="public">Public Products</option>
-            <option value="worklog">Work Log</option>
-            <option value="orders">Orders</option>
+            <option value="worklog">Working</option>
+            <option value="orders">Asset</option>
           </select>
           <button type="button" class="btn btn-copy-data" onclick="copySectionData('pipeline')">Salin Data</button>
           <button type="button" class="btn btn-move-data" onclick="moveSectionData('pipeline')">Pindahkan Data</button>
@@ -866,8 +866,8 @@
         <select id="transferTarget-public" class="transfer-select" aria-label="Target section for Public Products">
           <option value="pending">Pending Products</option>
           <option value="pipeline">Pipeline Queue</option>
-          <option value="worklog">Work Log</option>
-          <option value="orders">Orders</option>
+          <option value="worklog">Working</option>
+          <option value="orders">Asset</option>
         </select>
         <button type="button" class="btn btn-copy-data" onclick="copySectionData('public')">Salin Data</button>
         <button type="button" class="btn btn-move-data" onclick="moveSectionData('public')">Pindahkan Data</button>
@@ -895,23 +895,58 @@
       <div id="list-public"></div>
     </section>
 
-    <!-- ==================== WORK LOG ==================== -->
+    <!-- ==================== WORKING ==================== -->
     <section id="view-worklog" class="panel">
       <div class="panel-head">
-        <h2 class="panel-title">Work Log</h2>
+        <h2 class="panel-title">Working — Produksi Otomatis &amp; Request Produk</h2>
         <div class="panel-actions">
+          <button type="button" class="btn btn-orange" onclick="addAutoWorkingItem()">+ Produksi Otomatis</button>
           <button type="button" class="btn btn-delete-all" data-delete-all="worklog" onclick="deleteAllSectionItems('worklog')">
             Delete All
           </button>
         </div>
       </div>
+
+      <form onsubmit="addRequestWorkingItem(event)" style="display:flex; flex-wrap:wrap; gap:8px; background:var(--surface-soft); border:1px solid var(--border); border-radius:10px; padding:9px;">
+        <input
+          id="workingRequestTitle"
+          type="text"
+          class="search-input"
+          style="flex:2 1 180px; padding:7px 10px; font-size:12px;"
+          placeholder="Request produk baru..."
+          required
+        />
+        <input
+          id="workingRequestQty"
+          type="number"
+          min="1"
+          max="999"
+          value="1"
+          class="search-input"
+          style="flex:0 1 85px; padding:7px 10px; font-size:12px;"
+          aria-label="Qty"
+          placeholder="Qty"
+          required
+        />
+        <input
+          id="workingRequestProgress"
+          type="text"
+          class="search-input"
+          style="flex:1 1 130px; padding:7px 10px; font-size:12px;"
+          value="25%"
+          aria-label="Progress"
+          placeholder="Progress (mis. 25%)"
+        />
+        <button type="submit" class="btn btn-orange" style="padding:7px 12px;">+ Request Produk</button>
+      </form>
+
       <div class="transfer-bar">
         <span>Salin / Pindah:</span>
-        <select id="transferTarget-worklog" class="transfer-select" aria-label="Target section for Work Log">
+        <select id="transferTarget-worklog" class="transfer-select" aria-label="Target section for Working">
           <option value="pending">Pending Products</option>
           <option value="pipeline">Pipeline Queue</option>
           <option value="public">Public Products</option>
-          <option value="orders">Orders</option>
+          <option value="orders">Asset</option>
         </select>
         <button type="button" class="btn btn-copy-data" onclick="copySectionData('worklog')">Salin Data</button>
         <button type="button" class="btn btn-move-data" onclick="moveSectionData('worklog')">Pindahkan Data</button>
@@ -920,29 +955,55 @@
       <div id="list-worklog" class="table-wrap"></div>
     </section>
 
-    <!-- ==================== ORDERS ==================== -->
+    <!-- ==================== ASSET (PIN PROTECTED + COMPLETE DISPLAY) ==================== -->
     <section id="view-orders" class="panel">
       <div class="panel-head">
-        <h2 class="panel-title">Orders</h2>
-        <div class="panel-actions">
-          <button type="button" class="btn btn-delete-all" data-delete-all="orders" onclick="deleteAllSectionItems('orders')">
-            Delete All
-          </button>
+        <h2 class="panel-title">Asset — Hasil Produk Owner</h2>
+        <div class="panel-actions" id="assetTabOwnerActions" style="display:none;">
+          <button type="button" class="btn btn-copy-data" onclick="downloadAllOwnerAssets()">Unduh Semua (.json)</button>
+          <button type="button" class="btn" onclick="lockAssetTab()">Kunci PIN</button>
         </div>
       </div>
-      <div class="transfer-bar">
-        <span>Salin / Pindah:</span>
-        <select id="transferTarget-orders" class="transfer-select" aria-label="Target section for Orders">
-          <option value="pending">Pending Products</option>
-          <option value="pipeline">Pipeline Queue</option>
-          <option value="public">Public Products</option>
-          <option value="worklog">Work Log</option>
-        </select>
-        <button type="button" class="btn btn-copy-data" onclick="copySectionData('orders')">Salin Data</button>
-        <button type="button" class="btn btn-move-data" onclick="moveSectionData('orders')">Pindahkan Data</button>
-        <span id="transferStatus-orders" class="transfer-status"></span>
+
+      <div id="assetTabPinGate" style="display:flex; flex-direction:column; gap:10px; background:var(--surface-soft); border:1px solid var(--border); border-radius:10px; padding:14px;">
+        <div style="font-size:13px; font-weight:800; color:var(--navy);">Akses Asset Terkunci PIN</div>
+        <p style="font-size:12px; color:var(--muted);">
+          Masukkan PIN owner untuk membuka daftar aset hasil produk (tampilan lengkap gambar, lihat, hapus, dan download).
+        </p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+          <input
+            id="assetTabPinInput"
+            type="password"
+            inputmode="numeric"
+            maxlength="12"
+            class="pin-field"
+            style="flex:1 1 180px;"
+            placeholder="Masukkan PIN owner..."
+            onkeydown="if(event.key==='Enter'){ event.preventDefault(); verifyAssetTabPin(); }"
+          />
+          <button type="button" class="btn btn-orange" onclick="verifyAssetTabPin()">Buka Asset</button>
+          <button type="button" class="btn" onclick="resetForgotPin('asset')">Lupa PIN?</button>
+        </div>
+        <div id="assetTabPinError" class="pin-error"></div>
       </div>
-      <div id="list-orders" class="table-wrap"></div>
+
+      <div id="assetTabUnlockedContent" style="display:none; flex-direction:column; gap:12px;">
+        <div class="transfer-bar">
+          <span>Salin / Pindah:</span>
+          <select id="transferTarget-orders" class="transfer-select" aria-label="Target section for Asset">
+            <option value="pending">Pending Products</option>
+            <option value="pipeline">Pipeline Queue</option>
+            <option value="public">Public Products</option>
+            <option value="worklog">Working</option>
+          </select>
+          <button type="button" class="btn btn-copy-data" onclick="copySectionData('orders')">Salin Data</button>
+          <button type="button" class="btn btn-move-data" onclick="moveSectionData('orders')">Pindahkan Data</button>
+          <span id="transferStatus-orders" class="transfer-status"></span>
+        </div>
+
+        <div id="assetTabDetailPreview" style="display:none; background:var(--navy-soft); border:1px solid var(--border); border-radius:10px; padding:12px; font-size:12px;"></div>
+        <div id="list-orders" class="table-wrap"></div>
+      </div>
     </section>
   </div>
 
@@ -967,8 +1028,29 @@
     ];
 
     window.workLogs = Array.isArray(window.workLogs) ? window.workLogs : [
-      { id: "log-1", message: "Auto-Opt 1h scheduled (every 60m) • Trims log > 200 & syncs counters", timestamp: "Active" }
+      {
+        id: "wrk-1",
+        mode: "Produksi Otomatis",
+        product_name: "AI-Powered 3D Interior Design Blueprint",
+        qty: 5,
+        progress: "80%"
+      },
+      {
+        id: "wrk-2",
+        mode: "Request Produk",
+        product_name: "Faceless Aesthetic Photo & B-Roll Content Kit",
+        qty: 3,
+        progress: "45%"
+      }
     ];
+
+    const AUTO_WORK_PRODUCTS = [
+      { title: "Notion Finance & Habit Tracker System", type: "toolkit", qty: 4, progress: "35%" },
+      { title: "SaaS Landing Page Copywriting Matrix", type: "blueprint", qty: 2, progress: "60%" },
+      { title: "Short-Form Video Hook & Script Vault", type: "ebook", qty: 6, progress: "20%" },
+      { title: "Freelance Proposal & Scope Template Pack", type: "toolkit", qty: 3, progress: "50%" }
+    ];
+    let autoWorkCursor = 0;
 
     window.ordersList = Array.isArray(window.ordersList) ? window.ordersList : [
       { id: "ord-1", order_code: "ORD-1001", product_title: "AI-Powered 3D Interior Design Blueprint", channel: "Gumroad", status: "PAID" }
@@ -1001,12 +1083,20 @@
       }
     ];
 
+    function buildAssetThumbnailDataUri(title, badgeText) {
+      const safeTitle = String(title || "JOY ASSET").slice(0, 28).replace(/[<>&"]/g, "");
+      const safeBadge = String(badgeText || "ASSET").slice(0, 12).replace(/[<>&"]/g, "");
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="140" viewBox="0 0 320 140"><rect width="320" height="140" rx="12" fill="#16325b"/><rect x="16" y="16" width="36" height="4" rx="2" fill="#e67e22"/><text x="16" y="42" fill="#fdba74" font-family="Arial,sans-serif" font-size="11" font-weight="700">${safeBadge}</text><text x="16" y="72" fill="#ffffff" font-family="Arial,sans-serif" font-size="15" font-weight="800">${safeTitle}</text><text x="16" y="114" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="11">JOY CORPORATION • OWNER VAULT</text></svg>`;
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    }
+
     const DEFAULT_OWNER_ASSETS = [
       {
         id: "ast-1",
         title: "AI-Powered 3D Interior Design Blueprint (Master Package)",
         type: "blueprint",
         format: "Markdown / Kit",
+        image: buildAssetThumbnailDataUri("AI-Powered 3D Interior Design", "BLUEPRINT"),
         summary: "Full deliverable package: market insights, AI workflow architecture, GTM roadmap & finance.",
         highlights: [
           "Market insights & trends",
@@ -1019,6 +1109,7 @@
         title: "Faceless Aesthetic Photo & B-Roll Content Kit (Master Package)",
         type: "toolkit",
         format: "Prompt & Shot Sheet",
+        image: buildAssetThumbnailDataUri("Faceless Aesthetic Photo & B-Roll", "TOOLKIT"),
         summary: "Complete prompt bank, daily batch shooting checklist, and hook/caption pairing guide.",
         highlights: [
           "45+ scene & camera angle prompts",
@@ -1031,6 +1122,7 @@
         title: "Cold DM & Client Closing Script Playbook",
         type: "ebook",
         format: "Playbook",
+        image: buildAssetThumbnailDataUri("Cold DM & Closing Script Playbook", "EBOOK"),
         summary: "Outreach sequences, objection responses, and closing call framework.",
         highlights: [
           "Cold DM scripts & follow-ups",
@@ -1142,7 +1234,7 @@
       const pCount = (window.pendingProducts || []).length;
       const qCount = (window.pipelineQueue || []).length;
       const wCount = (window.workLogs || []).length;
-      const oCount = (window.ordersList || []).length;
+      const aCount = (window.ownerProductAssets || []).length;
       const pubCount = (window.publicProducts || []).length;
 
       const elPending = document.getElementById("count-pending");
@@ -1153,8 +1245,8 @@
 
       if (elPending) elPending.textContent = `${pCount} pending • Click to open`;
       if (elPipeline) elPipeline.textContent = `${qCount} queued • Click to open`;
-      if (elWorklog) elWorklog.textContent = `${wCount} entries • Click to open`;
-      if (elOrders) elOrders.textContent = `${oCount} orders • Click to open`;
+      if (elWorklog) elWorklog.textContent = `${wCount} working • Click to open`;
+      if (elOrders) elOrders.textContent = `${aCount} assets • Click to open`;
       if (elPubInline) elPubInline.textContent = `${pubCount} ${pubCount === 1 ? "product" : "products"}`;
 
       syncProductionAndNotifDot();
@@ -1323,26 +1415,98 @@
       container.appendChild(frag);
     }
 
+    window.addAutoWorkingItem = function addAutoWorkingItem() {
+      const existingTitles = new Set((window.workLogs || []).map((w) => String(w.product_name || w.message || "").toLowerCase()));
+      let picked = null;
+      for (let i = 0; i < AUTO_WORK_PRODUCTS.length; i++) {
+        const cand = AUTO_WORK_PRODUCTS[(autoWorkCursor + i) % AUTO_WORK_PRODUCTS.length];
+        if (!existingTitles.has(cand.title.toLowerCase())) {
+          picked = cand;
+          autoWorkCursor = (autoWorkCursor + i + 1) % AUTO_WORK_PRODUCTS.length;
+          break;
+        }
+      }
+      if (!picked) {
+        const base = AUTO_WORK_PRODUCTS[autoWorkCursor % AUTO_WORK_PRODUCTS.length];
+        autoWorkCursor = (autoWorkCursor + 1) % AUTO_WORK_PRODUCTS.length;
+        picked = {
+          title: `${base.title} #${(window.workLogs || []).length + 1}`,
+          type: base.type,
+          qty: base.qty,
+          progress: "30%"
+        };
+      }
+
+      const nextItem = {
+        id: `wrk-${Date.now().toString(36)}`,
+        mode: "Produksi Otomatis",
+        product_name: picked.title,
+        qty: picked.qty,
+        progress: picked.progress
+      };
+
+      window.workLogs = [...(window.workLogs || []), nextItem];
+      renderWorkLogPanel();
+      updateDashboardCounters();
+    };
+
+    window.addRequestWorkingItem = function addRequestWorkingItem(evt) {
+      if (evt) evt.preventDefault();
+      const titleEl = document.getElementById("workingRequestTitle");
+      const qtyEl = document.getElementById("workingRequestQty");
+      const progEl = document.getElementById("workingRequestProgress");
+
+      const title = String(titleEl?.value || "").trim();
+      const qty = Math.max(1, parseInt(qtyEl?.value || "1", 10) || 1);
+      const progress = String(progEl?.value || "25%").trim() || "25%";
+      if (!title) return;
+
+      const nextItem = {
+        id: `wrk-${Date.now().toString(36)}`,
+        mode: "Request Produk",
+        product_name: title,
+        qty,
+        progress
+      };
+
+      window.workLogs = [...(window.workLogs || []), nextItem];
+      if (titleEl) titleEl.value = "";
+      if (qtyEl) qtyEl.value = "1";
+      if (progEl) progEl.value = "25%";
+
+      renderWorkLogPanel();
+      updateDashboardCounters();
+    };
+
     function renderWorkLogPanel() {
       const container = document.getElementById("list-worklog");
       const list = window.workLogs || [];
       if (!container) return;
 
       if (!list.length) {
-        container.innerHTML = `<div class="empty">Work log is empty.</div>`;
+        container.innerHTML = `<div class="empty">Belum ada item di Working.</div>`;
         return;
       }
 
       const frag = document.createDocumentFragment();
       const table = document.createElement("table");
-      table.innerHTML = `<thead><tr><th>Entry</th><th>Time</th><th>Action</th></tr></thead>`;
+      table.innerHTML = `<thead><tr><th>Produksi Otomatis / Request Produk</th><th>Qty</th><th>Progress</th><th>Action</th></tr></thead>`;
       const tbody = document.createElement("tbody");
 
       list.forEach((item) => {
+        const modeLabel = item.mode || item.type || "Produksi Otomatis";
+        const productTitle = item.product_name || item.title || item.message || "Produk";
+        const qtyVal = item.qty ?? 1;
+        const progVal = item.progress || item.status || "0%";
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${esc(item.message || item.title || "Log entry")}</td>
-          <td>${esc(item.timestamp || item.created_at || "-")}</td>
+          <td>
+            <div style="font-size:11px; font-weight:800; color:var(--orange); text-transform:uppercase;">${esc(modeLabel)}</div>
+            <div style="font-weight:700; color:var(--navy);">${esc(productTitle)}</div>
+          </td>
+          <td>${esc(qtyVal)}</td>
+          <td>${esc(progVal)}</td>
           <td><button type="button" class="btn btn-delete" onclick="deleteSingleSectionItem('worklog', '${esc(item.id)}')">Delete</button></td>
         `;
         tbody.appendChild(tr);
@@ -1354,34 +1518,148 @@
       container.appendChild(frag);
     }
 
+    let isAssetTabUnlocked = false;
+
+    window.verifyAssetTabPin = function verifyAssetTabPin() {
+      const inputEl = document.getElementById("assetTabPinInput");
+      const errEl = document.getElementById("assetTabPinError");
+      const entered = String(inputEl?.value || "").trim();
+      const currentPin = getStoredSupabasePin();
+
+      if (!entered) {
+        if (errEl) {
+          errEl.style.color = "var(--danger-text)";
+          errEl.textContent = "PIN wajib diisi.";
+        }
+        return;
+      }
+
+      if (entered !== currentPin) {
+        if (errEl) {
+          errEl.style.color = "var(--danger-text)";
+          errEl.textContent = "PIN salah. Coba lagi.";
+        }
+        if (inputEl) inputEl.select();
+        return;
+      }
+
+      isAssetTabUnlocked = true;
+      if (errEl) errEl.textContent = "";
+      if (inputEl) inputEl.value = "";
+      syncAssetTabVisibility();
+      renderOrdersPanel();
+    };
+
+    window.lockAssetTab = function lockAssetTab() {
+      isAssetTabUnlocked = false;
+      const previewEl = document.getElementById("assetTabDetailPreview");
+      if (previewEl) previewEl.style.display = "none";
+      syncAssetTabVisibility();
+    };
+
+    function syncAssetTabVisibility() {
+      const gateEl = document.getElementById("assetTabPinGate");
+      const contentEl = document.getElementById("assetTabUnlockedContent");
+      const actionsEl = document.getElementById("assetTabOwnerActions");
+      const errEl = document.getElementById("assetTabPinError");
+
+      if (gateEl) gateEl.style.display = isAssetTabUnlocked ? "none" : "flex";
+      if (contentEl) contentEl.style.display = isAssetTabUnlocked ? "flex" : "none";
+      if (actionsEl) actionsEl.style.display = isAssetTabUnlocked ? "flex" : "none";
+      if (!isAssetTabUnlocked && errEl) errEl.textContent = "";
+    }
+
+    window.viewAssetTabDetail = function viewAssetTabDetail(assetId) {
+      const previewEl = document.getElementById("assetTabDetailPreview");
+      const asset = (window.ownerProductAssets || []).find((a) => String(a.id) === String(assetId));
+      if (!previewEl || !asset) return;
+
+      const thumb = asset.image || buildAssetThumbnailDataUri(asset.title, asset.type || "ASSET");
+      const highlightsHtml = Array.isArray(asset.highlights) && asset.highlights.length
+        ? `<ul style="margin:6px 0 0 16px;">${asset.highlights.map((h) => `<li>${esc(h)}</li>`).join("")}</ul>`
+        : "";
+
+      previewEl.style.display = "block";
+      previewEl.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <strong style="color:var(--navy); font-size:13px;">${esc(asset.title)}</strong>
+          <button type="button" class="btn" style="padding:3px 8px; font-size:11px;" onclick="document.getElementById('assetTabDetailPreview').style.display='none'">Tutup</button>
+        </div>
+        <img src="${esc(thumb)}" alt="${esc(asset.title)}" style="width:100%; max-height:170px; object-fit:cover; border-radius:8px; border:1px solid var(--border); margin-bottom:8px;" />
+        <div style="color:var(--muted);">${esc(asset.summary || "Aset hasil produksi JOY CORPORATION.")}</div>
+        ${highlightsHtml}
+      `;
+    };
+
+    window.deleteAssetTabItem = function deleteAssetTabItem(assetId) {
+      const list = window.ownerProductAssets || [];
+      const target = list.find((a) => String(a.id) === String(assetId));
+      if (!target) return;
+      if (!confirm(`Hapus aset "${target.title || "aset ini"}"?`)) return;
+
+      const nextList = list.filter((a) => String(a.id) !== String(assetId));
+      saveOwnerAssets(nextList);
+
+      const previewEl = document.getElementById("assetTabDetailPreview");
+      if (previewEl) previewEl.style.display = "none";
+
+      renderOrdersPanel();
+      updateDashboardCounters();
+    };
+
     function renderOrdersPanel() {
       const container = document.getElementById("list-orders");
-      const list = window.ordersList || [];
       if (!container) return;
 
+      syncAssetTabVisibility();
+      if (!isAssetTabUnlocked) return;
+
+      const list = window.ownerProductAssets || [];
       if (!list.length) {
-        container.innerHTML = `<div class="empty">No orders found.</div>`;
+        container.innerHTML = `<div class="empty">Belum ada aset hasil produk.</div>`;
         return;
       }
 
       const frag = document.createDocumentFragment();
-      const table = document.createElement("table");
-      table.innerHTML = `<thead><tr><th>Order</th><th>Product</th><th>Status</th><th>Action</th></tr></thead>`;
-      const tbody = document.createElement("tbody");
+      const grid = document.createElement("div");
+      grid.className = "public-cards";
 
-      list.forEach((item) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${esc(item.order_code || item.id || "Order")}</td>
-          <td>${esc(item.product_title || item.title || "-")}</td>
-          <td>${esc(item.status || "COMPLETED")}</td>
-          <td><button type="button" class="btn btn-delete" onclick="deleteSingleSectionItem('orders', '${esc(item.id)}')">Delete</button></td>
+      list.forEach((asset) => {
+        const thumb = asset.image || buildAssetThumbnailDataUri(asset.title, asset.type || "ASSET");
+        const bullets = Array.isArray(asset.highlights) && asset.highlights.length
+          ? asset.highlights.slice(0, 3)
+          : ["Aset hasil produksi siap pakai", "Format terstruktur JOY CORPORATION", "Akses khusus owner"];
+
+        const card = document.createElement("article");
+        card.className = "pub-card";
+        card.innerHTML = `
+          <div>
+            <img
+              src="${esc(thumb)}"
+              alt="${esc(asset.title || "Asset")}"
+              style="width:100%; height:132px; object-fit:cover; border-radius:9px; border:1px solid rgba(255,255,255,0.2); margin-bottom:10px;"
+            />
+            <div class="pub-meta-top">
+              <span>${esc(asset.type || "ASSET")}</span>
+              <span>${esc(asset.format || "PACKAGE")}</span>
+            </div>
+            <h3 class="pub-title">${esc(asset.title || "Untitled Asset")}</h3>
+            <p class="pub-summary">${esc(asset.summary || "Hasil produk tersimpan di vault owner.")}</p>
+            <ul class="pub-bullets">${bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
+          </div>
+          <div class="pub-footer">
+            <span class="pub-brand-tag">OWNER ASSET</span>
+            <div class="pub-actions">
+              <button type="button" class="btn" style="padding:5px 8px; font-size:11px;" onclick="viewAssetTabDetail('${esc(asset.id)}')">Lihat</button>
+              <button type="button" class="btn btn-copy-data" style="padding:5px 8px; font-size:11px;" onclick="downloadOwnerAsset('${esc(asset.id)}')">Download</button>
+              <button type="button" class="btn btn-delete" style="padding:5px 8px; font-size:11px;" onclick="deleteAssetTabItem('${esc(asset.id)}')">Hapus</button>
+            </div>
+          </div>
         `;
-        tbody.appendChild(tr);
+        grid.appendChild(card);
       });
 
-      table.appendChild(tbody);
-      frag.appendChild(table);
+      frag.appendChild(grid);
       container.innerHTML = "";
       container.appendChild(frag);
     }
@@ -1768,6 +2046,22 @@
       setStoredSupabasePin(DEFAULT_SUPABASE_PIN);
       setAppSessionUnlocked(false);
 
+      if (context === "asset") {
+        isAssetTabUnlocked = false;
+        syncAssetTabVisibility();
+        const assetInput = document.getElementById("assetTabPinInput");
+        const assetErr = document.getElementById("assetTabPinError");
+        if (assetInput) {
+          assetInput.value = "";
+          assetInput.focus();
+        }
+        if (assetErr) {
+          assetErr.style.color = "#15803d";
+          assetErr.textContent = "PIN telah direset ke PIN awal.";
+        }
+        return;
+      }
+
       if (context === "app") {
         const appInput = document.getElementById("appEntryPinInput");
         const appErr = document.getElementById("appEntryPinError");
@@ -2038,7 +2332,7 @@
   <div id="supabasePinModal" class="pin-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pinModalTitle">
     <div class="pin-modal" style="max-width:520px; max-height:88vh; overflow-y:auto;">
       <div class="pin-modal-head">
-        <h2 id="pinModalTitle" class="pin-modal-title">Owner PIN &amp; Product Assets</h2>
+        <h2 id="pinModalTitle" class="pin-modal-title">Kunci &amp; PIN Owner</h2>
         <button type="button" class="btn" onclick="closeSupabasePinModal()">Close</button>
       </div>
 
